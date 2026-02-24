@@ -1,5 +1,9 @@
 # AngularMaterialSignalsJestCypress
 
+[![CI](https://github.com/lucasdev10/Angular-Material-Signals-Jest-Cypress/actions/workflows/ci.yml/badge.svg)](https://github.com/lucasdev10/Angular-Material-Signals-Jest-Cypress/actions/workflows/ci.yml)
+[![Deploy](https://github.com/lucasdev10/Angular-Material-Signals-Jest-Cypress/actions/workflows/deploy.yml/badge.svg)](https://github.com/lucasdev10/Angular-Material-Signals-Jest-Cypress/actions/workflows/deploy.yml)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.2.
 
 ## Development server
@@ -57,3 +61,41 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Code Quality
+
+This project uses:
+- **ESLint** for code linting
+- **Prettier** for code formatting
+- **Husky** for Git hooks
+- **lint-staged** for pre-commit checks
+
+### Available Scripts
+
+```bash
+npm run lint          # Run ESLint
+npm run lint:fix      # Fix ESLint issues
+npm run format        # Format code with Prettier
+npm run format:check  # Check code formatting
+```
+
+## CI/CD Pipeline
+
+The project includes GitHub Actions workflows:
+
+- **CI Pipeline** (`ci.yml`): Runs on every push/PR
+  - Linting and formatting checks
+  - Unit tests
+  - Build verification
+
+- **Deploy Pipeline** (`deploy.yml`): Deploys to GitHub Pages on main branch
+  
+- **PR Checks** (`pr-checks.yml`): Validates pull requests with detailed feedback
+
+### Setting up GitHub Pages
+
+1. Go to repository Settings → Pages
+2. Source: GitHub Actions
+3. The app will be deployed automatically on push to main
+
+Replace `lucasdev10/Angular-Material-Signals-Jest-Cypress` in badges with your GitHub info.
