@@ -36,7 +36,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'dist/angular-material-signals-jest-cypress/browser'
+          path: 'dist/Angular-Material-Signals-Jest-Cypress/browser'
 
       - name: Deploy to GitHub Pages
         id: deployment
