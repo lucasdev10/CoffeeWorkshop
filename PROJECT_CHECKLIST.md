@@ -22,10 +22,10 @@
 
 -   [x] Criar projeto
 -   [x] Configurar ESLint
--   [ ] Configurar Prettier
--   [ ] Configurar Husky (pre-commit)
--   [ ] Configurar alias de imports
--   [ ] Criar estrutura base por feature:
+-   [x] Configurar Prettier
+-   [x] Configurar Husky (pre-commit)
+-   [x] Configurar alias de imports
+-   [x] Criar estrutura base por feature:
 
 /core\
 /shared\
@@ -34,7 +34,7 @@
 /cart\
 /admin
 
--   [ ] Criar README com decisões técnicas
+-   [x] Criar README com decisões técnicas
 
 ------------------------------------------------------------------------
 
