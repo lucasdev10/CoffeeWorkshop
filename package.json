@@ -57,14 +57,14 @@
     "@angular/compiler-cli": "^21.1.0",
     "@angular/material": "^21.1.5",
     "angular-eslint": "21.2.0",
-    "eslint": "^10.0.2",
+    "eslint": "^9.39.3",
     "husky": "^9.1.7",
     "jsdom": "^28.1.0",
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "typescript": "~5.9.2",
-    "typescript-eslint": "8.56.1",
+    "typescript-eslint": "8.50.1",
     "vitest": "^4.0.8"
   }
 }
