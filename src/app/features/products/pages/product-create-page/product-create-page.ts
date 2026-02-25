@@ -1,45 +1,93 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { FieldTree, form, min, required } from '@angular/forms/signals';
-import { ProductForm } from '../../components/product-form/product-form';
-import { IProduct } from '../../models/Product';
-import { ProductService } from '../../services/product';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { CreateProductDto } from '../../models/product.model';
+import { ProductStore } from '../../store/product.store';
 
 @Component({
   selector: 'app-product-create-page',
-  imports: [ProductForm],
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatSnackBarModule,
+  ],
   templateUrl: './product-create-page.html',
   styleUrl: './product-create-page.scss',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductCreatePageComponent {
-  productService = inject(ProductService);
+  private readonly productStore = inject(ProductStore);
+  private readonly router = inject(Router);
+  private readonly snackBar = inject(MatSnackBar);
 
-  productModel = signal<IProduct>({
-    name: '',
-    description: '',
-    price: 0,
+  readonly isSubmitting = signal(false);
+
+  readonly productForm = new FormGroup({
+    name: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(3)],
+    }),
+    description: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(10)],
+    }),
+    price: new FormControl(0, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(0.01)],
+    }),
+    category: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    stock: new FormControl(0, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(0)],
+    }),
   });
 
-  productForm = form(this.productModel, (fieldPath) => {
-    required(fieldPath.name, { message: 'Name coffee is required' });
-    required(fieldPath.description, { message: 'Description is required' });
-    required(fieldPath.price, { message: 'Price is required' });
-    min(fieldPath.price, 1, { message: 'Price must be greater than 1' });
-  });
+  onSubmit(): void {
+    if (this.productForm.invalid) {
+      this.productForm.markAllAsTouched();
+      return;
+    }
 
-  saveProduct(event: FieldTree<unknown, string | number>) {
-    this.productService.addProduct(event().value() as IProduct);
-    this.resetForm();
+    this.isSubmitting.set(true);
+
+    const dto: CreateProductDto = this.productForm.getRawValue();
+
+    this.productStore.createProduct(dto);
+
+    // Simula sucesso após delay do mock
+    setTimeout(() => {
+      this.isSubmitting.set(false);
+      this.snackBar.open('Product created successfully!', 'Close', {
+        duration: 3000,
+      });
+      this.router.navigate(['/product/list']);
+    }, 600);
   }
 
-  resetForm() {
-    this.productModel.set({
-      name: '',
-      description: '',
-      price: 0,
-    });
+  onCancel(): void {
+    this.productForm.reset();
+    this.router.navigate(['/product/list']);
+  }
 
-    this.productForm().reset();
+  getErrorMessage(controlName: string): string {
+    const control = this.productForm.get(controlName);
+    if (!control?.errors || !control.touched) return '';
+
+    if (control.errors['required']) return 'This field is required';
+    if (control.errors['minlength'])
+      return `Minimum ${control.errors['minlength'].requiredLength} characters`;
+    if (control.errors['min']) return `Minimum value is ${control.errors['min'].min}`;
+
+    return '';
   }
 }

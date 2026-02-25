@@ -1,26 +1,27 @@
-import { Component, inject, signal, WritableSignal } from '@angular/core';
-import { CartService } from '@app/features/cart/services/cart';
+import { Component, inject } from '@angular/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { CartStore } from '@app/features/cart/store/cart.store';
 import { ProductCardComponent } from '../../components/product-card/product-card';
-import { IProduct } from '../../models/Product';
-import { ProductService } from '../../services/product';
+import { Product } from '../../models/product.model';
+import { ProductStore } from '../../store/product.store';
 
 @Component({
-  selector: 'app-product-list',
-  imports: [ProductCardComponent],
+  selector: 'app-product-list-page',
+  imports: [ProductCardComponent, MatProgressSpinnerModule],
   templateUrl: './product-list-page.html',
   styleUrl: './product-list-page.scss',
   standalone: true,
 })
 export class ProductListPageComponent {
-  productsService = inject(ProductService);
-  cartService = inject(CartService);
-  products: WritableSignal<IProduct[]> = signal([]);
+  private readonly productStore = inject(ProductStore);
+  private readonly cartStore = inject(CartStore);
 
-  constructor() {
-    this.products.set(this.productsService.getProducts());
-  }
+  // Expõe signals da store para o template
+  readonly products = this.productStore.filteredProducts;
+  readonly isLoading = this.productStore.isLoading;
+  readonly error = this.productStore.error;
 
-  addProductToCart(product: IProduct) {
-    this.cartService.addItemToCart(product);
+  onAddToCart(product: Product): void {
+    this.cartStore.addItem(product, 1);
   }
 }

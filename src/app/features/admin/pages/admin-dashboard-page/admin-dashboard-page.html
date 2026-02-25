@@ -1,0 +1,93 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>
+      <mat-icon>dashboard</mat-icon>
+      Dashboard Administrativo
+    </h1>
+    <p>Visão geral do sistema</p>
+  </div>
+
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon products">
+          <mat-icon>inventory_2</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>{{ totalProducts() }}</h3>
+          <p>Total de Produtos</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon value">
+          <mat-icon>attach_money</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>{{ totalValue() | currency: 'BRL' }}</h3>
+          <p>Valor Total em Estoque</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon warning">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>{{ lowStockProducts() }}</h3>
+          <p>Produtos com Estoque Baixo</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon orders">
+          <mat-icon>shopping_cart</mat-icon>
+        </div>
+        <div class="stat-info">
+          <h3>{{ totalOrders() }}</h3>
+          <p>Itens no Carrinho</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="actions-section">
+    <h2>Ações Rápidas</h2>
+    <div class="actions-grid">
+      <mat-card class="action-card">
+        <mat-card-content>
+          <mat-icon>add_circle</mat-icon>
+          <h3>Novo Produto</h3>
+          <p>Cadastrar um novo produto no sistema</p>
+          <button mat-raised-button color="primary" routerLink="/admin/products/create">
+            Cadastrar
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card">
+        <mat-card-content>
+          <mat-icon>list</mat-icon>
+          <h3>Gerenciar Produtos</h3>
+          <p>Visualizar, editar e remover produtos</p>
+          <button mat-raised-button color="accent" routerLink="/admin/products">Gerenciar</button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card">
+        <mat-card-content>
+          <mat-icon>store</mat-icon>
+          <h3>Ver Loja</h3>
+          <p>Visualizar a loja como cliente</p>
+          <button mat-raised-button routerLink="/products">Ver Loja</button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

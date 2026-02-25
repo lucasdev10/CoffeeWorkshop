@@ -1,9 +1,9 @@
 import { CurrencyPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { IProduct } from '../../models/Product';
+import { Product } from '../../models/product.model';
 
 @Component({
   selector: 'app-product-card',
@@ -14,15 +14,13 @@ import { IProduct } from '../../models/Product';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductCardComponent {
-  @Input() product: IProduct = {
-    name: '',
-    price: 0,
-    description: '',
-  };
+  // Inputs usando signal-based API
+  product = input.required<Product>();
 
-  @Output() addToCart = new EventEmitter<IProduct>();
+  // Outputs usando signal-based API
+  addToCart = output<Product>();
 
-  addProductToCart() {
-    this.addToCart.emit(this.product);
+  onAddToCart(): void {
+    this.addToCart.emit(this.product());
   }
 }

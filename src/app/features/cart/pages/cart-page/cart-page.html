@@ -1,164 +1,177 @@
 <div class="cart-container">
-  <div class="cart-header">
-    <h1 class="cart-title">
-      <mat-icon class="title-icon">shopping_cart</mat-icon>
-      Shopping Cart
-    </h1>
-    <span class="items-count">{{ cartService.cartData()?.items?.length || 0 }}</span>
-  </div>
+  @if (!isEmpty()) {
+    <div class="cart-header">
+      <h1 class="cart-title">
+        <mat-icon class="title-icon">shopping_cart</mat-icon>
+        Shopping Cart
+      </h1>
+      <span class="items-count">{{ itemCount() }} {{ itemCount() === 1 ? 'item' : 'items' }}</span>
+    </div>
 
-  <div class="cart-content">
-    <div class="cart-items">
-      @for (item of cartService.cartData()?.items; track item) {
-        <mat-card class="cart-item" appearance="outlined">
-          <div class="item-wrapper">
-            <div class="item-image-container">
-              <img src="../../../../../assets/images/coffee.jpg" alt="Product" class="item-image" />
+    <div class="cart-content">
+      <!-- Lista de produtos -->
+      <div class="cart-items">
+        @for (item of items(); track item.product.id) {
+          <mat-card class="cart-item" appearance="outlined">
+            <div class="item-wrapper">
+              <div class="item-image-container">
+                <img [src]="item.product.image" [alt]="item.product.name" class="item-image" />
+              </div>
+
+              <div class="item-main">
+                <div class="item-header">
+                  <div class="item-info">
+                    <h3 class="item-name">{{ item.product.name }}</h3>
+                    <p class="item-description">{{ item.product.description }}</p>
+                    <div class="item-meta">
+                      <span class="meta-badge">{{ item.product.category }}</span>
+                    </div>
+                  </div>
+                  <button
+                    mat-icon-button
+                    class="remove-button"
+                    color="warn"
+                    (click)="onRemoveItem(item.product.id)"
+                    aria-label="Remove item"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+
+                <div class="item-footer">
+                  <div class="item-price-section">
+                    <span class="price-label">Unit Price</span>
+                    <span class="price-value">{{ item.product.price | currency }}</span>
+                  </div>
+
+                  <div class="item-quantity-section">
+                    <span class="quantity-label">Quantity</span>
+                    <div class="quantity-controls">
+                      <button
+                        mat-icon-button
+                        class="quantity-btn"
+                        (click)="onDecrement(item.product.id)"
+                      >
+                        <mat-icon>remove</mat-icon>
+                      </button>
+                      <span class="quantity-value">{{ item.quantity }}</span>
+                      <button
+                        mat-icon-button
+                        class="quantity-btn"
+                        (click)="onIncrement(item.product.id)"
+                      >
+                        <mat-icon>add</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="item-subtotal-section">
+                    <span class="subtotal-label">Subtotal</span>
+                    <span class="subtotal-value">{{ item.subtotal | currency }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card>
+        }
+      </div>
+
+      <!-- Resumo do carrinho -->
+      <div class="cart-summary-wrapper">
+        <mat-card class="cart-summary" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="summary-icon">receipt_long</mat-icon>
+              Order Summary
+            </mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="summary-section">
+              <div class="summary-row">
+                <span class="summary-label">Subtotal ({{ itemCount() }} items)</span>
+                <span class="summary-amount">{{ subtotal() | currency }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Shipping</span>
+                @if (hasFreeShipping()) {
+                  <span class="summary-amount shipping">Free</span>
+                } @else {
+                  <span class="summary-amount">{{ shipping() | currency }}</span>
+                }
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Tax (10%)</span>
+                <span class="summary-amount">{{ tax() | currency }}</span>
+              </div>
             </div>
 
-            <div class="item-main">
-              <div class="item-header">
-                <div class="item-info">
-                  <h3 class="item-name">{{ item.product.name }}</h3>
-                  <p class="item-description">{{ item.product.description }}</p>
-                  <div class="item-meta">
-                    <span class="meta-badge">In Stock</span>
-                    <span class="meta-text">ID: {{ item.product.id }}</span>
-                  </div>
-                </div>
-                <button
-                  mat-icon-button
-                  class="remove-button"
-                  color="warn"
-                  aria-label="Remove item"
-                  (click)="deleteProduct(item.product.id || '')"
-                >
-                  <mat-icon>close</mat-icon>
-                </button>
+            <mat-divider></mat-divider>
+
+            <div class="summary-total">
+              <span class="total-label">Total</span>
+              <div class="total-amount-wrapper">
+                <span class="total-currency">USD</span>
+                <span class="total-amount">{{ total() | currency }}</span>
               </div>
+            </div>
 
-              <div class="item-footer">
-                <div class="item-price-section">
-                  <span class="price-label">Unit Price</span>
-                  <span class="price-value">{{ item.price | currency }}</span>
-                </div>
-
-                <div class="item-quantity-section">
-                  <span class="quantity-label">Quantity</span>
-                  <div class="quantity-controls">
-                    <button mat-icon-button class="quantity-btn">
-                      <mat-icon>remove</mat-icon>
-                    </button>
-                    <mat-form-field appearance="outline" class="quantity-field">
-                      <input
-                        matInput
-                        type="number"
-                        [value]="item.quantity"
-                        min="1"
-                        (change)="updateItemQuantity($event, item.product.id || '')"
-                      />
-                    </mat-form-field>
-                    <button mat-icon-button class="quantity-btn">
-                      <mat-icon>add</mat-icon>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="item-subtotal-section">
-                  <span class="subtotal-label">Subtotal</span>
-                  <span class="subtotal-value">{{ item.price | currency }}</span>
-                </div>
+            @if (!hasFreeShipping()) {
+              <div class="free-shipping-notice">
+                <mat-icon>local_shipping</mat-icon>
+                <span>Add {{ 100 - subtotal() | currency }} more for free shipping!</span>
               </div>
+            }
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button
+              mat-raised-button
+              color="primary"
+              class="checkout-button"
+              (click)="onCheckout()"
+            >
+              <mat-icon>lock</mat-icon>
+              Secure Checkout
+            </button>
+            <button mat-stroked-button class="continue-button" (click)="onContinueShopping()">
+              <mat-icon>arrow_back</mat-icon>
+              Continue Shopping
+            </button>
+          </mat-card-actions>
+
+          <div class="trust-badges">
+            <div class="badge-item">
+              <mat-icon>verified_user</mat-icon>
+              <span>Secure Payment</span>
+            </div>
+            <div class="badge-item">
+              <mat-icon>local_shipping</mat-icon>
+              <span>Free Shipping</span>
             </div>
           </div>
         </mat-card>
-      }
-    </div>
-
-    <div class="cart-summary-wrapper">
-      <mat-card class="cart-summary" appearance="outlined">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon class="summary-icon">receipt_long</mat-icon>
-            Order Summary
-          </mat-card-title>
-        </mat-card-header>
-
-        <mat-card-content>
-          <div class="summary-section">
-            <div class="summary-row">
-              <span class="summary-label"
-                >Subtotal ({{ cartService.cartData()?.items?.length || 0 }} items)</span
-              >
-              <span class="summary-amount">{{ cartService.cartData()?.total | currency }}</span>
-            </div>
-            <!-- <div class="summary-row">
-              <span class="summary-label">Shipping</span>
-              <span class="summary-amount shipping">Free</span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">Tax (10%)</span>
-              <span class="summary-amount">$21.00</span>
-            </div> -->
-          </div>
-
-          <mat-divider></mat-divider>
-
-          <div class="summary-total">
-            <span class="total-label">Total</span>
-            <div class="total-amount-wrapper">
-              <span class="total-currency">USD</span>
-              <span class="total-amount">{{ cartService.cartData()?.total | currency }}</span>
-            </div>
-          </div>
-
-          <!-- <div class="promo-section">
-            <mat-form-field appearance="outline" class="promo-field">
-              <mat-label>Promo Code</mat-label>
-              <input matInput placeholder="Enter code" />
-              <button mat-icon-button matSuffix>
-                <mat-icon>local_offer</mat-icon>
-              </button>
-            </mat-form-field>
-          </div> -->
-        </mat-card-content>
-
-        <mat-card-actions>
-          <button mat-raised-button color="primary" class="checkout-button">
-            <mat-icon>lock</mat-icon>
-            Secure Checkout
-          </button>
-          <button mat-stroked-button class="continue-button">
-            <mat-icon>arrow_back</mat-icon>
-            Continue Shopping
-          </button>
-        </mat-card-actions>
-
-        <div class="trust-badges">
-          <div class="badge-item">
-            <mat-icon>verified_user</mat-icon>
-            <span>Secure Payment</span>
-          </div>
-          <div class="badge-item">
-            <mat-icon>local_shipping</mat-icon>
-            <span>Free Shipping</span>
-          </div>
-        </div>
-      </mat-card>
-    </div>
-  </div>
-
-  <div class="empty-cart" style="display: none">
-    <div class="empty-content">
-      <div class="empty-icon-wrapper">
-        <mat-icon class="empty-icon">shopping_cart</mat-icon>
       </div>
-      <h2 class="empty-title">Your cart is empty</h2>
-      <p class="empty-description">Looks like you haven't added anything to your cart yet</p>
-      <button mat-raised-button color="primary" class="start-shopping-button">
-        <mat-icon>storefront</mat-icon>
-        Start Shopping
-      </button>
     </div>
-  </div>
+  } @else {
+    <!-- Carrinho vazio -->
+    <div class="empty-cart">
+      <div class="empty-content">
+        <div class="empty-icon-wrapper">
+          <mat-icon class="empty-icon">shopping_cart</mat-icon>
+        </div>
+        <h2 class="empty-title">Your cart is empty</h2>
+        <p class="empty-description">Looks like you haven't added anything to your cart yet</p>
+        <button
+          mat-raised-button
+          color="primary"
+          class="start-shopping-button"
+          (click)="onContinueShopping()"
+        >
+          <mat-icon>storefront</mat-icon>
+          Start Shopping
+        </button>
+      </div>
+    </div>
+  }
 </div>

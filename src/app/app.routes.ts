@@ -1,9 +1,15 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/product', pathMatch: 'full' },
+  { path: '', redirectTo: '/products', pathMatch: 'full' },
   {
-    path: 'product',
+    path: 'auth',
+    loadChildren: () => import('./features/auth/auth.routes').then((r) => r.authRoutes),
+  },
+  {
+    path: 'products',
     loadChildren: () => import('./features/products/products.route').then((r) => r.PRODUCT_ROUTES),
   },
   {
@@ -11,5 +17,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/cart/pages/cart-page/cart-page').then((c) => c.CartPage),
   },
-  { path: '**', redirectTo: '/product' },
+  {
+    path: 'admin',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] },
+    loadChildren: () => import('./features/admin/admin.routes').then((r) => r.adminRoutes),
+  },
+  { path: '**', redirectTo: '/products' },
 ];

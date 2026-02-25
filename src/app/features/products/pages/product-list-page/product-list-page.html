@@ -1,7 +1,28 @@
-<section class="product-list">
-  @for (item of products(); track item) {
-    <app-product-card [product]="item" (addToCart)="addProductToCart($event)"></app-product-card>
-  } @empty {
-    <p>No records found</p>
+<div class="product-list-container">
+  <h1 class="page-title">Our Products</h1>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Loading products...</p>
+    </div>
   }
-</section>
+
+  @if (error()) {
+    <div class="error-container">
+      <p class="error-message">{{ error() }}</p>
+    </div>
+  }
+
+  @if (!isLoading() && !error()) {
+    <div class="products-grid">
+      @for (product of products(); track product.id) {
+        <app-product-card [product]="product" (addToCart)="onAddToCart($event)" />
+      } @empty {
+        <div class="empty-state">
+          <p>No products found</p>
+        </div>
+      }
+    </div>
+  }
+</div>
