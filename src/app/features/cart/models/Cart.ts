@@ -2,9 +2,9 @@ import { IProduct } from '@app/features/products/models/Product';
 
 export interface ICartService {
   addItemToCart(product: IProduct): void;
-  removeItemFromCart(productId: number): Promise<void>;
-  updateItemQuantity(productId: number, quantity: number): Promise<void>;
-  calculateCartTotal(): Promise<ICart>;
+  removeItemFromCart(productId: string): void;
+  updateItemQuantity(productId: string, quantity: number): void;
+  calculateCartTotal(): ICart | null;
 }
 
 export interface ICart {
@@ -13,7 +13,7 @@ export interface ICart {
 }
 
 export interface ICartItem {
-  productId: number;
+  product: IProduct;
   quantity: number;
   price: number;
 }

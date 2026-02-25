@@ -12,8 +12,15 @@
     </li>
   </ul>
 
-  <button class="shopping-cart-button" matIconButton aria-label="Shopping cart">
+  <button
+    class="shopping-cart-button"
+    matIconButton
+    aria-label="Shopping cart"
+    [routerLink]="['/cart']"
+  >
     <mat-icon>shopping_cart</mat-icon>
-    <span class="cart-count-badge">{{ cartService.products().length }}</span>
+    @if (cartService.cartData()?.items?.length) {
+      <span class="cart-count-badge">{{ cartService.cartData()?.items?.length }}</span>
+    }
   </button>
 </mat-toolbar>
