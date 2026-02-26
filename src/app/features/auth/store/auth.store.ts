@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { StorageService } from '@app/core/storage/storage';
-import { LoginCredentials, User, UserRole } from '../models/auth.model';
+import { ILoginCredentials, IUser, IUserRole } from '../models/auth.model';
 import { AuthRepository } from '../repositories/auth.repository';
 
 /**
@@ -17,7 +17,7 @@ export class AuthStore {
   private readonly router = inject(Router);
 
   // State
-  private readonly userState = signal<User | null>(null);
+  private readonly userState = signal<IUser | null>(null);
   private readonly tokenState = signal<string | null>(null);
   private readonly loadingState = signal<boolean>(false);
   private readonly errorState = signal<string | null>(null);
@@ -28,7 +28,7 @@ export class AuthStore {
   readonly isLoading = computed(() => this.loadingState());
   readonly error = computed(() => this.errorState());
   readonly isAuthenticated = computed(() => !!this.userState() && !!this.tokenState());
-  readonly isAdmin = computed(() => this.userState()?.role === UserRole.ADMIN);
+  readonly isAdmin = computed(() => this.userState()?.role === IUserRole.ADMIN);
 
   constructor() {
     this.initializeAuth();
@@ -39,7 +39,7 @@ export class AuthStore {
    */
   private initializeAuth(): void {
     const token = this.storage.get('auth_token') as string | null;
-    const user = this.storage.get('auth_user') as User | null;
+    const user = this.storage.get('auth_user') as IUser | null;
 
     if (token && user) {
       this.tokenState.set(token);
@@ -50,7 +50,7 @@ export class AuthStore {
   /**
    * Realiza login
    */
-  login(credentials: LoginCredentials): void {
+  login(credentials: ILoginCredentials): void {
     this.loadingState.set(true);
     this.errorState.set(null);
 
@@ -66,7 +66,7 @@ export class AuthStore {
         this.loadingState.set(false);
 
         // Redireciona baseado no role
-        if (response.user.role === UserRole.ADMIN) {
+        if (response.user.role === IUserRole.ADMIN) {
           this.router.navigate(['/admin']);
         } else {
           this.router.navigate(['/products']);

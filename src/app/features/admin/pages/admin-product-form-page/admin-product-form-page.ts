@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CreateProductDto } from '@app/features/products/models/product.model';
+import { ICreateProductDto } from '@app/features/products/models/product.model';
 import { ProductStore } from '@app/features/products/store/product.store';
 import { FormError } from '@app/shared';
 
@@ -106,7 +106,7 @@ export class AdminProductFormPageComponent {
     if (this.isEditMode() && this.productId()) {
       this.productStore.updateProduct(this.productId()!, formValue);
     } else {
-      const newProduct: CreateProductDto = formValue;
+      const newProduct: ICreateProductDto = formValue;
       this.productStore.createProduct(newProduct);
     }
 

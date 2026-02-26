@@ -1,6 +1,6 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Product, ProductFilters } from '../models/product.model';
+import { IProduct, IProductFilters } from '../models/product.model';
 import { ProductRepository } from '../repositories/product.repository';
 
 /**
@@ -11,10 +11,10 @@ export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 /**
  * Estado da store de produtos
  */
-interface ProductState {
-  products: Product[];
-  selectedProduct: Product | null;
-  filters: ProductFilters;
+interface IProductState {
+  products: IProduct[];
+  selectedProduct: IProduct | null;
+  filters: IProductFilters;
   loading: LoadingState;
   error: string | null;
 }
@@ -32,7 +32,7 @@ export class ProductStore {
   private readonly destroyRef = inject(DestroyRef);
 
   // Estado privado (writable signals)
-  private readonly state = signal<ProductState>({
+  private readonly state = signal<IProductState>({
     products: [],
     selectedProduct: null,
     filters: {},
@@ -184,7 +184,7 @@ export class ProductStore {
       });
   }
 
-  updateProduct(id: string, dto: Partial<Product>): void {
+  updateProduct(id: string, dto: Partial<IProduct>): void {
     this.setLoading('loading');
 
     this.repository
@@ -237,7 +237,7 @@ export class ProductStore {
       });
   }
 
-  setFilters(filters: ProductFilters): void {
+  setFilters(filters: IProductFilters): void {
     this.state.update((state) => ({
       ...state,
       filters: { ...state.filters, ...filters },

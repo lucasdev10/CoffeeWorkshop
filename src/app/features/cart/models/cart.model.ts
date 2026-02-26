@@ -1,10 +1,10 @@
-import { Product } from '@app/features/products/models/product.model';
+import { IProduct } from '@app/features/products/models/product.model';
 
 /**
  * Item do carrinho
  */
-export interface CartItem {
-  product: Product;
+export interface ICartItem {
+  product: IProduct;
   quantity: number;
   subtotal: number; // price * quantity
 }
@@ -12,8 +12,8 @@ export interface CartItem {
 /**
  * Carrinho de compras
  */
-export interface Cart {
-  items: CartItem[];
+export interface ICart {
+  items: ICartItem[];
   subtotal: number;
   shipping: number;
   tax: number;
@@ -24,7 +24,7 @@ export interface Cart {
 /**
  * DTO para adicionar item ao carrinho
  */
-export interface AddToCartDto {
+export interface IAddToCartDto {
   productId: string;
   quantity: number;
 }
@@ -32,7 +32,7 @@ export interface AddToCartDto {
 /**
  * DTO para atualizar quantidade
  */
-export interface UpdateCartItemDto {
+export interface IUpdateCartItemDto {
   productId: string;
   quantity: number;
 }

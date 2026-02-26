@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { Product } from '../../models/product.model';
+import { IProduct } from '../../models/product.model';
 
 @Component({
   selector: 'app-product-card',
@@ -15,10 +15,10 @@ import { Product } from '../../models/product.model';
 })
 export class ProductCardComponent {
   // Inputs usando signal-based API
-  product = input.required<Product>();
+  product = input.required<IProduct>();
 
   // Outputs usando signal-based API
-  addToCart = output<Product>();
+  addToCart = output<IProduct>();
 
   onAddToCart(): void {
     this.addToCart.emit(this.product());

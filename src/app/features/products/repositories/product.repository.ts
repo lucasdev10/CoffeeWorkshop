@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { MockDataService } from '@app/core/data/mock-data.service';
 import { Observable } from 'rxjs';
-import { CreateProductDto, Product, UpdateProductDto } from '../models/product.model';
+import { ICreateProductDto, IProduct, IUpdateProductDto } from '../models/product.model';
 
 /**
  * Repository Pattern para Products
@@ -17,22 +17,22 @@ export class ProductRepository {
   /**
    * Busca todos os produtos
    */
-  findAll(): Observable<Product[]> {
-    return this.mockData.get<Product[]>(this.COLLECTION_KEY);
+  findAll(): Observable<IProduct[]> {
+    return this.mockData.get<IProduct[]>(this.COLLECTION_KEY);
   }
 
   /**
    * Busca produto por ID
    */
-  findById(id: string): Observable<Product> {
-    return this.mockData.getById<Product>(this.COLLECTION_KEY, id);
+  findById(id: string): Observable<IProduct> {
+    return this.mockData.getById<IProduct>(this.COLLECTION_KEY, id);
   }
 
   /**
    * Cria novo produto
    */
-  create(dto: CreateProductDto): Observable<Product> {
-    const product: Partial<Product> = {
+  create(dto: ICreateProductDto): Observable<IProduct> {
+    const product: Partial<IProduct> = {
       ...dto,
       image: dto.image || '/assets/images/coffee.jpg',
       rating: 0,
@@ -40,19 +40,19 @@ export class ProductRepository {
       updatedAt: new Date(),
     };
 
-    return this.mockData.post<Product>(this.COLLECTION_KEY, product as Product);
+    return this.mockData.post<IProduct>(this.COLLECTION_KEY, product as IProduct);
   }
 
   /**
    * Atualiza produto existente
    */
-  update(id: string, dto: UpdateProductDto): Observable<Product> {
-    const updateData: Partial<Product> = {
+  update(id: string, dto: IUpdateProductDto): Observable<IProduct> {
+    const updateData: Partial<IProduct> = {
       ...dto,
       updatedAt: new Date(),
     };
 
-    return this.mockData.put<Product>(this.COLLECTION_KEY, id, updateData as Product);
+    return this.mockData.put<IProduct>(this.COLLECTION_KEY, id, updateData as IProduct);
   }
 
   /**

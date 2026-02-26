@@ -1,7 +1,7 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { StorageService } from '@app/core/storage/storage';
-import { Product } from '@app/features/products/models/product.model';
-import { Cart, CartItem } from '../models/cart.model';
+import { IProduct } from '@app/features/products/models/product.model';
+import { ICart, ICartItem } from '../models/cart.model';
 
 /**
  * Store do carrinho usando Signals
@@ -11,7 +11,7 @@ import { Cart, CartItem } from '../models/cart.model';
   providedIn: 'root',
 })
 export class CartStore {
-  private readonly storage = inject(StorageService<Cart>);
+  private readonly storage = inject(StorageService<ICart>);
   private readonly STORAGE_KEY = 'cart';
 
   // Taxas e configurações
@@ -20,7 +20,7 @@ export class CartStore {
   private readonly SHIPPING_COST = 10;
 
   // Estado privado
-  private readonly state = signal<Cart>(this.loadFromStorage());
+  private readonly state = signal<ICart>(this.loadFromStorage());
 
   // Selectores públicos
   readonly items = computed(() => this.state().items);
@@ -45,11 +45,11 @@ export class CartStore {
    * Actions
    */
 
-  addItem(product: Product, quantity = 1): void {
+  addItem(product: IProduct, quantity = 1): void {
     const currentItems = this.items();
     const existingItemIndex = currentItems.findIndex((item) => item.product.id === product.id);
 
-    let updatedItems: CartItem[];
+    let updatedItems: ICartItem[];
 
     if (existingItemIndex !== -1) {
       // Atualiza quantidade do item existente
@@ -64,7 +64,7 @@ export class CartStore {
       );
     } else {
       // Adiciona novo item
-      const newItem: CartItem = {
+      const newItem: ICartItem = {
         product,
         quantity,
         subtotal: product.price * quantity,
@@ -121,7 +121,7 @@ export class CartStore {
    * Helpers privados
    */
 
-  private updateCart(items: CartItem[]): void {
+  private updateCart(items: ICartItem[]): void {
     const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
     const shipping = subtotal >= this.SHIPPING_THRESHOLD ? 0 : this.SHIPPING_COST;
     const tax = subtotal * this.TAX_RATE;
@@ -138,7 +138,7 @@ export class CartStore {
     });
   }
 
-  private loadFromStorage(): Cart {
+  private loadFromStorage(): ICart {
     try {
       const stored = this.storage.get(this.STORAGE_KEY);
       return (
@@ -167,7 +167,7 @@ export class CartStore {
    * Query helpers
    */
 
-  getItemByProductId(productId: string): CartItem | undefined {
+  getItemByProductId(productId: string): ICartItem | undefined {
     return this.items().find((item) => item.product.id === productId);
   }
 

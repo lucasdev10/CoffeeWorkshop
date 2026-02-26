@@ -1,7 +1,7 @@
 /**
  * Modelo de domínio para Produto
  */
-export interface Product {
+export interface IProduct {
   id: string;
   name: string;
   description: string;
@@ -17,7 +17,7 @@ export interface Product {
 /**
  * DTO para criação de produto (sem campos gerados automaticamente)
  */
-export interface CreateProductDto {
+export interface ICreateProductDto {
   name: string;
   description: string;
   price: number;
@@ -29,7 +29,7 @@ export interface CreateProductDto {
 /**
  * DTO para atualização de produto (todos os campos opcionais)
  */
-export interface UpdateProductDto {
+export interface IUpdateProductDto {
   name?: string;
   description?: string;
   price?: number;
@@ -41,7 +41,7 @@ export interface UpdateProductDto {
 /**
  * Filtros para busca de produtos
  */
-export interface ProductFilters {
+export interface IProductFilters {
   category?: string;
   minPrice?: number;
   maxPrice?: number;

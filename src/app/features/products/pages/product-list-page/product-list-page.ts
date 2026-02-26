@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CartStore } from '@app/features/cart/store/cart.store';
 import { ProductCardComponent } from '../../components/product-card/product-card';
-import { Product } from '../../models/product.model';
+import { IProduct } from '../../models/product.model';
 import { ProductStore } from '../../store/product.store';
 
 @Component({
@@ -11,6 +11,7 @@ import { ProductStore } from '../../store/product.store';
   templateUrl: './product-list-page.html',
   styleUrl: './product-list-page.scss',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductListPageComponent {
   private readonly productStore = inject(ProductStore);
@@ -21,7 +22,7 @@ export class ProductListPageComponent {
   readonly isLoading = this.productStore.isLoading;
   readonly error = this.productStore.error;
 
-  onAddToCart(product: Product): void {
+  onAddToCart(product: IProduct): void {
     this.cartStore.addItem(product, 1);
   }
 }

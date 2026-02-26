@@ -8,7 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
-import { Product } from '@app/features/products/models/product.model';
+import { IProduct } from '@app/features/products/models/product.model';
 import { ProductStore } from '@app/features/products/store/product.store';
 import { ConfirmDialogComponent } from '@app/shared/components/confirm-dialog/confirm-dialog';
 
@@ -45,11 +45,11 @@ export class AdminProductsPageComponent {
     this.productStore.loadProducts();
   }
 
-  onEdit(product: Product): void {
+  onEdit(product: IProduct): void {
     this.router.navigate(['/admin/products/edit', product.id]);
   }
 
-  onDelete(product: Product): void {
+  onDelete(product: IProduct): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: 'Confirm Deletion',

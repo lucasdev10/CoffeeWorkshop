@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, delay, of, throwError } from 'rxjs';
-import { AuthResponse, LoginCredentials, User, UserRole } from '../models/auth.model';
+import { IAuthResponse, ILoginCredentials, IUser, IUserRole } from '../models/auth.model';
 
 /**
  * Repository para autenticação
@@ -17,23 +17,23 @@ export class AuthRepository {
       email: 'admin@admin.com',
       password: 'admin123',
       name: 'Admin User',
-      role: UserRole.ADMIN,
+      role: IUserRole.ADMIN,
     },
     {
       id: '2',
       email: 'user@user.com',
       password: 'user123',
       name: 'Regular User',
-      role: UserRole.USER,
+      role: IUserRole.USER,
     },
   ];
 
   /**
    * Realiza login
    */
-  login(credentials: LoginCredentials): Observable<AuthResponse> {
+  login(credentials: ILoginCredentials): Observable<IAuthResponse> {
     // Simula delay de rede
-    return new Observable<AuthResponse>((observer) => {
+    return new Observable<IAuthResponse>((observer) => {
       setTimeout(() => {
         const user = this.mockUsers.find(
           (u) => u.email === credentials.email && u.password === credentials.password,
@@ -45,7 +45,7 @@ export class AuthRepository {
         }
 
         const { ...userWithoutPassword } = user;
-        const response: AuthResponse = {
+        const response: IAuthResponse = {
           user: userWithoutPassword,
           token: `mock-jwt-token-${user.id}`,
           refreshToken: `mock-refresh-token-${user.id}`,
@@ -67,9 +67,9 @@ export class AuthRepository {
   /**
    * Valida token
    */
-  validateToken(token: string): Observable<User> {
+  validateToken(token: string): Observable<IUser> {
     // Simula validação de token
-    return new Observable<User>((observer) => {
+    return new Observable<IUser>((observer) => {
       setTimeout(() => {
         if (!token || !token.startsWith('mock-jwt-token-')) {
           observer.error({ message: 'Token inválido' });
@@ -94,7 +94,7 @@ export class AuthRepository {
   /**
    * Refresh token
    */
-  refreshToken(): Observable<AuthResponse> {
+  refreshToken(): Observable<IAuthResponse> {
     return throwError(() => ({ message: 'Not implemented' }));
   }
 }

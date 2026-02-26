@@ -1,18 +1,18 @@
 /**
  * Modelo de usuário
  */
-export interface User {
+export interface IUser {
   id: string;
   email: string;
   name: string;
-  role: UserRole;
+  role: IUserRole;
   avatar?: string;
 }
 
 /**
  * Roles de usuário
  */
-export enum UserRole {
+export enum IUserRole {
   ADMIN = 'ADMIN',
   USER = 'USER',
 }
@@ -20,7 +20,7 @@ export enum UserRole {
 /**
  * Credenciais de login
  */
-export interface LoginCredentials {
+export interface ILoginCredentials {
   email: string;
   password: string;
 }
@@ -28,8 +28,8 @@ export interface LoginCredentials {
 /**
  * Resposta de autenticação
  */
-export interface AuthResponse {
-  user: User;
+export interface IAuthResponse {
+  user: IUser;
   token: string;
   refreshToken?: string;
 }
@@ -37,8 +37,8 @@ export interface AuthResponse {
 /**
  * Estado de autenticação
  */
-export interface AuthState {
-  user: User | null;
+export interface IAuthState {
+  user: IUser | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
