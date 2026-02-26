@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { IHttpService } from '@app/core/http/models/Http';
+import { IHttpService } from '@app/shared/models/http.model';
 import { Observable } from 'rxjs';
 import { StorageService } from '../storage/storage';
 

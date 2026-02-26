@@ -18,6 +18,7 @@ export * from './interceptors/loading.interceptor';
 export * from './handlers/global-error.handler';
 
 // Services
+export * from '../shared/models/storage.model';
 export * from './data/mock-data.service';
 export * from './services/analytics.service';
 export * from './services/api.service';
@@ -27,7 +28,6 @@ export * from './services/notification.service';
 export * from './services/performance.service';
 export * from './services/seo.service';
 export * from './services/theme.service';
-export * from './storage/storage';
 
 // Config
 export * from './config/app.constants';
