@@ -1,21 +1,4 @@
-/**
- * Modelo de usuário
- */
-export interface IUser {
-  id: string;
-  email: string;
-  name: string;
-  role: IUserRole;
-  avatar?: string;
-}
-
-/**
- * Roles de usuário
- */
-export enum IUserRole {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
-}
+import { IUser } from '@app/features/user/models/user.model';
 
 /**
  * Credenciais de login

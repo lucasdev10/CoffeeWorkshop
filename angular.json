@@ -14,18 +14,24 @@
           "style": "scss",
           "standalone": true,
           "changeDetection": "OnPush",
-          "flat": false
+          "flat": false,
+          "skipTests": false,
+          "inlineStyle": false,
+          "inlineTemplate": false
         },
         "@schematics/angular:service": {
-          "flat": false
+          "flat": false,
+          "skipTests": false
         },
         "@schematics/angular:directive": {
           "standalone": true,
-          "flat": false
+          "flat": false,
+          "skipTests": false
         },
         "@schematics/angular:pipe": {
           "standalone": true,
-          "flat": false
+          "flat": false,
+          "skipTests": false
         }
       },
       "root": "",

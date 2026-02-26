@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
-import { Observable, delay, of, throwError } from 'rxjs';
-import { IAuthResponse, ILoginCredentials, IUser, IUserRole } from '../models/auth.model';
+import { inject, Injectable } from '@angular/core';
+import { HttpService } from '@app/core/http/http';
+import { IUser } from '@app/features/user/models/user.model';
+import { delay, firstValueFrom, Observable, of, throwError } from 'rxjs';
+import { IAuthResponse, ILoginCredentials } from '../models/auth.model';
 
 /**
  * Repository para autenticação
@@ -10,23 +12,7 @@ import { IAuthResponse, ILoginCredentials, IUser, IUserRole } from '../models/au
   providedIn: 'root',
 })
 export class AuthRepository {
-  // Mock de usuários (substituir por API real)
-  private readonly mockUsers = [
-    {
-      id: '1',
-      email: 'admin@admin.com',
-      password: 'admin123',
-      name: 'Admin User',
-      role: IUserRole.ADMIN,
-    },
-    {
-      id: '2',
-      email: 'user@user.com',
-      password: 'user123',
-      name: 'Regular User',
-      role: IUserRole.USER,
-    },
-  ];
+  private readonly http = inject(HttpService);
 
   /**
    * Realiza login
@@ -34,13 +20,14 @@ export class AuthRepository {
   login(credentials: ILoginCredentials): Observable<IAuthResponse> {
     // Simula delay de rede
     return new Observable<IAuthResponse>((observer) => {
-      setTimeout(() => {
-        const user = this.mockUsers.find(
+      setTimeout(async () => {
+        const users = await firstValueFrom(this.http.get<IUser[]>('users'));
+        const user = users.find(
           (u) => u.email === credentials.email && u.password === credentials.password,
         );
 
         if (!user) {
-          observer.error({ message: 'Email ou senha inválidos' });
+          observer.error({ message: 'Invalid email or password' });
           return;
         }
 
@@ -70,17 +57,18 @@ export class AuthRepository {
   validateToken(token: string): Observable<IUser> {
     // Simula validação de token
     return new Observable<IUser>((observer) => {
-      setTimeout(() => {
+      setTimeout(async () => {
         if (!token || !token.startsWith('mock-jwt-token-')) {
           observer.error({ message: 'Token inválido' });
           return;
         }
 
         const userId = token.replace('mock-jwt-token-', '');
-        const user = this.mockUsers.find((u) => u.id === userId);
+        const users = await firstValueFrom(this.http.get<IUser[]>('users'));
+        const user = users.find((u) => u.id === userId);
 
         if (!user) {
-          observer.error({ message: 'Usuário não encontrado' });
+          observer.error({ message: 'User not found' });
           return;
         }
 

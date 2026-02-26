@@ -1,0 +1,28 @@
+{
+  "defaults": {
+    "component": {
+      "flat": false,
+      "spec": true,
+      "inlineStyle": false,
+      "inlineTemplate": false,
+      "changeDetection": "OnPush",
+      "style": "scss",
+      "skipTests": false,
+      "standalone": true
+    },
+    "directive": {
+      "flat": false,
+      "spec": true,
+      "standalone": true
+    },
+    "pipe": {
+      "flat": false,
+      "spec": true,
+      "standalone": true
+    },
+    "service": {
+      "flat": false,
+      "spec": true
+    }
+  }
+}

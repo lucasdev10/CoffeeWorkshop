@@ -1,0 +1,22 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { UserFormPageComponent } from './user-form-page';
+
+describe('UserFormPageComponent', () => {
+  let component: UserFormPageComponent;
+  let fixture: ComponentFixture<UserFormPageComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [UserFormPageComponent],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(UserFormPageComponent);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

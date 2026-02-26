@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { MockDataService } from '@app/core/data/mock-data.service';
+import { HttpService } from '@app/core/http/http';
 import { Observable } from 'rxjs';
 import { ICreateProductDto, IProduct, IUpdateProductDto } from '../models/product.model';
 
@@ -11,21 +11,21 @@ import { ICreateProductDto, IProduct, IUpdateProductDto } from '../models/produc
   providedIn: 'root',
 })
 export class ProductRepository {
-  private readonly mockData = inject(MockDataService);
+  private readonly http = inject(HttpService);
   private readonly COLLECTION_KEY = 'products';
 
   /**
    * Busca todos os produtos
    */
   findAll(): Observable<IProduct[]> {
-    return this.mockData.get<IProduct[]>(this.COLLECTION_KEY);
+    return this.http.get<IProduct[]>(this.COLLECTION_KEY);
   }
 
   /**
    * Busca produto por ID
    */
   findById(id: string): Observable<IProduct> {
-    return this.mockData.getById<IProduct>(this.COLLECTION_KEY, id);
+    return this.http.getById<IProduct>(this.COLLECTION_KEY, id);
   }
 
   /**
@@ -40,7 +40,7 @@ export class ProductRepository {
       updatedAt: new Date(),
     };
 
-    return this.mockData.post<IProduct>(this.COLLECTION_KEY, product as IProduct);
+    return this.http.post<IProduct>(this.COLLECTION_KEY, product as IProduct);
   }
 
   /**
@@ -52,13 +52,13 @@ export class ProductRepository {
       updatedAt: new Date(),
     };
 
-    return this.mockData.put<IProduct>(this.COLLECTION_KEY, id, updateData as IProduct);
+    return this.http.put<IProduct>(this.COLLECTION_KEY, id, updateData as IProduct);
   }
 
   /**
    * Remove produto
    */
   delete(id: string): Observable<void> {
-    return this.mockData.delete(this.COLLECTION_KEY, id);
+    return this.http.delete(this.COLLECTION_KEY, id);
   }
 }

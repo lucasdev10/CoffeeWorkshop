@@ -1,7 +1,8 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { StorageService } from '@app/core/storage/storage';
-import { ILoginCredentials, IUser, IUserRole } from '../models/auth.model';
+import { IUser, IUserRole } from '@app/features/user/models/user.model';
+import { ILoginCredentials } from '../models/auth.model';
 import { AuthRepository } from '../repositories/auth.repository';
 
 /**
