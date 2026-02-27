@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpService } from './http';
 
 describe('HttpService', () => {
-  let service: HttpService<unknown>;
+  let service: HttpService<{ id?: string }>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
