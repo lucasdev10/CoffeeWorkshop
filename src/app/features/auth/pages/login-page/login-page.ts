@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RouterLink } from '@angular/router';
 import { FormError } from '@app/shared';
 import { AuthStore } from '../../store/auth.store';
 
@@ -22,6 +23,7 @@ import { AuthStore } from '../../store/auth.store';
     MatProgressSpinnerModule,
     FormError,
     FormField,
+    RouterLink,
   ],
   templateUrl: './login-page.html',
   styleUrl: './login-page.scss',

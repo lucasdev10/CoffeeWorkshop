@@ -77,8 +77,16 @@ form {
   }
 }
 
+.register-user {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
 .demo-credentials {
-  margin-top: 2rem;
+  margin-top: 1rem;
   padding: 1rem;
   background-color: #f5f5f5;
   border-radius: 4px;

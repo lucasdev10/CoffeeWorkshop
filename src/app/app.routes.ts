@@ -9,6 +9,10 @@ export const routes: Routes = [
     loadChildren: () => import('./features/auth/auth.routes').then((r) => r.AUTH_ROUTES),
   },
   {
+    path: 'user',
+    loadChildren: () => import('./features/user/user.route').then((r) => r.USER_ROUTES),
+  },
+  {
     path: 'products',
     loadChildren: () => import('./features/products/products.route').then((r) => r.PRODUCT_ROUTES),
   },

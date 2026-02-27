@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { StorageService } from '@app/core/storage/storage';
-import { IUser, IUserRole } from '@app/features/user/models/user.model';
+import { EUserRole, IUser } from '@app/features/user/models/user.model';
 import { ILoginCredentials } from '../models/auth.model';
 import { AuthRepository } from '../repositories/auth.repository';
 
@@ -29,7 +29,7 @@ export class AuthStore {
   readonly isLoading = computed(() => this.loadingState());
   readonly error = computed(() => this.errorState());
   readonly isAuthenticated = computed(() => !!this.userState() && !!this.tokenState());
-  readonly isAdmin = computed(() => this.userState()?.role === IUserRole.ADMIN);
+  readonly isAdmin = computed(() => this.userState()?.role === EUserRole.ADMIN);
 
   constructor() {
     this.initializeAuth();
@@ -67,14 +67,14 @@ export class AuthStore {
         this.loadingState.set(false);
 
         // Redireciona baseado no role
-        if (response.user.role === IUserRole.ADMIN) {
+        if (response.user.role === EUserRole.ADMIN) {
           this.router.navigate(['/admin']);
         } else {
           this.router.navigate(['/products']);
         }
       },
       error: (error) => {
-        this.errorState.set(error.message || 'Erro ao fazer login');
+        this.errorState.set(error.message || 'Error when logging in');
         this.loadingState.set(false);
       },
     });

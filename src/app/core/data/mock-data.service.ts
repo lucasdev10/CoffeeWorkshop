@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { IUserRole } from '@app/features/user/models/user.model';
+import { IProduct } from '@app/features/products/models/product.model';
+import { EUserRole, IUser } from '@app/features/user/models/user.model';
 import { Utils } from '@app/shared/utils/utils';
 import moment from 'moment';
 
@@ -21,7 +22,7 @@ export class MockDataService {
    */
   private initializeMockData(): void {
     // Produtos iniciais
-    const products = [
+    const products: IProduct[] = [
       {
         id: Utils.generateId(),
         name: 'Premium Coffee Beans',
@@ -31,8 +32,8 @@ export class MockDataService {
         category: 'Food',
         stock: 50,
         rating: 4.5,
-        createdAt: moment('2024-01-01').unix(),
-        updatedAt: moment('2024-01-01').unix(),
+        createdAt: moment('2026-01-01').unix(),
+        updatedAt: moment('2026-01-01').unix(),
       },
       {
         id: Utils.generateId(),
@@ -43,8 +44,8 @@ export class MockDataService {
         category: 'Electronics',
         stock: 15,
         rating: 4.8,
-        createdAt: moment('2024-01-02').unix(),
-        updatedAt: moment('2024-01-02').unix(),
+        createdAt: moment('2026-01-02').unix(),
+        updatedAt: moment('2026-01-02').unix(),
       },
       {
         id: Utils.generateId(),
@@ -55,28 +56,32 @@ export class MockDataService {
         category: 'Electronics',
         stock: 8,
         rating: 4.3,
-        createdAt: moment('2024-01-03').unix(),
-        updatedAt: moment('2024-01-03').unix(),
+        createdAt: moment('2026-01-03').unix(),
+        updatedAt: moment('2026-01-03').unix(),
       },
     ];
 
     STORAGE_MOCK.set('products', products);
 
     // Usuários iniciais
-    const users = [
+    const users: IUser[] = [
       {
         id: Utils.generateId(),
         email: 'admin@admin.com',
         password: 'admin123',
-        name: 'Admin User',
-        role: IUserRole.ADMIN,
+        fullName: 'Admin User',
+        role: EUserRole.ADMIN,
+        createdAt: moment('2026-01-01').unix(),
+        updatedAt: moment('2026-01-01').unix(),
       },
       {
         id: Utils.generateId(),
         email: 'user@user.com',
         password: 'user123',
-        name: 'Regular User',
-        role: IUserRole.USER,
+        fullName: 'Regular User',
+        role: EUserRole.USER,
+        createdAt: moment('2026-01-02').unix(),
+        updatedAt: moment('2026-01-02').unix(),
       },
     ];
 

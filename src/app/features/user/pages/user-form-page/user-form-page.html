@@ -1,1 +1,74 @@
-<p>user-form-page works!</p>
+<div class="form-container">
+  <div class="page-header">
+    <h1>
+      <mat-icon>{{ isEditMode() ? 'edit' : 'add_circle' }}</mat-icon>
+      {{ isEditMode() ? 'Edit User' : 'New User' }}
+    </h1>
+    <p>
+      {{ isEditMode() ? 'Update the user information' : 'Fill in the details for the new user' }}
+    </p>
+  </div>
+
+  <mat-card class="form-card">
+    <mat-card-content>
+      @if (isLoading()) {
+        <div class="loading-overlay">
+          <mat-spinner></mat-spinner>
+        </div>
+      }
+
+      <form>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Full Name</mat-label>
+          <input matInput [formField]="userForm.fullName" placeholder="Ex: Your Name" />
+          <mat-icon matPrefix>label</mat-icon>
+          <app-form-error [control]="userForm.fullName"></app-form-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>E-mail</mat-label>
+          <input matInput type="email" [formField]="userForm.email" placeholder="your@email.com" />
+          <mat-icon matPrefix>email</mat-icon>
+          <app-form-error [control]="userForm.email"></app-form-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            [formField]="userForm.password"
+            placeholder="Your password"
+          />
+          <mat-icon matPrefix>lock</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="'Show password'"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <app-form-error [control]="userForm.password"></app-form-error>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="onCancel()">Cancel</button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            [disabled]="!canSubmit()"
+            (click)="onSubmit()"
+          >
+            @if (isLoading()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            }
+            {{ isEditMode() ? 'Update' : 'Register' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

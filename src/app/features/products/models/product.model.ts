@@ -10,8 +10,8 @@ export interface IProduct {
   category: string;
   stock: number;
   rating: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: number;
+  updatedAt: number;
 }
 
 /**
