@@ -5,7 +5,7 @@ import { AuthRepository } from '@app/features/auth/repositories/auth.repository'
 import { AuthStore } from '@app/features/auth/store/auth.store';
 import { EUserRole } from '@app/features/user/models/user.model';
 import moment from 'moment';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 
 /**
  * Testes de integração para fluxo de autenticação
@@ -341,28 +341,27 @@ describe('Authentication Flow Integration Tests', () => {
 
   describe('Loading States', () => {
     it('should manage loading state during login', () => {
-      // Arrange
-      const mockResponse = {
-        user: mockRegularUser,
-        token: 'token',
-      };
+      const subject = new Subject<any>();
 
-      const loginSpy = vi.spyOn(authRepository, 'login');
-      loginSpy.mockReturnValue(of(mockResponse));
+      vi.spyOn(authRepository, 'login').mockReturnValue(subject.asObservable());
 
-      // Act
       authStore.login({
         email: 'user@test.com',
         password: 'hashed',
       });
 
-      vi.waitFor(() => {
-        // Assert - Loading starts
-        expect(authStore.isLoading()).toBe(true);
+      // Loading deve estar true imediatamente
+      expect(authStore.isLoading()).toBe(true);
 
-        // Assert - Loading ends
-        expect(authStore.isLoading()).toBe(false);
+      // Agora simulamos resposta do backend
+      subject.next({
+        user: mockRegularUser,
+        token: 'token',
       });
+      subject.complete();
+
+      // Agora deve estar false
+      expect(authStore.isLoading()).toBe(false);
     });
   });
 });

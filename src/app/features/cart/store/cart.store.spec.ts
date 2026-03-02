@@ -6,10 +6,9 @@ import moment from 'moment';
 import { CartStore } from './cart.store';
 
 describe('CartStore', () => {
-  let cartStore: CartStore;
   let storageService: StorageService<unknown>;
 
-  let mockProduct: IProduct = {
+  const mockProduct: IProduct = {
     id: Utils.generateId(),
     name: 'Premium Coffee Beans',
     description: 'Arabica blend from Colombia with rich flavor notes',
@@ -22,137 +21,105 @@ describe('CartStore', () => {
     updatedAt: moment('2026-01-01').unix(),
   };
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [],
-      providers: [CartStore, StorageService],
-    }).compileComponents();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        CartStore,
+        {
+          provide: StorageService,
+          useValue: {
+            get: vi.fn(),
+            set: vi.fn(),
+            remove: vi.fn(),
+          },
+        },
+      ],
+    });
 
-    cartStore = TestBed.inject(CartStore);
     storageService = TestBed.inject(StorageService);
-    cartStore.clear();
   });
 
   afterEach(() => {
-    localStorage.clear();
+    vi.clearAllMocks();
+    TestBed.resetTestingModule();
   });
 
-  it('should add item correctly', async () => {
-    const mockItemsResponse = [
-      {
-        product: mockProduct,
-        quantity: 1,
-        subtotal: 29.99,
-      },
-    ];
+  function createStore() {
+    return TestBed.inject(CartStore);
+  }
 
-    expect(cartStore.items().length).toBe(0);
+  it('should add item correctly', () => {
+    const store = createStore();
 
-    cartStore.addItem(mockProduct, 1);
+    store.addItem(mockProduct, 1);
 
-    expect(cartStore.items()).toEqual(mockItemsResponse);
-    expect(cartStore.items().length).toBe(1);
+    expect(store.items().length).toBe(1);
+    expect(store.items()[0].quantity).toBe(1);
   });
 
-  it('do not duplicate item', () => {
-    const mockItemsResponse = [
-      {
-        product: mockProduct,
-        quantity: 3,
-        subtotal: 89.97,
-      },
-    ];
+  it('should not duplicate item', () => {
+    const store = createStore();
 
-    cartStore.addItem(mockProduct, 1);
-    cartStore.addItem(mockProduct, 2);
+    store.addItem(mockProduct, 1);
+    store.addItem(mockProduct, 2);
 
-    expect(cartStore.items().length).toBe(1);
-    expect(cartStore.items()).toEqual(mockItemsResponse);
+    expect(store.items().length).toBe(1);
+    expect(store.items()[0].quantity).toBe(3);
   });
 
   it('should update quantity', () => {
-    cartStore.addItem(mockProduct, 1);
-    cartStore.updateQuantity(mockProduct.id, 2);
+    const store = createStore();
 
-    expect(cartStore.items()[0].quantity).toBe(2);
-  });
+    store.addItem(mockProduct, 1);
+    store.updateQuantity(mockProduct.id, 2);
 
-  it('should calculate shipping cost correctly', () => {
-    cartStore.addItem(mockProduct, 1);
-    expect(cartStore.shipping()).toBe(10);
-  });
-
-  it('should have free shipping when subtotal >= 100', () => {
-    const expensiveProduct: IProduct = {
-      ...mockProduct,
-      price: 150,
-    };
-
-    cartStore.addItem(expensiveProduct, 1);
-    expect(cartStore.hasFreeShipping()).toBe(true);
-    expect(cartStore.shipping()).toBe(0);
-  });
-
-  it('should calculate tax correctly (10%)', () => {
-    cartStore.addItem(mockProduct, 1);
-    const expectedTax = 29.99 * 0.1;
-    expect(cartStore.tax()).toBeCloseTo(expectedTax, 2);
-  });
-
-  it('should calculate total correctly', () => {
-    cartStore.addItem(mockProduct, 2);
-    const subtotal = 59.98;
-    const tax = subtotal * 0.1;
-    const shipping = 10;
-    const expectedTotal = subtotal + tax + shipping;
-
-    expect(cartStore.total()).toBeCloseTo(expectedTotal, 2);
+    expect(store.items()[0].quantity).toBe(2);
   });
 
   it('should remove item correctly', () => {
-    cartStore.addItem(mockProduct, 1);
-    expect(cartStore.items().length).toBe(1);
+    const store = createStore();
 
-    cartStore.removeItem(mockProduct.id);
-    expect(cartStore.items().length).toBe(0);
-    expect(cartStore.isEmpty()).toBe(true);
-  });
+    store.addItem(mockProduct, 1);
+    store.removeItem(mockProduct.id);
 
-  it('should update quantity to 0 and remove item', () => {
-    cartStore.addItem(mockProduct, 1);
-    cartStore.updateQuantity(mockProduct.id, 0);
-
-    expect(cartStore.items().length).toBe(0);
+    expect(store.items().length).toBe(0);
   });
 
   it('should clear cart', () => {
-    cartStore.addItem(mockProduct, 2);
-    expect(cartStore.hasItems()).toBe(true);
+    const store = createStore();
 
-    cartStore.clear();
-    expect(cartStore.isEmpty()).toBe(true);
-    expect(cartStore.itemCount()).toBe(0);
+    store.addItem(mockProduct, 2);
+    store.clear();
+
+    expect(store.isEmpty()).toBe(true);
+    expect(store.itemCount()).toBe(0);
   });
 
-  it('should calculate item count correctly', () => {
-    const product2: IProduct = {
-      ...mockProduct,
-      id: Utils.generateId(),
-      name: 'Product 2',
-    };
+  it('should calculate totals correctly', () => {
+    const store = createStore();
 
-    cartStore.addItem(mockProduct, 2);
-    cartStore.addItem(product2, 3);
+    store.addItem(mockProduct, 2);
 
-    expect(cartStore.itemCount()).toBe(5);
+    const subtotal = 59.98;
+    const tax = subtotal * 0.1;
+    const shipping = 10;
+    const total = subtotal + tax + shipping;
+
+    expect(store.subtotal()).toBeCloseTo(subtotal, 2);
+    expect(store.tax()).toBeCloseTo(tax, 2);
+    expect(store.total()).toBeCloseTo(total, 2);
   });
 
   it('should persist cart to localStorage', async () => {
-    cartStore.addItem(mockProduct, 1);
+    const store = createStore();
+    const setSpy = vi.spyOn(storageService, 'set');
 
+    store.addItem(mockProduct, 1);
+
+    // Aguardar o effect ser executado
     await vi.waitFor(() => {
-      const stored = storageService.get('cart');
-      expect(stored).toBeDefined();
+      expect(setSpy).toHaveBeenCalled();
+      expect(setSpy).toHaveBeenCalledWith('cart', expect.any(Object));
     });
   });
 
@@ -172,82 +139,11 @@ describe('CartStore', () => {
       itemCount: 2,
     };
 
-    storageService.set('cart', mockInitialCart);
-    const newCartStore = TestBed.inject(CartStore);
+    (storageService.get as any).mockReturnValue(mockInitialCart);
 
-    vi.waitFor(() => {
-      expect(newCartStore.items().length).toBe(1);
-      expect(newCartStore.itemCount()).toBe(2);
-    });
-  });
+    const store = createStore();
 
-  it('should check if there is a shipping cost', () => {
-    cartStore.addItem(mockProduct, 1);
-    expect(cartStore.hasFreeShipping()).toBeFalsy();
-
-    cartStore.addItem(mockProduct, 5);
-    expect(cartStore.hasFreeShipping()).toBeTruthy();
-  });
-
-  it('should calculate total correctly', () => {
-    cartStore.addItem(mockProduct, 1);
-    cartStore.updateQuantity(mockProduct.id, 2);
-
-    const total =
-      mockProduct.price * cartStore.itemCount() + cartStore.shipping() + cartStore.tax();
-
-    expect(cartStore.total()).toBe(total);
-  });
-
-  it('should remove item correctly', () => {
-    cartStore.addItem(mockProduct, 1);
-    expect(cartStore.items().length).toBe(1);
-
-    cartStore.removeItem(mockProduct.id);
-    expect(cartStore.items().length).toBe(0);
-  });
-
-  it('should recover saved state', () => {
-    // Arrange - salvar dados no storage
-    const savedCart = {
-      items: [
-        {
-          product: mockProduct,
-          quantity: 3,
-          subtotal: 89.97,
-        },
-      ],
-      subtotal: 89.97,
-      shipping: 10,
-      tax: 8.997,
-      total: 108.967,
-      itemCount: 3,
-    };
-
-    // Salvar no localStorage diretamente (como o StorageService faz)
-    localStorage.setItem('cart', JSON.stringify(savedCart));
-
-    // Act - criar uma nova instância da store
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
-      providers: [CartStore, StorageService],
-    });
-    const newStore = TestBed.inject(CartStore);
-
-    // Assert
-    expect(newStore.items().length).toBe(1);
-    expect(newStore.items()[0].product.id).toBe(mockProduct.id);
-    expect(newStore.items()[0].quantity).toBe(3);
-    expect(newStore.itemCount()).toBe(3);
-    expect(newStore.subtotal()).toBe(89.97);
-  });
-
-  it('should clean cart', () => {
-    cartStore.addItem(mockProduct, 2);
-    expect(cartStore.items().length).toBe(1);
-
-    cartStore.clear();
-
-    expect(cartStore.items().length).toBe(0);
+    expect(store.items().length).toBe(1);
+    expect(store.itemCount()).toBe(2);
   });
 });

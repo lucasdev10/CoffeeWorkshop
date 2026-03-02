@@ -48,6 +48,10 @@ describe('AuthStore', () => {
     store = TestBed.inject(AuthStore);
   });
 
+  afterEach(() => {
+    mockStorage.clear();
+  });
+
   it('should be created', () => {
     expect(store).toBeTruthy();
   });
