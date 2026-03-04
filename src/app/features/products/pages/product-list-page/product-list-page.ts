@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CartStore } from '@app/features/cart/store/cart.store';
 import { ProductCardComponent } from '../../components/product-card/product-card';
@@ -13,7 +13,7 @@ import { ProductStore } from '../../store/product.store';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductListPageComponent {
+export class ProductListPageComponent implements OnInit {
   private readonly productStore = inject(ProductStore);
   private readonly cartStore = inject(CartStore);
 
@@ -21,6 +21,12 @@ export class ProductListPageComponent {
   readonly products = this.productStore.filteredProducts;
   readonly isLoading = this.productStore.isLoading;
   readonly error = this.productStore.error;
+
+  ngOnInit(): void {
+    // Force reload of products to ensure data is synchronized with STORAGE_MOCK
+    // This is critical for Cypress tests that create products and navigate to /products
+    this.productStore.loadProducts();
+  }
 
   onAddToCart(product: IProduct): void {
     this.cartStore.addItem(product, 1);

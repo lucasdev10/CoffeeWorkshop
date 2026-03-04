@@ -1,37 +1,41 @@
 /// <reference types="cypress" />
-// ***********************************************
-// This example commands.ts shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+
+// Custom command para login
+Cypress.Commands.add('login', (email: string, password: string) => {
+  cy.visit('/auth/login');
+  cy.get('input[type="email"]').type(email);
+  cy.get('input[type="password"]').type(password);
+  cy.get('button[type="submit"]').click();
+  cy.url().should('not.include', '/auth/login');
+});
+
+// Custom command para adicionar produto ao carrinho
+Cypress.Commands.add('addProductToCart', (productIndex = 0) => {
+  cy.visit('/products');
+  cy.get('app-product-card').should('have.length.greaterThan', 0);
+  cy.get('app-product-card').eq(productIndex).find('button').contains('Add to Cart').click();
+});
+
+// Custom command para limpar o carrinho
+Cypress.Commands.add('clearCart', () => {
+  cy.visit('/cart');
+  cy.get('body').then(($body) => {
+    if ($body.find('.remove-button').length > 0) {
+      cy.get('.remove-button').each(($btn) => {
+        cy.wrap($btn).click();
+      });
+    }
+  });
+});
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      login(email: string, password: string): Chainable<void>;
+      addProductToCart(productIndex?: number): Chainable<void>;
+      clearCart(): Chainable<void>;
+    }
+  }
+}
+
+export {};

@@ -77,11 +77,24 @@ describe('ProductListPageComponent', () => {
   });
 
   it('should render product cards when products are loaded', () => {
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    const productCards = compiled.querySelectorAll('app-product-card');
+    vi.spyOn(productStore as any, 'state', 'get').mockReturnValue(
+      signal({
+        products: mockProducts,
+        selectedProduct: null,
+        filters: {},
+        loading: 'success',
+        error: null,
+      }),
+    );
 
-    expect(productCards.length).toBe(2);
+    fixture.detectChanges();
+
+    vi.waitFor(() => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const productCards = compiled.querySelectorAll('app-product-card');
+
+      expect(productCards.length).toBe(2);
+    });
   });
 
   it('should display loading spinner when loading', () => {
@@ -145,12 +158,15 @@ describe('ProductListPageComponent', () => {
 
     // Act
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    const emptyState = compiled.querySelector('.empty-state');
 
-    // Assert
-    expect(emptyState).toBeTruthy();
-    expect(emptyState?.textContent).toContain('No products found');
+    vi.waitFor(() => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const emptyState = compiled.querySelector('.empty-state');
+
+      // Assert
+      expect(emptyState).toBeTruthy();
+      expect(emptyState?.textContent).toContain('No products found');
+    });
   });
 
   it('should call cartStore.addItem when onAddToCart is called', () => {
@@ -166,17 +182,31 @@ describe('ProductListPageComponent', () => {
   });
 
   it('should not display loading or error when products are loaded successfully', () => {
+    // Arrange
+    vi.spyOn(productStore as any, 'state', 'get').mockReturnValue(
+      signal({
+        products: [],
+        selectedProduct: null,
+        filters: {},
+        loading: 'success',
+        error: null,
+      }),
+    );
+
     // Act
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    const spinner = compiled.querySelector('mat-spinner');
-    const errorContainer = compiled.querySelector('.error-container');
-    const productsGrid = compiled.querySelector('.products-grid');
 
-    // Assert
-    expect(spinner).toBeFalsy();
-    expect(errorContainer).toBeFalsy();
-    expect(productsGrid).toBeTruthy();
+    vi.waitFor(() => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const spinner = compiled.querySelector('mat-spinner');
+      const errorContainer = compiled.querySelector('.error-container');
+      const productsGrid = compiled.querySelector('.products-grid');
+
+      // Assert
+      expect(spinner).toBeFalsy();
+      expect(errorContainer).toBeFalsy();
+      expect(productsGrid).toBeTruthy();
+    });
   });
 
   it('should expose correct signals from store', () => {

@@ -4,7 +4,38 @@ import { EUserRole, IUser } from '@app/features/user/models/user.model';
 import { Utils } from '@app/shared/utils/utils';
 import moment from 'moment';
 
-export const STORAGE_MOCK = new Map<string, unknown>();
+export class StorageMock {
+  private readonly STORAGE_KEY_PREFIX = 'MOCK_';
+
+  get(key: string): unknown {
+    const stored = localStorage.getItem(this.STORAGE_KEY_PREFIX + key);
+    return stored ? JSON.parse(stored) : undefined;
+  }
+
+  set(key: string, value: unknown): void {
+    localStorage.setItem(this.STORAGE_KEY_PREFIX + key, JSON.stringify(value));
+  }
+
+  has(key: string): boolean {
+    return localStorage.getItem(this.STORAGE_KEY_PREFIX + key) !== null;
+  }
+
+  clear(): void {
+    const keys = Object.keys(localStorage);
+    keys.forEach((key) => {
+      if (key.startsWith(this.STORAGE_KEY_PREFIX)) {
+        localStorage.removeItem(key);
+      }
+    });
+  }
+
+  get size(): number {
+    return Object.keys(localStorage).filter((key) => key.startsWith(this.STORAGE_KEY_PREFIX))
+      .length;
+  }
+}
+
+export const STORAGE_MOCK = new StorageMock();
 
 /**
  * Serviço centralizado para gerenciar dados mock
@@ -21,6 +52,11 @@ export class MockDataService {
    * Inicializa dados mock no "banco de dados" simulado
    */
   private initializeMockData(): void {
+    // Only initialize if STORAGE_MOCK is empty (prevents overwriting data in Cypress tests)
+    if (STORAGE_MOCK.size > 0) {
+      return;
+    }
+
     // Produtos iniciais
     const products: IProduct[] = [
       {

@@ -1,0 +1,18 @@
+{
+  "testProduct": {
+    "name": "Cypress Test Product",
+    "description": "A product created for testing purposes",
+    "category": "Electronics",
+    "price": 99.99,
+    "stock": 10,
+    "image": "https://via.placeholder.com/300"
+  },
+  "adminCredentials": {
+    "email": "admin@example.com",
+    "password": "admin123"
+  },
+  "userCredentials": {
+    "email": "user@example.com",
+    "password": "user123"
+  }
+}
