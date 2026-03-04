@@ -231,10 +231,10 @@ Fluxos obrigatórios:
 
 # 🔐 11. SEGURANÇA
 
-- [ ] Criar rota protegida para admin
-- [ ] Simular autenticação
-- [ ] Guard / ProtectedRoute
-- [ ] Sanitizar inputs
+- [x] Criar rota protegida para admin
+- [x] Simular autenticação
+- [x] Guard / ProtectedRoute
+- [x] Sanitizar inputs
 
 ---
 
