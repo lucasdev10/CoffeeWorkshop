@@ -1,9 +1,10 @@
 import { provideHttpClient } from '@angular/common/http';
-import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CartStore } from '@app/features/cart/store/cart.store';
 import moment from 'moment';
+import { delay, of, throwError } from 'rxjs';
 import { IProduct } from '../../models/product.model';
+import { ProductRepository } from '../../repositories/product.repository';
 import { ProductStore } from '../../store/product.store';
 import { ProductListPageComponent } from './product-list-page';
 
@@ -12,6 +13,7 @@ describe('ProductListPageComponent', () => {
   let fixture: ComponentFixture<ProductListPageComponent>;
   let productStore: ProductStore;
   let cartStore: CartStore;
+  let productRepository: ProductRepository;
 
   const mockProducts: IProduct[] = [
     {
@@ -32,7 +34,7 @@ describe('ProductListPageComponent', () => {
       description: 'Description 2',
       price: 200,
       image: 'image2.jpg',
-      category: 'Eletronics',
+      category: 'Electronics',
       stock: 5,
       rating: 4.0,
       createdAt: moment().unix(),
@@ -40,35 +42,37 @@ describe('ProductListPageComponent', () => {
     },
   ];
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  const setupTest = (repositoryMock: any) => {
+    TestBed.configureTestingModule({
       imports: [ProductListPageComponent],
-      providers: [provideHttpClient(), ProductStore, CartStore],
+      providers: [provideHttpClient(), ProductStore, CartStore, ProductRepository],
     }).compileComponents();
+
+    productStore = TestBed.inject(ProductStore);
+    cartStore = TestBed.inject(CartStore);
+    productRepository = TestBed.inject(ProductRepository);
+
+    vi.spyOn(productRepository, 'findAll').mockReturnValue(repositoryMock);
 
     fixture = TestBed.createComponent(ProductListPageComponent);
     component = fixture.componentInstance;
-    productStore = TestBed.inject(ProductStore);
-    cartStore = TestBed.inject(CartStore);
+    fixture.detectChanges();
+  };
 
-    // Mock do estado da store para evitar chamadas HTTP reais
-    vi.spyOn(productStore as any, 'state', 'get').mockReturnValue(
-      signal({
-        products: mockProducts,
-        selectedProduct: null,
-        filters: {},
-        loading: 'success',
-        error: null,
-      }),
-    );
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProductListPageComponent],
+      providers: [provideHttpClient(), ProductStore, CartStore, ProductRepository],
+    }).compileComponents();
   });
 
   it('should create', () => {
+    setupTest(of(mockProducts));
     expect(component).toBeTruthy();
   });
 
   it('should render page title', () => {
-    fixture.detectChanges();
+    setupTest(of(mockProducts));
     const compiled = fixture.nativeElement as HTMLElement;
     const title = compiled.querySelector('.page-title');
 
@@ -77,140 +81,72 @@ describe('ProductListPageComponent', () => {
   });
 
   it('should render product cards when products are loaded', () => {
-    vi.spyOn(productStore as any, 'state', 'get').mockReturnValue(
-      signal({
-        products: mockProducts,
-        selectedProduct: null,
-        filters: {},
-        loading: 'success',
-        error: null,
-      }),
-    );
-
-    fixture.detectChanges();
-
-    vi.waitFor(() => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      const productCards = compiled.querySelectorAll('app-product-card');
-
-      expect(productCards.length).toBe(2);
-    });
+    setupTest(of(mockProducts));
+    const compiled = fixture.nativeElement as HTMLElement;
+    const productCards = compiled.querySelectorAll('app-product-card');
+    expect(productCards.length).toBe(2);
   });
 
   it('should display loading spinner when loading', () => {
-    // Arrange - simular estado de loading
-    vi.spyOn(productStore as any, 'state', 'get').mockReturnValue(
-      signal({
-        products: [],
-        selectedProduct: null,
-        filters: {},
-        loading: 'loading',
-        error: null,
-      }),
-    );
+    // Mock repository to delay response, keeping loading state
+    setupTest(of(mockProducts).pipe(delay(1000)));
 
-    // Act
-    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     const spinner = compiled.querySelector('mat-spinner');
     const loadingText = compiled.querySelector('.loading-container p');
 
-    // Assert
     expect(spinner).toBeTruthy();
     expect(loadingText?.textContent).toContain('Loading products...');
   });
 
   it('should display error message when there is an error', () => {
-    // Arrange - simular estado de erro
     const errorMessage = 'Failed to load products';
-    vi.spyOn(productStore as any, 'state', 'get').mockReturnValue(
-      signal({
-        products: [],
-        selectedProduct: null,
-        filters: {},
-        loading: 'error',
-        error: errorMessage,
-      }),
-    );
+    setupTest(throwError(() => new Error(errorMessage)));
 
-    // Act
-    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     const errorContainer = compiled.querySelector('.error-container');
     const errorText = compiled.querySelector('.error-message');
 
-    // Assert
     expect(errorContainer).toBeTruthy();
     expect(errorText?.textContent).toContain(errorMessage);
   });
 
   it('should display empty state when no products are available', () => {
-    // Arrange - simular lista vazia
-    vi.spyOn(productStore as any, 'state', 'get').mockReturnValue(
-      signal({
-        products: [],
-        selectedProduct: null,
-        filters: {},
-        loading: 'success',
-        error: null,
-      }),
-    );
+    setupTest(of([]));
 
-    // Act
-    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const emptyState = compiled.querySelector('.empty-state');
 
-    vi.waitFor(() => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      const emptyState = compiled.querySelector('.empty-state');
-
-      // Assert
-      expect(emptyState).toBeTruthy();
-      expect(emptyState?.textContent).toContain('No products found');
-    });
+    expect(emptyState).toBeTruthy();
+    expect(emptyState?.textContent).toContain('No products found');
   });
 
   it('should call cartStore.addItem when onAddToCart is called', () => {
-    // Arrange
+    setupTest(of(mockProducts));
     const addItemSpy = vi.spyOn(cartStore, 'addItem');
     const product = mockProducts[0];
 
-    // Act
     component.onAddToCart(product);
 
-    // Assert
     expect(addItemSpy).toHaveBeenCalledWith(product, 1);
   });
 
   it('should not display loading or error when products are loaded successfully', () => {
-    // Arrange
-    vi.spyOn(productStore as any, 'state', 'get').mockReturnValue(
-      signal({
-        products: [],
-        selectedProduct: null,
-        filters: {},
-        loading: 'success',
-        error: null,
-      }),
-    );
+    setupTest(of(mockProducts));
 
-    // Act
-    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const spinner = compiled.querySelector('mat-spinner');
+    const errorContainer = compiled.querySelector('.error-container');
+    const productsGrid = compiled.querySelector('.products-grid');
 
-    vi.waitFor(() => {
-      const compiled = fixture.nativeElement as HTMLElement;
-      const spinner = compiled.querySelector('mat-spinner');
-      const errorContainer = compiled.querySelector('.error-container');
-      const productsGrid = compiled.querySelector('.products-grid');
-
-      // Assert
-      expect(spinner).toBeFalsy();
-      expect(errorContainer).toBeFalsy();
-      expect(productsGrid).toBeTruthy();
-    });
+    expect(spinner).toBeFalsy();
+    expect(errorContainer).toBeFalsy();
+    expect(productsGrid).toBeTruthy();
   });
 
   it('should expose correct signals from store', () => {
-    // Assert
+    setupTest(of(mockProducts));
+
     expect(component.products()).toEqual(mockProducts);
     expect(component.isLoading()).toBe(false);
     expect(component.error()).toBeNull();
