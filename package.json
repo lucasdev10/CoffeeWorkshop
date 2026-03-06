@@ -1,5 +1,5 @@
 {
-  "name": "angular-material-signals-jest-cypress",
+  "name": "angular-material-signals-Vitest-cypress",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -64,6 +64,7 @@
     "@angular/compiler-cli": "^21.1.0",
     "@angular/material": "^21.1.5",
     "@types/mocha": "^10.0.10",
+    "@vitest/coverage-v8": "^4.0.18",
     "angular-eslint": "21.2.0",
     "cypress": "^15.11.0",
     "eslint": "^9.39.3",

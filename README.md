@@ -1,96 +1,236 @@
-# AngularMaterialSignalsJestCypress
+# Angular Material Signals Vitest Cypress
 
-[![CI](https://github.com/lucasdev10/Angular-Material-Signals-Jest-Cypress/actions/workflows/ci.yml/badge.svg)](https://github.com/lucasdev10/Angular-Material-Signals-Jest-Cypress/actions/workflows/ci.yml)
-[![Deploy](https://github.com/lucasdev10/Angular-Material-Signals-Jest-Cypress/actions/workflows/deploy.yml/badge.svg)](https://github.com/lucasdev10/Angular-Material-Signals-Jest-Cypress/actions/workflows/deploy.yml)
+[![CI](https://github.com/lucasdev10/Angular-Material-Signals-Vitest-Cypress/actions/workflows/ci.yml/badge.svg)](https://github.com/lucasdev10/Angular-Material-Signals-Vitest-Cypress/actions/workflows/ci.yml)
+[![Deploy](https://github.com/lucasdev10/Angular-Material-Signals-Vitest-Cypress/actions/workflows/deploy.yml/badge.svg)](https://github.com/lucasdev10/Angular-Material-Signals-Vitest-Cypress/actions/workflows/deploy.yml)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.2.
+E-commerce study project built with Angular 21, demonstrating modern architecture, testing strategies, and best practices.
 
-## Development server
+## 🏗️ Architecture
 
-To start a local development server, run:
+This project follows a **feature-based architecture** with clear separation of concerns:
+
+```
+src/app/
+├── core/                    # Core functionality (singleton services)
+│   ├── guards/             # Route guards (auth, role, unsaved-changes)
+│   ├── interceptors/       # HTTP interceptors (auth, error handling)
+│   ├── layout/             # Layout components (header, footer)
+│   ├── storage/            # Storage service (localStorage wrapper)
+│   └── http/               # HTTP client wrapper
+│
+├── features/               # Feature modules (lazy-loaded)
+│   ├── products/          # Product management
+│   │   ├── components/    # Feature-specific components
+│   │   ├── pages/         # Route components
+│   │   ├── store/         # State management (Signals)
+│   │   ├── repositories/  # Data access layer
+│   │   ├── models/        # TypeScript interfaces
+│   │   └── integration/   # Integration tests
+│   │
+│   ├── cart/              # Shopping cart
+│   ├── admin/             # Admin panel (protected)
+│   ├── auth/              # Authentication
+│   └── user/              # User management
+│
+└── shared/                 # Shared resources
+    ├── components/        # Reusable components
+    ├── directives/        # Custom directives
+    ├── pipes/             # Custom pipes
+    ├── validators/        # Form validators
+    └── utils/             # Utility functions
+```
+
+### Key Architectural Decisions
+
+**State Management**: Angular Signals (v16+)
+
+- Reactive state with automatic change detection
+- Computed values with automatic memoization
+- Better performance than traditional RxJS BehaviorSubjects
+
+**Lazy Loading**: All feature modules are lazy-loaded
+
+- Reduces initial bundle size
+- Improves application startup time
+- Better code splitting
+
+**Repository Pattern**: Separation of data access logic
+
+- Abstracts API calls from business logic
+- Easier to test and mock
+- Centralized data transformation
+
+**Guards & Interceptors**: Security and HTTP handling
+
+- Authentication guard for protected routes
+- Role-based access control
+- Automatic token injection
+- Global error handling
+
+## 🚀 Tech Stack
+
+- **Framework**: Angular 21
+- **UI Library**: Angular Material 21
+- **State Management**: Angular Signals
+- **Forms**: Reactive Forms with Signal-based API
+- **HTTP Client**: Angular HttpClient
+- **Routing**: Angular Router with lazy loading
+- **Testing**: Vitest (unit) + Cypress (e2e)
+- **Linting**: ESLint + Angular ESLint
+- **Formatting**: Prettier
+- **Git Hooks**: Husky + lint-staged
+- **CI/CD**: GitHub Actions
+
+## 📦 Features
+
+- ✅ Product catalog with filtering
+- ✅ Shopping cart with persistence
+- ✅ Admin panel (CRUD operations)
+- ✅ Authentication & authorization
+- ✅ Role-based access control
+- ✅ Form validation
+- ✅ Responsive design
+- ✅ Lazy loading
+- ✅ Performance optimizations
+
+## 🛠️ Development
+
+### Prerequisites
+
+- Node.js 22+
+- npm 10+
+
+### Installation
 
 ```bash
+npm install
+```
+
+### Development Server
+
+```bash
+npm start
+# or
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Navigate to `http://localhost:4200/`
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Build
 
 ```bash
-ng generate component component-name
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Build artifacts will be stored in the `dist/` directory.
+
+## 🧪 Testing
+
+### Unit Tests (Vitest)
 
 ```bash
-ng generate --help
+npm test                 # Run tests in watch mode
+npm run test:coverage    # Run tests with coverage report
 ```
 
-## Building
+**Current Coverage**: ~70% (target: 80%)
 
-To build the project run:
+### E2E Tests (Cypress)
 
 ```bash
-ng build
+npm run cypress          # Open Cypress UI
+npm run cypress:headless # Run tests headlessly
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+**Test Suites**:
 
-## Running unit tests
+- User shopping flow
+- Admin product management
+- Cart calculations
+- Product list preservation
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## 📊 Code Quality
+
+### Linting
 
 ```bash
-ng test
+npm run lint             # Check for linting errors
+npm run lint:fix         # Fix linting errors automatically
 ```
 
-## Running end-to-end tests
+**ESLint Configuration**:
 
-For end-to-end (e2e) testing, run:
+- Angular ESLint rules
+- TypeScript strict mode
+- No `any` types (enforced)
+- Consistent code style
+
+### Formatting
 
 ```bash
-ng e2e
+npm run format           # Format all files
+npm run format:check     # Check formatting
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+**Prettier Configuration**:
 
-## Additional Resources
+- Print width: 100
+- Single quotes
+- Angular HTML parser
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### Pre-commit Hooks
 
-## Code Quality
+Husky + lint-staged automatically run on commit:
 
-This project uses:
-- **ESLint** for code linting
-- **Prettier** for code formatting
-- **Husky** for Git hooks
-- **lint-staged** for pre-commit checks
+- ESLint on `.ts` files
+- Prettier on all files
+- Prevents committing broken code
 
-### Available Scripts
+## 🔒 Security
 
-```bash
-npm run lint          # Run ESLint
-npm run lint:fix      # Fix ESLint issues
-npm run format        # Format code with Prettier
-npm run format:check  # Check code formatting
-```
+- ✅ Protected admin routes with guards
+- ✅ JWT token authentication (simulated)
+- ✅ Role-based access control
+- ✅ Input sanitization
+- ✅ XSS protection (Angular built-in)
+- ✅ HTTP interceptors for auth & errors
 
-## CI/CD Pipeline
+See [SECURITY_GUIDE.md](docs/SECURITY_GUIDE.md) for details.
 
-The project includes GitHub Actions workflows:
+## ⚡ Performance
 
-- **CI Pipeline** (`ci.yml`): Runs on every push/PR
-  - Linting and formatting checks
-  - Unit tests
-  - Build verification
+- ✅ Lazy loading (all feature modules)
+- ✅ Code splitting
+- ✅ OnPush change detection strategy
+- ✅ Computed signals (memoization)
+- ✅ TrackBy functions in lists
+- ✅ Optimized bundle size
 
-- **Deploy Pipeline** (`deploy.yml`): Deploys to GitHub Pages on main branch
-  
-- **PR Checks** (`pr-checks.yml`): Validates pull requests with detailed feedback
+See [PERFORMANCE_OPTIMIZATIONS.md](docs/PERFORMANCE_OPTIMIZATIONS.md) for details.
+
+## 🔄 CI/CD Pipeline
+
+### GitHub Actions Workflows
+
+**CI Pipeline** (`ci.yml`):
+
+- Runs on push/PR to main/develop
+- Linting & formatting checks
+- Unit tests
+- Build verification
+- Artifact upload
+
+**Deploy Pipeline** (`deploy.yml`):
+
+- Deploys to GitHub Pages
+- Runs on push to main
+- Automatic deployment
+
+**PR Checks** (`pr-checks.yml`):
+
+- Validates pull requests
+- Detailed feedback on code quality
 
 ### Setting up GitHub Pages
 
@@ -98,4 +238,30 @@ The project includes GitHub Actions workflows:
 2. Source: GitHub Actions
 3. The app will be deployed automatically on push to main
 
-Replace `lucasdev10/Angular-Material-Signals-Jest-Cypress` in badges with your GitHub info.
+## 📚 Documentation
+
+- [Architecture Guide](docs/ARCHITECTURE.md)
+- [Testing Strategy](docs/TESTING_STRATEGY.md)
+- [Security Guide](docs/SECURITY_GUIDE.md)
+- [Performance Optimizations](docs/PERFORMANCE_OPTIMIZATIONS.md)
+- [Development Guide](docs/DEVELOPMENT.md)
+- [Project Checklist](docs/PROJECT_CHECKLIST.md)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is for educational purposes.
+
+## 🙏 Acknowledgments
+
+- Angular Team for the amazing framework
+- Angular Material for the UI components
+- Vitest for fast unit testing
+- Cypress for reliable e2e testing

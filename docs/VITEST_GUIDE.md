@@ -6,7 +6,7 @@ O Angular 21 vem com **Vitest configurado por padrão**. É a solução oficial 
 
 - ✅ Oficialmente suportado pelo Angular CLI
 - ✅ Extremamente rápido (usa Vite)
-- ✅ API compatível com Jest
+- ✅ API compatível com Vitest
 - ✅ Hot Module Replacement (HMR) para testes
 - ✅ UI interativa para visualizar testes
 - ✅ Melhor integração com TypeScript

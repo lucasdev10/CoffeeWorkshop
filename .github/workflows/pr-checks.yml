@@ -33,6 +33,9 @@ jobs:
       - name: Run tests with coverage
         run: npm run test
 
+      - name: Run cypress headless
+        run: npm run e2e:headless
+
       - name: Build application
         run: npm run build
 

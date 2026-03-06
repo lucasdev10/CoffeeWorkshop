@@ -240,12 +240,12 @@ Fluxos obrigatórios:
 
 # 📊 12. QUALIDADE
 
-- [ ] Cobertura mínima 80%
-- [ ] ESLint sem erros
-- [ ] Nenhum any desnecessário
-- [ ] Build sem warnings
-- [ ] README explicando arquitetura
-- [ ] Pipeline CI rodando testes automaticamente
+- [x] Cobertura mínima 80%
+- [x] ESLint sem erros
+- [x] Nenhum any desnecessário
+- [x] Build sem warnings
+- [x] README explicando arquitetura
+- [x] Pipeline CI rodando testes automaticamente
 
 ---
 

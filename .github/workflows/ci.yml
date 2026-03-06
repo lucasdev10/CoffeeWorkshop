@@ -50,6 +50,9 @@ jobs:
       - name: Run tests
         run: npm run test
 
+      - name: Run cypress
+        run: npm run e2e:headless
+
   build:
     name: Build Application
     runs-on: ubuntu-latest

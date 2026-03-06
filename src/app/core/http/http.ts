@@ -22,16 +22,16 @@ export class HttpService<T extends { id?: string }> implements IHttpService<T> {
    * GET - Busca dados por chave
    */
   get<T>(url: string): Observable<T> {
-    const data = STORAGE_MOCK.get(url);
+    const collection = STORAGE_MOCK.get(url);
 
-    if (!data) {
+    if (!collection) {
       return throwError(() => ({
         status: 404,
         message: `Resource '${url}' not found`,
       })).pipe(delay(this.DELAY_MS));
     }
 
-    return of(data as T).pipe(delay(this.DELAY_MS));
+    return of(collection as T).pipe(delay(this.DELAY_MS));
   }
 
   /**

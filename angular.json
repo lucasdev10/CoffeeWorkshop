@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "Angular-Material-Signals-Jest-Cypress": {
+    "Angular-Material-Signals-Vitest-Cypress": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -85,10 +85,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "Angular-Material-Signals-Jest-Cypress:build:production"
+              "buildTarget": "Angular-Material-Signals-Vitest-Cypress:build:production"
             },
             "development": {
-              "buildTarget": "Angular-Material-Signals-Jest-Cypress:build:development"
+              "buildTarget": "Angular-Material-Signals-Vitest-Cypress:build:development"
             }
           },
           "defaultConfiguration": "development"

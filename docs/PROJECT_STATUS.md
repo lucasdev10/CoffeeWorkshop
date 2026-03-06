@@ -200,7 +200,7 @@ Este projeto está implementado seguindo as melhores práticas de nível **Senio
 
 ### **Testes** (Mencionado para fazer depois)
 
-- [ ] Unit Tests (Jest/Vitest)
+- [ ] Unit Tests (Vitest)
 - [ ] Integration Tests
 - [ ] E2E Tests (Cypress)
 - [ ] Coverage > 80%
