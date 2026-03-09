@@ -255,7 +255,7 @@ Fluxos obrigatórios:
 - [ ] Internacionalização (i18n)
 - [ ] Docker
 - [ ] Deploy automatizado
-- [ ] Lighthouse performance
+- [x] Lighthouse performance
 - [x] Acessibilidade (aria, roles, tabIndex)
 
 ---

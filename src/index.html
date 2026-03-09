@@ -4,18 +4,79 @@
     <meta charset="utf-8" />
     <title>Coffee Workshop - E-commerce Platform</title>
     <meta name="description" content="Coffee Workshop - Your premium coffee e-commerce platform" />
+    <meta name="theme-color" content="#3f51b5" />
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+    <!-- Preconnect to external domains for faster resource loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+
+    <!-- Optimized font loading with font-display: swap -->
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media = 'all'"
     />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <!-- Preload Material Icons with font-display: swap -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <noscript>
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    </noscript>
   </head>
   <body>
-    <app-root role="application" aria-label="Coffee Workshop Application"></app-root>
+    <app-root role="application" aria-label="Coffee Workshop Application">
+      <!-- Loading indicator for better perceived performance -->
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          font-family: Roboto, sans-serif;
+        "
+      >
+        <div style="text-align: center">
+          <div
+            style="
+              width: 40px;
+              height: 40px;
+              border: 4px solid #f3f3f3;
+              border-top: 4px solid #3f51b5;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+              margin: 0 auto 16px;
+            "
+          ></div>
+          <p style="color: #666; margin: 0">Loading Coffee Workshop...</p>
+        </div>
+      </div>
+      <style>
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+      </style>
+    </app-root>
   </body>
 </html>

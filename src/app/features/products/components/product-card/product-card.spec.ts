@@ -96,7 +96,7 @@ describe('ProductCardComponent', () => {
     const addToCartSpy = vi.fn();
     component.addToCart.subscribe(addToCartSpy);
 
-    const button = fixture.debugElement.query(By.css('#add-to-cart-button'));
+    const button = fixture.debugElement.query(By.css('#add-to-cart-button-' + mockProduct.id));
     button.nativeElement.click();
 
     expect(addToCartSpy).toHaveBeenCalledWith(mockProduct);
@@ -107,7 +107,9 @@ describe('ProductCardComponent', () => {
     fixture.componentRef.setInput('product', outOfStockProduct);
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('#add-to-cart-button') as HTMLButtonElement;
+    const button = fixture.nativeElement.querySelector(
+      '#add-to-cart-button-' + mockProduct.id,
+    ) as HTMLButtonElement;
 
     expect(button.disabled).toBe(true);
   });
