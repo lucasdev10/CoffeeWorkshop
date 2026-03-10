@@ -33,10 +33,13 @@ coverage
 .nyc_output
 cypress/videos
 cypress/screenshots
+**/*.spec.ts
+**/*.test.ts
 
 # CI/CD
 .github
 .gitlab-ci.yml
+.husky
 
 # Environment
 .env
@@ -51,3 +54,8 @@ logs
 .editorconfig
 .prettierrc
 .eslintrc.json
+.kiro
+
+# Temporary files
+tmp
+temp

@@ -1,10 +1,24 @@
-name: CI
+name: Reusable CI
 
 on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
+  workflow_call:
+    inputs:
+      environment:
+        required: false
+        type: string
+        default: 'development'
+      run-e2e:
+        required: false
+        type: boolean
+        default: false
+      upload-artifacts:
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      build-success:
+        description: 'Build completed successfully'
+        value: ${{ jobs.build.outputs.success }}
 
 jobs:
   lint-and-format:
@@ -47,16 +61,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
-        run: npm run test
+      - name: Run unit tests
+        run: npm run test:ci
 
-      - name: Run cypress
+      - name: Run E2E tests
+        if: inputs.run-e2e
         run: npx start-server-and-test "npm start" http://localhost:4200 "npm run e2e:headless"
 
   build:
     name: Build Application
     runs-on: ubuntu-latest
     needs: [lint-and-format, test]
+    outputs:
+      success: ${{ steps.build.outcome == 'success' }}
 
     steps:
       - name: Checkout code
@@ -72,11 +89,20 @@ jobs:
         run: npm ci
 
       - name: Build project
-        run: npm run build
+        id: build
+        run: |
+          if [ "${{ inputs.environment }}" = "production" ]; then
+            npm run build -- --configuration production
+          else
+            npm run build
+          fi
+        env:
+          NODE_ENV: ${{ inputs.environment }}
 
       - name: Upload build artifacts
+        if: inputs.upload-artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
+          name: build-artifacts-${{ inputs.environment }}
           path: dist/
           retention-days: 7

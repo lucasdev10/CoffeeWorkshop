@@ -6,11 +6,24 @@ on:
       - main
     tags:
       - 'v*'
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   workflow_dispatch:
 
 jobs:
+  ci:
+    name: CI Pipeline
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      environment: 'production'
+      run-e2e: false
+      upload-artifacts: true
+
   deploy:
+    name: Deploy to Production
     runs-on: ubuntu-latest
+    needs: ci
     environment:
       name: production
       url: https://coffee-workshop.com
@@ -19,34 +32,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Run tests
-        run: npm run test:ci
-
-      - name: Run linter
-        run: npm run lint
-
-      - name: Build application
-        run: npm run build
-        env:
-          NODE_ENV: production
-
-      # - name: Deploy to Vercel
-      #   uses: amondnet/vercel-action@v25
-      #   with:
-      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-      #     vercel-args: '--prod'
-      #     working-directory: ./
+          name: build-artifacts-production
+          path: dist/
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2
