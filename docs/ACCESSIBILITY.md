@@ -1,79 +1,79 @@
-# ♿ Accessibility Implementation Guide
+# ♿ Guia de Implementação de Acessibilidade
 
-## Overview
+## Visão Geral
 
-This document outlines the accessibility features implemented in the Coffee Workshop e-commerce application to ensure WCAG 2.1 Level AA compliance and provide an inclusive experience for all users.
-
----
-
-## 🎯 Accessibility Standards
-
-- **WCAG 2.1 Level AA** compliance target
-- **Semantic HTML** for proper document structure
-- **ARIA attributes** for enhanced screen reader support
-- **Keyboard navigation** support throughout the application
-- **Focus management** for interactive elements
+Este documento descreve as funcionalidades de acessibilidade implementadas na aplicação de e-commerce Coffee Workshop para garantir conformidade com WCAG 2.1 Nível AA e proporcionar uma experiência inclusiva para todos os usuários.
 
 ---
 
-## 🔧 Implementation Details
+## 🎯 Padrões de Acessibilidade
 
-### 1. Semantic HTML Structure
-
-#### Document Structure
-
-- `<html lang="en">` - Language declaration for screen readers
-- `<main role="main">` - Main content landmark
-- `<nav role="navigation">` - Navigation landmarks
-- `<header role="banner">` - Site header
-- Proper heading hierarchy (h1 → h2 → h3)
-
-#### Lists and Tables
-
-- `<ul role="list">` for product grids
-- `<table role="table">` with proper `<th scope="col">` headers
-- Semantic list structures for navigation menus
+- Conformidade com **WCAG 2.1 Nível AA**
+- **HTML semântico** para estrutura adequada do documento
+- **Atributos ARIA** para suporte aprimorado a leitores de tela
+- **Navegação por teclado** em toda a aplicação
+- **Gerenciamento de foco** para elementos interativos
 
 ---
 
-### 2. ARIA Attributes
+## 🔧 Detalhes de Implementação
 
-#### Labels and Descriptions
+### 1. Estrutura HTML Semântica
+
+#### Estrutura do Documento
+
+- `<html lang="pt-BR">` - Declaração de idioma para leitores de tela
+- `<main role="main">` - Marco do conteúdo principal
+- `<nav role="navigation">` - Marcos de navegação
+- `<header role="banner">` - Cabeçalho do site
+- Hierarquia adequada de cabeçalhos (h1 → h2 → h3)
+
+#### Listas e Tabelas
+
+- `<ul role="list">` para grades de produtos
+- `<table role="table">` com cabeçalhos `<th scope="col">` adequados
+- Estruturas de lista semânticas para menus de navegação
+
+---
+
+### 2. Atributos ARIA
+
+#### Rótulos e Descrições
 
 ```html
-<!-- Dynamic aria-label for context -->
-<button [attr.aria-label]="'Shopping cart with ' + cartItemCount() + ' items'">
-  <!-- aria-describedby for additional context -->
+<!-- aria-label dinâmico para contexto -->
+<button [attr.aria-label]="'Carrinho de compras com ' + cartItemCount() + ' itens'">
+  <!-- aria-describedby para contexto adicional -->
   <input aria-describedby="email-error" />
 
-  <!-- aria-labelledby for associating labels -->
+  <!-- aria-labelledby para associar rótulos -->
   <div aria-labelledby="summary-heading"></div>
 </button>
 ```
 
-#### Live Regions
+#### Regiões Dinâmicas
 
 ```html
-<!-- Polite announcements for non-critical updates -->
-<div role="status" aria-live="polite">Loading products...</div>
+<!-- Anúncios educados para atualizações não críticas -->
+<div role="status" aria-live="polite">Carregando produtos...</div>
 
-<!-- Assertive announcements for errors -->
+<!-- Anúncios assertivos para erros -->
 <div role="alert" aria-live="assertive">{{ error() }}</div>
 ```
 
-#### State Management
+#### Gerenciamento de Estado
 
 ```html
-<!-- Loading states -->
+<!-- Estados de carregamento -->
 <div aria-busy="true">
-  <!-- Expanded/collapsed states -->
+  <!-- Estados expandido/recolhido -->
   <button [attr.aria-expanded]="menuOpen">
-    <!-- Pressed states for toggles -->
+    <!-- Estados pressionado para alternadores -->
     <button [attr.aria-pressed]="!hidePassword()">
-      <!-- Required fields -->
+      <!-- Campos obrigatórios -->
       <input aria-required="true" />
 
-      <!-- Invalid fields -->
+      <!-- Campos inválidos -->
       <input [attr.aria-invalid]="hasError" />
     </button>
   </button>
@@ -82,228 +82,228 @@ This document outlines the accessibility features implemented in the Coffee Work
 
 ---
 
-### 3. Keyboard Navigation
+### 3. Navegação por Teclado
 
-#### Tab Order
+#### Ordem de Tabulação
 
-- All interactive elements have `tabindex="0"` for natural tab order
-- No positive tabindex values (anti-pattern)
-- Logical focus flow through the page
+- Todos os elementos interativos têm `tabindex="0"` para ordem natural de tabulação
+- Nenhum valor positivo de tabindex (anti-padrão)
+- Fluxo lógico de foco pela página
 
-#### Focus Indicators
+#### Indicadores de Foco
 
-- Visible focus indicators on all interactive elements
-- Enhanced focus styles for better visibility
-- Skip links for keyboard users (future enhancement)
+- Indicadores de foco visíveis em todos os elementos interativos
+- Estilos de foco aprimorados para melhor visibilidade
+- Links de pular para usuários de teclado (melhoria futura)
 
-#### Keyboard Shortcuts
+#### Atalhos de Teclado
 
-- Enter/Space: Activate buttons and links
-- Escape: Close modals and menus
-- Arrow keys: Navigate through menus (Material components)
+- Enter/Espaço: Ativar botões e links
+- Escape: Fechar modais e menus
+- Setas: Navegar pelos menus (componentes Material)
 
 ---
 
-### 4. Component-Specific Implementations
+### 4. Implementações Específicas de Componentes
 
-#### Header Navigation
+#### Navegação do Cabeçalho
 
 ```html
-<nav role="navigation" aria-label="Main navigation">
+<nav role="navigation" aria-label="Navegação principal">
   <ul role="menubar">
     <li role="none">
-      <a role="menuitem" aria-label="View products">Products</a>
+      <a role="menuitem" aria-label="Ver produtos">Produtos</a>
     </li>
   </ul>
 </nav>
 ```
 
-#### Shopping Cart Badge
+#### Badge do Carrinho de Compras
 
 ```html
-<button [attr.aria-label]="'Shopping cart with ' + cartItemCount() + ' items'">
+<button [attr.aria-label]="'Carrinho de compras com ' + cartItemCount() + ' itens'">
   <mat-icon aria-hidden="true">shopping_cart</mat-icon>
 </button>
 ```
 
-#### Product Cards
+#### Cards de Produtos
 
 ```html
-<mat-card role="article" [attr.aria-label]="'Product: ' + product().name">
+<mat-card role="article" [attr.aria-label]="'Produto: ' + product().name">
   <img [alt]="product().name + ' - ' + product().description" />
-  <button [attr.aria-label]="'Add ' + product().name + ' to cart'">
+  <button [attr.aria-label]="'Adicionar ' + product().name + ' ao carrinho'">
 </mat-card>
 ```
 
-#### Forms
+#### Formulários
 
 ```html
 <form role="form" [attr.aria-labelledby]="'form-heading'">
   <input aria-required="true" aria-describedby="field-error" [attr.aria-invalid]="hasError" />
-  <div id="field-error" role="alert" aria-live="polite">Error message</div>
+  <div id="field-error" role="alert" aria-live="polite">Mensagem de erro</div>
 </form>
 ```
 
-#### Data Tables
+#### Tabelas de Dados
 
 ```html
 <table role="table" aria-labelledby="admin-heading">
-  <th scope="col">Column Name</th>
-  <td [attr.aria-label]="'Price: ' + (product.price | currency)"></td>
+  <th scope="col">Nome da Coluna</th>
+  <td [attr.aria-label]="'Preço: ' + (product.price | currency)"></td>
 </table>
 ```
 
-#### Quantity Controls
+#### Controles de Quantidade
 
 ```html
-<div role="group" [attr.aria-label]="'Quantity controls for ' + product.name">
-  <button [attr.aria-label]="'Decrease quantity'">-</button>
+<div role="group" [attr.aria-label]="'Controles de quantidade para ' + product.name">
+  <button [attr.aria-label]="'Diminuir quantidade'">-</button>
   <span role="status" aria-live="polite">{{ quantity }}</span>
-  <button [attr.aria-label]="'Increase quantity'">+</button>
+  <button [attr.aria-label]="'Aumentar quantidade'">+</button>
 </div>
 ```
 
 ---
 
-### 5. Visual Accessibility
+### 5. Acessibilidade Visual
 
-#### Icons
+#### Ícones
 
-- All decorative icons have `aria-hidden="true"`
-- Icon-only buttons have descriptive `aria-label`
-- Text alternatives provided where needed
+- Todos os ícones decorativos têm `aria-hidden="true"`
+- Botões apenas com ícones têm `aria-label` descritivo
+- Alternativas de texto fornecidas quando necessário
 
-#### Images
+#### Imagens
 
-- Descriptive alt text for all images
-- Context-aware descriptions (e.g., "Product name - description")
-- Fallback images with proper alt text
+- Texto alternativo descritivo para todas as imagens
+- Descrições contextuais (ex: "Nome do produto - descrição")
+- Imagens de fallback com texto alternativo adequado
 
-#### Color Contrast
+#### Contraste de Cores
 
-- Material Design components provide WCAG AA contrast ratios
-- Error states use color + icons + text
-- Focus indicators are highly visible
+- Componentes do Material Design fornecem taxas de contraste WCAG AA
+- Estados de erro usam cor + ícones + texto
+- Indicadores de foco são altamente visíveis
 
 ---
 
-## 🧪 Testing Recommendations
+## 🧪 Recomendações de Teste
 
-### Automated Testing
+### Testes Automatizados
 
 ```bash
-# Install axe-core for accessibility testing
+# Instalar axe-core para testes de acessibilidade
 npm install --save-dev @axe-core/playwright
 
-# Run accessibility tests
+# Executar testes de acessibilidade
 npm run test:a11y
 ```
 
-### Manual Testing Checklist
+### Checklist de Testes Manuais
 
-#### Keyboard Navigation
+#### Navegação por Teclado
 
-- [ ] Tab through all interactive elements
-- [ ] Verify focus indicators are visible
-- [ ] Test form submission with keyboard only
-- [ ] Navigate menus with arrow keys
+- [ ] Navegar por todos os elementos interativos com Tab
+- [ ] Verificar se os indicadores de foco estão visíveis
+- [ ] Testar envio de formulário apenas com teclado
+- [ ] Navegar pelos menus com setas
 
-#### Screen Reader Testing
+#### Testes com Leitor de Tela
 
-- [ ] Test with NVDA (Windows)
-- [ ] Test with JAWS (Windows)
-- [ ] Test with VoiceOver (macOS/iOS)
-- [ ] Verify all content is announced correctly
+- [ ] Testar com NVDA (Windows)
+- [ ] Testar com JAWS (Windows)
+- [ ] Testar com VoiceOver (macOS/iOS)
+- [ ] Verificar se todo o conteúdo é anunciado corretamente
 
-#### Visual Testing
+#### Testes Visuais
 
-- [ ] Zoom to 200% - content should remain usable
-- [ ] Test with high contrast mode
-- [ ] Verify color is not the only indicator
-- [ ] Check focus indicators at all zoom levels
-
----
-
-## 📋 WCAG 2.1 Compliance Checklist
-
-### Level A (Must Have)
-
-- [x] 1.1.1 Non-text Content - Alt text for images
-- [x] 1.3.1 Info and Relationships - Semantic HTML
-- [x] 2.1.1 Keyboard - All functionality via keyboard
-- [x] 2.4.1 Bypass Blocks - Skip links (via router)
-- [x] 3.3.1 Error Identification - Form validation
-- [x] 4.1.2 Name, Role, Value - ARIA attributes
-
-### Level AA (Should Have)
-
-- [x] 1.4.3 Contrast (Minimum) - Material Design defaults
-- [x] 2.4.6 Headings and Labels - Descriptive labels
-- [x] 2.4.7 Focus Visible - Focus indicators
-- [x] 3.2.4 Consistent Identification - Consistent UI
-- [x] 3.3.3 Error Suggestion - Helpful error messages
-- [x] 4.1.3 Status Messages - Live regions
+- [ ] Ampliar para 200% - o conteúdo deve permanecer utilizável
+- [ ] Testar com modo de alto contraste
+- [ ] Verificar se a cor não é o único indicador
+- [ ] Verificar indicadores de foco em todos os níveis de zoom
 
 ---
 
-## 🚀 Future Enhancements
+## 📋 Checklist de Conformidade WCAG 2.1
 
-### High Priority
+### Nível A (Obrigatório)
 
-- [ ] Add skip navigation links
-- [ ] Implement focus trap for modals
-- [ ] Add keyboard shortcuts documentation
-- [ ] Create accessibility statement page
+- [x] 1.1.1 Conteúdo Não-textual - Texto alternativo para imagens
+- [x] 1.3.1 Informações e Relacionamentos - HTML semântico
+- [x] 2.1.1 Teclado - Toda funcionalidade via teclado
+- [x] 2.4.1 Blocos de Contorno - Links de pular (via roteador)
+- [x] 3.3.1 Identificação de Erro - Validação de formulário
+- [x] 4.1.2 Nome, Função, Valor - Atributos ARIA
 
-### Medium Priority
+### Nível AA (Recomendado)
 
-- [ ] Add reduced motion support
-- [ ] Implement dark mode with proper contrast
-- [ ] Add language switcher (i18n)
-- [ ] Create accessible data visualizations
-
-### Low Priority
-
-- [ ] Add voice control support
-- [ ] Implement gesture alternatives
-- [ ] Add customizable text size
-- [ ] Create accessibility preferences panel
+- [x] 1.4.3 Contraste (Mínimo) - Padrões do Material Design
+- [x] 2.4.6 Cabeçalhos e Rótulos - Rótulos descritivos
+- [x] 2.4.7 Foco Visível - Indicadores de foco
+- [x] 3.2.4 Identificação Consistente - UI consistente
+- [x] 3.3.3 Sugestão de Erro - Mensagens de erro úteis
+- [x] 4.1.3 Mensagens de Status - Regiões dinâmicas
 
 ---
 
-## 📚 Resources
+## 🚀 Melhorias Futuras
 
-### Documentation
+### Alta Prioridade
 
-- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
-- [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
-- [Angular Material Accessibility](https://material.angular.io/cdk/a11y/overview)
+- [ ] Adicionar links de navegação rápida
+- [ ] Implementar armadilha de foco para modais
+- [ ] Adicionar documentação de atalhos de teclado
+- [ ] Criar página de declaração de acessibilidade
 
-### Testing Tools
+### Média Prioridade
+
+- [ ] Adicionar suporte a movimento reduzido
+- [ ] Implementar modo escuro com contraste adequado
+- [ ] Adicionar seletor de idioma (i18n)
+- [ ] Criar visualizações de dados acessíveis
+
+### Baixa Prioridade
+
+- [ ] Adicionar suporte a controle por voz
+- [ ] Implementar alternativas a gestos
+- [ ] Adicionar tamanho de texto personalizável
+- [ ] Criar painel de preferências de acessibilidade
+
+---
+
+## 📚 Recursos
+
+### Documentação
+
+- [Diretrizes WCAG 2.1](https://www.w3.org/WAI/WCAG21/quickref/)
+- [Práticas de Autoria ARIA](https://www.w3.org/WAI/ARIA/apg/)
+- [Acessibilidade do Angular Material](https://material.angular.io/cdk/a11y/overview)
+
+### Ferramentas de Teste
 
 - [axe DevTools](https://www.deque.com/axe/devtools/)
-- [WAVE Browser Extension](https://wave.webaim.org/extension/)
-- [Lighthouse Accessibility Audit](https://developers.google.com/web/tools/lighthouse)
+- [Extensão WAVE para Navegador](https://wave.webaim.org/extension/)
+- [Auditoria de Acessibilidade do Lighthouse](https://developers.google.com/web/tools/lighthouse)
 
-### Screen Readers
+### Leitores de Tela
 
-- [NVDA (Free)](https://www.nvaccess.org/)
+- [NVDA (Gratuito)](https://www.nvaccess.org/)
 - [JAWS](https://www.freedomscientific.com/products/software/jaws/)
-- [VoiceOver (Built-in macOS/iOS)](https://www.apple.com/accessibility/voiceover/)
+- [VoiceOver (Integrado no macOS/iOS)](https://www.apple.com/accessibility/voiceover/)
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contribuindo
 
-When adding new features, ensure:
+Ao adicionar novas funcionalidades, certifique-se de:
 
-1. All interactive elements are keyboard accessible
-2. Proper ARIA attributes are added
-3. Focus management is implemented
-4. Screen reader testing is performed
-5. Color contrast meets WCAG AA standards
+1. Todos os elementos interativos são acessíveis por teclado
+2. Atributos ARIA adequados são adicionados
+3. Gerenciamento de foco é implementado
+4. Testes com leitor de tela são realizados
+5. Contraste de cores atende aos padrões WCAG AA
 
 ---
 
-**Last Updated:** March 2026  
-**Maintained by:** Development Team
+**Última Atualização:** Março 2026  
+**Mantido por:** Equipe de Desenvolvimento

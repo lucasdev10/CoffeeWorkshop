@@ -1,12 +1,12 @@
-# 🐳 Docker Guide
+# 🐳 Guia do Docker
 
-## Overview
+## Visão Geral
 
-This guide explains how to build, run, and deploy the Coffee Workshop application using Docker.
+Este guia explica como construir, executar e fazer deploy da aplicação Coffee Workshop usando Docker.
 
 ---
 
-## 📋 Prerequisites
+## 📋 Pré-requisitos
 
 - Docker 20.10+
 - Docker Compose 2.0+
@@ -14,62 +14,62 @@ This guide explains how to build, run, and deploy the Coffee Workshop applicatio
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Início Rápido
 
-### Using Docker Compose (Recommended)
+### Usando Docker Compose (Recomendado)
 
 ```bash
-# Start the application
+# Iniciar a aplicação
 docker-compose up -d
 
-# Access the application
+# Acessar a aplicação
 open http://localhost:8080
 
-# View logs
+# Ver logs
 docker-compose logs -f
 
-# Stop the application
+# Parar a aplicação
 docker-compose down
 ```
 
-### Using Docker CLI
+### Usando Docker CLI
 
 ```bash
-# Build the image
+# Build da imagem
 docker build -t coffee-workshop .
 
-# Run the container
+# Executar o container
 docker run -d -p 8080:80 --name coffee-workshop coffee-workshop
 
-# Access the application
+# Acessar a aplicação
 open http://localhost:8080
 
-# Stop and remove
+# Parar e remover
 docker stop coffee-workshop
 docker rm coffee-workshop
 ```
 
 ---
 
-## 🏗️ Build Process
+## 🏗️ Processo de Build
 
-### Multi-Stage Build
+### Build Multi-Stage
 
-The Dockerfile uses a multi-stage build for optimal image size:
+O Dockerfile usa um build multi-stage para tamanho otimizado da imagem:
 
 **Stage 1: Build** (node:22-alpine)
 
-- Install dependencies
-- Build Angular application
-- Output: Production-ready static files
+- Instalar dependências
+- Build da aplicação Angular
+- Saída: Arquivos estáticos prontos para produção
 
 **Stage 2: Serve** (nginx:alpine)
 
-- Copy built files
-- Configure Nginx
-- Serve application
+- Copiar arquivos construídos
+- Configurar Nginx
+- Servir aplicação
 
-### Build Arguments
+### Argumentos de Build
 
 ```bash
 docker build \
@@ -80,40 +80,40 @@ docker build \
 
 ---
 
-## 📦 Image Details
+## 📦 Detalhes da Imagem
 
-### Base Images
+### Imagens Base
 
 - **Build**: `node:22-alpine` (~180 MB)
 - **Runtime**: `nginx:alpine` (~40 MB)
 
-### Final Image Size
+### Tamanho da Imagem Final
 
-- **Uncompressed**: ~50 MB
-- **Compressed**: ~20 MB
+- **Descomprimida**: ~50 MB
+- **Comprimida**: ~20 MB
 
-### Layers
+### Camadas
 
-1. Nginx base layer
-2. Custom nginx.conf
-3. Application files
-4. Health check configuration
+1. Camada base do Nginx
+2. nginx.conf customizado
+3. Arquivos da aplicação
+4. Configuração de health check
 
 ---
 
-## ⚙️ Configuration
+## ⚙️ Configuração
 
-### Nginx Configuration
+### Configuração do Nginx
 
-The `nginx.conf` includes:
+O `nginx.conf` inclui:
 
-- Gzip compression
-- Cache headers for static assets
-- Security headers
-- Angular routing support
-- Health check endpoint
+- Compressão Gzip
+- Headers de cache para assets estáticos
+- Headers de segurança
+- Suporte ao roteamento do Angular
+- Endpoint de health check
 
-### Environment Variables
+### Variáveis de Ambiente
 
 ```yaml
 # docker-compose.yml
@@ -121,36 +121,36 @@ environment:
   - NODE_ENV=production
 ```
 
-### Ports
+### Portas
 
 - **Container**: 80
-- **Host**: 8080 (configurable)
+- **Host**: 8080 (configurável)
 
 ---
 
 ## 🔧 Scripts
 
-### Build Script
+### Script de Build
 
 ```bash
 ./scripts/docker-build.sh [tag]
 
-# Examples
+# Exemplos
 ./scripts/docker-build.sh latest
 ./scripts/docker-build.sh v1.0.0
 ```
 
-### Push Script
+### Script de Push
 
 ```bash
 ./scripts/docker-push.sh [tag]
 
-# Examples
+# Exemplos
 ./scripts/docker-push.sh latest
 ./scripts/docker-push.sh v1.0.0
 ```
 
-### Local Deploy Script
+### Script de Deploy Local
 
 ```bash
 ./scripts/deploy-local.sh
@@ -158,36 +158,36 @@ environment:
 
 ---
 
-## 🏥 Health Checks
+## 🏥 Verificações de Saúde
 
-### Docker Health Check
+### Health Check do Docker
 
 ```dockerfile
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
 ```
 
-### Nginx Health Endpoint
+### Endpoint de Saúde do Nginx
 
 ```bash
 curl http://localhost:8080/health
-# Response: healthy
+# Resposta: healthy
 ```
 
-### Check Container Health
+### Verificar Saúde do Container
 
 ```bash
 docker ps
-# Look for "healthy" status
+# Procurar por status "healthy"
 
 docker inspect coffee-workshop | grep -A 5 Health
 ```
 
 ---
 
-## 🔒 Security
+## 🔒 Segurança
 
-### Security Headers
+### Headers de Segurança
 
 ```nginx
 X-Frame-Options: SAMEORIGIN
@@ -197,93 +197,93 @@ Referrer-Policy: no-referrer-when-downgrade
 Content-Security-Policy: default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';
 ```
 
-### Best Practices
+### Melhores Práticas
 
-- ✅ Non-root user (nginx)
-- ✅ Minimal base image (alpine)
-- ✅ Multi-stage build
-- ✅ .dockerignore file
+- ✅ Usuário não-root (nginx)
+- ✅ Imagem base mínima (alpine)
+- ✅ Build multi-stage
+- ✅ Arquivo .dockerignore
 - ✅ Health checks
-- ✅ Security headers
+- ✅ Headers de segurança
 
 ---
 
 ## 📊 Performance
 
-### Optimizations
+### Otimizações
 
-1. **Multi-stage build**: Reduces final image size
-2. **Alpine Linux**: Minimal base image
-3. **Gzip compression**: Reduces bandwidth
-4. **Cache headers**: Improves client-side caching
-5. **Static file serving**: Fast Nginx delivery
+1. **Build multi-stage**: Reduz o tamanho da imagem final
+2. **Alpine Linux**: Imagem base mínima
+3. **Compressão Gzip**: Reduz largura de banda
+4. **Headers de cache**: Melhora cache do lado cliente
+5. **Servir arquivos estáticos**: Entrega rápida pelo Nginx
 
 ### Benchmarks
 
 ```bash
-# Image size
+# Tamanho da imagem
 docker images coffee-workshop
 # ~50 MB
 
-# Build time
+# Tempo de build
 time docker build -t coffee-workshop .
-# ~2-3 minutes (first build)
-# ~30 seconds (cached)
+# ~2-3 minutos (primeiro build)
+# ~30 segundos (com cache)
 
-# Startup time
+# Tempo de inicialização
 time docker run -d -p 8080:80 coffee-workshop
-# ~2 seconds
+# ~2 segundos
 ```
 
 ---
 
-## 🐛 Troubleshooting
+## 🐛 Solução de Problemas
 
-### Container won't start
+### Container não inicia
 
 ```bash
-# Check logs
+# Verificar logs
 docker logs coffee-workshop
 
-# Check if port is in use
+# Verificar se a porta está em uso
 lsof -i :8080
 
-# Inspect container
+# Inspecionar container
 docker inspect coffee-workshop
 ```
 
-### Build fails
+### Build falha
 
 ```bash
-# Clear build cache
+# Limpar cache de build
 docker builder prune
 
-# Build without cache
+# Build sem cache
 docker build --no-cache -t coffee-workshop .
 
-# Check .dockerignore
+# Verificar .dockerignore
 cat .dockerignore
 ```
 
-### Application not accessible
+### Aplicação não acessível
 
 ```bash
-# Check container is running
+# Verificar se container está rodando
 docker ps
 
-# Check port mapping
+# Verificar mapeamento de porta
 docker port coffee-workshop
 
-# Test health endpoint
+# Testar endpoint de saúde
 curl http://localhost:8080/health
 
-# Check nginx logs
+# Verificar logs do nginx
 docker exec coffee-workshop cat /var/log/nginx/error.log
 ```
 
 ---
 
-## 🚢 Deployment
+## 🚢 Deploy
 
 ### Docker Hub
 
@@ -291,7 +291,7 @@ docker exec coffee-workshop cat /var/log/nginx/error.log
 # Login
 docker login
 
-# Tag image
+# Tag da imagem
 docker tag coffee-workshop username/coffee-workshop:latest
 
 # Push
@@ -304,20 +304,20 @@ docker push username/coffee-workshop:latest
 # Login
 echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
-# Tag image
+# Tag da imagem
 docker tag coffee-workshop ghcr.io/username/coffee-workshop:latest
 
 # Push
 docker push ghcr.io/username/coffee-workshop:latest
 ```
 
-### Pull and Run
+### Pull e Executar
 
 ```bash
-# Pull from registry
+# Pull do registry
 docker pull ghcr.io/username/coffee-workshop:latest
 
-# Run
+# Executar
 docker run -d -p 8080:80 ghcr.io/username/coffee-workshop:latest
 ```
 
@@ -325,7 +325,7 @@ docker run -d -p 8080:80 ghcr.io/username/coffee-workshop:latest
 
 ## 🔄 Docker Compose
 
-### Services
+### Serviços
 
 ```yaml
 services:
@@ -343,104 +343,104 @@ services:
       retries: 3
 ```
 
-### Commands
+### Comandos
 
 ```bash
-# Start services
+# Iniciar serviços
 docker-compose up -d
 
-# View logs
+# Ver logs
 docker-compose logs -f app
 
-# Restart service
+# Reiniciar serviço
 docker-compose restart app
 
-# Stop services
+# Parar serviços
 docker-compose down
 
-# Rebuild and start
+# Rebuild e iniciar
 docker-compose up -d --build
 
-# Scale services
+# Escalar serviços
 docker-compose up -d --scale app=3
 ```
 
 ---
 
-## 📈 Monitoring
+## 📈 Monitoramento
 
-### Container Stats
+### Estatísticas do Container
 
 ```bash
-# Real-time stats
+# Estatísticas em tempo real
 docker stats coffee-workshop
 
-# Resource usage
+# Uso de recursos
 docker inspect coffee-workshop | grep -A 10 Memory
 ```
 
 ### Logs
 
 ```bash
-# Follow logs
+# Seguir logs
 docker logs -f coffee-workshop
 
-# Last 100 lines
+# Últimas 100 linhas
 docker logs --tail 100 coffee-workshop
 
-# Since timestamp
+# Desde timestamp
 docker logs --since 2024-03-09T10:00:00 coffee-workshop
 ```
 
 ---
 
-## 🧪 Testing
+## 🧪 Testes
 
-### Test Build
+### Testar Build
 
 ```bash
-# Build test image
+# Build da imagem de teste
 docker build -t coffee-workshop:test .
 
-# Run tests in container
+# Executar testes no container
 docker run --rm coffee-workshop:test npm test
 ```
 
-### Integration Tests
+### Testes de Integração
 
 ```bash
-# Start container
+# Iniciar container
 docker-compose up -d
 
-# Wait for healthy
+# Aguardar healthy
 sleep 5
 
-# Run tests
+# Executar testes
 curl http://localhost:8080/health
 curl http://localhost:8080/
 
-# Cleanup
+# Limpeza
 docker-compose down
 ```
 
 ---
 
-## 📚 Resources
+## 📚 Recursos
 
-### Documentation
+### Documentação
 
-- [Docker Documentation](https://docs.docker.com/)
-- [Nginx Documentation](https://nginx.org/en/docs/)
+- [Documentação do Docker](https://docs.docker.com/)
+- [Documentação do Nginx](https://nginx.org/en/docs/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
-### Best Practices
+### Melhores Práticas
 
-- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
-- [Dockerfile Best Practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
-- [Multi-stage Builds](https://docs.docker.com/build/building/multi-stage/)
+- [Melhores Práticas do Docker](https://docs.docker.com/develop/dev-best-practices/)
+- [Melhores Práticas do Dockerfile](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
+- [Builds Multi-stage](https://docs.docker.com/build/building/multi-stage/)
 
 ---
 
-**Last Updated**: March 2026  
-**Docker Version**: 20.10+  
-**Status**: ✅ Production Ready
+**Última Atualização**: Março 2026  
+**Versão do Docker**: 20.10+  
+**Status**: ✅ Pronto para Produção
