@@ -1,4 +1,5 @@
 import { IUser } from '@app/features/user/models/user.model';
+import { LoadingState } from '@app/shared';
 
 /**
  * Credenciais de login
@@ -18,12 +19,11 @@ export interface IAuthResponse {
 }
 
 /**
- * Estado de autenticação
+ * Interface da store de autenticação
  */
-export interface IAuthState {
+export interface IAuthStoreState {
   user: IUser | null;
   token: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
+  loading: LoadingState;
   error: string | null;
 }

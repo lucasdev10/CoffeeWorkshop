@@ -12,7 +12,7 @@ import { of, Subject, throwError } from 'rxjs';
  * Testa o fluxo completo de login, persistência e logout
  */
 describe('Authentication Flow Integration Tests', () => {
-  let authStore: AuthStore;
+  let authStore: InstanceType<typeof AuthStore>;
   let authRepository: AuthRepository;
   let storageService: StorageService;
   let router: Router;

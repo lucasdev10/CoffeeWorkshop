@@ -9,7 +9,7 @@ import { AuthRepository } from '../repositories/auth.repository';
 import { AuthStore } from './auth.store';
 
 describe('AuthStore', () => {
-  let store: AuthStore;
+  let store: InstanceType<typeof AuthStore>;
   let mockRepository: Mocked<AuthRepository>;
   let mockStorage: Mocked<StorageService>;
   let mockRouter: Mocked<Router>;

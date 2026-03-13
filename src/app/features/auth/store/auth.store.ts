@@ -1,121 +1,130 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { StorageService } from '@app/core/storage/storage';
 import { EUserRole, IUser } from '@app/features/user/models/user.model';
-import { ILoginCredentials } from '../models/auth.model';
+import {
+  patchState,
+  signalStore,
+  withComputed,
+  withHooks,
+  withMethods,
+  withState,
+} from '@ngrx/signals';
+import { IAuthStoreState, ILoginCredentials } from '../models/auth.model';
 import { AuthRepository } from '../repositories/auth.repository';
 
 /**
- * Store de autenticação usando Signals
- * Gerencia estado de autenticação da aplicação
+ * Estado inicial da store de usuários
  */
-@Injectable({
-  providedIn: 'root',
-})
-export class AuthStore {
-  private readonly repository = inject(AuthRepository);
-  private readonly storage = inject(StorageService);
-  private readonly router = inject(Router);
+const initialState: IAuthStoreState = {
+  user: null,
+  token: null,
+  loading: 'idle',
+  error: null,
+};
 
-  // State
-  private readonly userState = signal<IUser | null>(null);
-  private readonly tokenState = signal<string | null>(null);
-  private readonly loadingState = signal<boolean>(false);
-  private readonly errorState = signal<string | null>(null);
+/**
+ * Store de Autenticação usando SignalStore
+ * Gerencia estado global de autenticação de forma reativa
+ */
+export const AuthStore = signalStore(
+  { providedIn: 'root' },
+  withState(initialState),
+  withComputed((store) => ({
+    user: computed(() => store.user()),
+    token: computed(() => store.token()),
+    isLoading: computed(() => store.loading() === 'loading'),
+    error: computed(() => store.error()),
+    isAuthenticated: computed(() => !!store.user() && !!store.token()),
+    isAdmin: computed(() => store.user()?.role === EUserRole.ADMIN),
+  })),
+  withMethods(
+    (
+      store,
+      storage = inject(StorageService),
+      repository = inject(AuthRepository),
+      router = inject(Router),
+    ) => ({
+      /**
+       * Inicializa autenticação do localStorage
+       */
+      _initializeAuth(): void {
+        const token = storage.get('auth_token') as string | null;
+        const user = storage.get('auth_user') as IUser | null;
 
-  // Computed signals
-  readonly user = computed(() => this.userState());
-  readonly token = computed(() => this.tokenState());
-  readonly isLoading = computed(() => this.loadingState());
-  readonly error = computed(() => this.errorState());
-  readonly isAuthenticated = computed(() => !!this.userState() && !!this.tokenState());
-  readonly isAdmin = computed(() => this.userState()?.role === EUserRole.ADMIN);
-
-  constructor() {
-    this.initializeAuth();
-  }
-
-  /**
-   * Inicializa autenticação do localStorage
-   */
-  private initializeAuth(): void {
-    const token = this.storage.get('auth_token') as string | null;
-    const user = this.storage.get('auth_user') as IUser | null;
-
-    if (token && user) {
-      this.tokenState.set(token);
-      this.userState.set(user);
-    }
-  }
-
-  /**
-   * Realiza login
-   */
-  login(credentials: ILoginCredentials): void {
-    this.loadingState.set(true);
-    this.errorState.set(null);
-
-    this.repository.login(credentials).subscribe({
-      next: (response) => {
-        this.userState.set(response.user);
-        this.tokenState.set(response.token);
-
-        // Persiste no localStorage
-        this.storage.set('auth_token', response.token);
-        this.storage.set('auth_user', response.user);
-
-        this.loadingState.set(false);
-
-        // Redireciona baseado no role
-        if (response.user.role === EUserRole.ADMIN) {
-          this.router.navigate(['/admin']);
-        } else {
-          this.router.navigate(['/products']);
+        if (token && user) {
+          patchState(store, { token, user });
         }
       },
-      error: (error) => {
-        this.errorState.set(error.message || 'Error when logging in');
-        this.loadingState.set(false);
+      /**
+       * Realiza login
+       */
+      login(credentials: ILoginCredentials): void {
+        patchState(store, { loading: 'loading', error: null });
+
+        repository.login(credentials).subscribe({
+          next: ({ user, token }) => {
+            patchState(store, { user, token });
+
+            // Persiste no localStorage
+            storage.set('auth_token', token);
+            storage.set('auth_user', user);
+
+            patchState(store, { loading: 'success' });
+
+            // Redireciona baseado no role
+            if (user.role === EUserRole.ADMIN) {
+              router.navigate(['/admin']);
+            } else {
+              router.navigate(['/products']);
+            }
+          },
+          error: (error) => {
+            patchState(store, {
+              error: error.message || 'Error when logging in',
+              loading: 'error',
+            });
+          },
+        });
       },
-    });
-  }
+      /**
+       * Realiza logout
+       */
+      logout(): void {
+        patchState(store, { loading: 'loading' });
 
-  /**
-   * Realiza logout
-   */
-  logout(): void {
-    this.loadingState.set(true);
-
-    this.repository.logout().subscribe({
-      next: () => {
-        this.clearAuth();
-        this.router.navigate(['/auth/login']);
+        repository.logout().subscribe({
+          next: () => {
+            this._clearAuth();
+            router.navigate(['/auth/login']);
+          },
+          error: () => {
+            // Mesmo com erro, limpa autenticação
+            this._clearAuth();
+            router.navigate(['/auth/login']);
+          },
+        });
       },
-      error: () => {
-        // Mesmo com erro, limpa autenticação
-        this.clearAuth();
-        this.router.navigate(['/auth/login']);
+      /**
+       * Limpa estado de autenticação
+       */
+      _clearAuth(): void {
+        patchState(store, { user: null, token: null, loading: 'idle', error: null });
+
+        storage.remove('auth_token');
+        storage.remove('auth_user');
       },
-    });
-  }
-
-  /**
-   * Limpa estado de autenticação
-   */
-  private clearAuth(): void {
-    this.userState.set(null);
-    this.tokenState.set(null);
-    this.loadingState.set(false);
-    this.errorState.set(null);
-
-    this.storage.remove('auth_token');
-    this.storage.remove('auth_user');
-  }
-
-  /**
-   * Limpa erro
-   */
-  clearError(): void {
-    this.errorState.set(null);
-  }
-}
+      /**
+       * Limpa erro
+       */
+      _clearError(): void {
+        patchState(store, { error: null });
+      },
+    }),
+  ),
+  withHooks((store) => ({
+    onInit: () => {
+      store._initializeAuth();
+    },
+  })),
+);

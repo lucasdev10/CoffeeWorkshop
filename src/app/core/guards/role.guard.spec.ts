@@ -8,7 +8,7 @@ import { roleGuard } from './role.guard';
 
 describe('roleGuard', () => {
   let mockRouter: Router;
-  let mockAuthStore: Partial<AuthStore>;
+  let mockAuthStore: Partial<InstanceType<typeof AuthStore>>;
 
   const mockAdminUser: IUser = {
     id: '1',
