@@ -1,4 +1,5 @@
-import { computed, inject } from '@angular/core';
+import { computed, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { StorageService } from '@app/core/storage/storage';
 import { EUserRole, IUser } from '@app/features/user/models/user.model';
@@ -44,6 +45,7 @@ export const AuthStore = signalStore(
       storage = inject(StorageService),
       repository = inject(AuthRepository),
       router = inject(Router),
+      destroyRef = inject(DestroyRef),
     ) => ({
       /**
        * Inicializa autenticação do localStorage
@@ -62,30 +64,33 @@ export const AuthStore = signalStore(
       login(credentials: ILoginCredentials): void {
         patchState(store, { loading: 'loading', error: null });
 
-        repository.login(credentials).subscribe({
-          next: ({ user, token }) => {
-            patchState(store, { user, token });
+        repository
+          .login(credentials)
+          .pipe(takeUntilDestroyed(destroyRef))
+          .subscribe({
+            next: ({ user, token }) => {
+              patchState(store, { user, token });
 
-            // Persiste no localStorage
-            storage.set('auth_token', token);
-            storage.set('auth_user', user);
+              // Persiste no localStorage
+              storage.set('auth_token', token);
+              storage.set('auth_user', user);
 
-            patchState(store, { loading: 'success' });
+              patchState(store, { loading: 'success' });
 
-            // Redireciona baseado no role
-            if (user.role === EUserRole.ADMIN) {
-              router.navigate(['/admin']);
-            } else {
-              router.navigate(['/products']);
-            }
-          },
-          error: (error) => {
-            patchState(store, {
-              error: error.message || 'Error when logging in',
-              loading: 'error',
-            });
-          },
-        });
+              // Redireciona baseado no role
+              if (user.role === EUserRole.ADMIN) {
+                router.navigate(['/admin']);
+              } else {
+                router.navigate(['/products']);
+              }
+            },
+            error: (error) => {
+              patchState(store, {
+                error: error.message || 'Error when logging in',
+                loading: 'error',
+              });
+            },
+          });
       },
       /**
        * Realiza logout
@@ -93,17 +98,20 @@ export const AuthStore = signalStore(
       logout(): void {
         patchState(store, { loading: 'loading' });
 
-        repository.logout().subscribe({
-          next: () => {
-            this._clearAuth();
-            router.navigate(['/auth/login']);
-          },
-          error: () => {
-            // Mesmo com erro, limpa autenticação
-            this._clearAuth();
-            router.navigate(['/auth/login']);
-          },
-        });
+        repository
+          .logout()
+          .pipe(takeUntilDestroyed(destroyRef))
+          .subscribe({
+            next: () => {
+              this._clearAuth();
+              router.navigate(['/auth/login']);
+            },
+            error: () => {
+              // Mesmo com erro, limpa autenticação
+              this._clearAuth();
+              router.navigate(['/auth/login']);
+            },
+          });
       },
       /**
        * Limpa estado de autenticação

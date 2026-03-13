@@ -1,4 +1,5 @@
-import { computed, inject } from '@angular/core';
+import { computed, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoadingState } from '@app/shared';
 import {
   patchState,
@@ -60,101 +61,116 @@ export const UserStore = signalStore(
       hasError: computed(() => store.error() !== null),
     };
   }),
-  withMethods((store, repository = inject(UserRepository)) => ({
+  withMethods((store, repository = inject(UserRepository), destroyRef = inject(DestroyRef)) => ({
     loadUsers(): void {
       this._setLoading('loading');
 
-      repository.findAll().subscribe({
-        next: (users) => {
-          patchState(store, { users, loading: 'success', error: null });
-        },
-        error: (error) => {
-          patchState(store, {
-            loading: 'error',
-            error: error.message || 'Failed to load users',
-          });
-        },
-      });
+      repository
+        .findAll()
+        .pipe(takeUntilDestroyed(destroyRef))
+        .subscribe({
+          next: (users) => {
+            patchState(store, { users, loading: 'success', error: null });
+          },
+          error: (error) => {
+            patchState(store, {
+              loading: 'error',
+              error: error.message || 'Failed to load users',
+            });
+          },
+        });
     },
     loadUserById(id: string): void {
       this._setLoading('loading');
 
-      repository.findById(id).subscribe({
-        next: (user) => {
-          patchState(store, { selectedUser: user, loading: 'success', error: null });
-        },
-        error: (error) => {
-          patchState(store, {
-            loading: 'error',
-            error: error.message || 'Failed to load user',
-          });
-        },
-      });
+      repository
+        .findById(id)
+        .pipe(takeUntilDestroyed(destroyRef))
+        .subscribe({
+          next: (user) => {
+            patchState(store, { selectedUser: user, loading: 'success', error: null });
+          },
+          error: (error) => {
+            patchState(store, {
+              loading: 'error',
+              error: error.message || 'Failed to load user',
+            });
+          },
+        });
     },
     createUser(dto: ICreateUserDto): void {
       this._setLoading('loading');
 
-      repository.create(dto).subscribe({
-        next: (user) => {
-          patchState(store, {
-            users: [...store.users(), user],
-            loading: 'success',
-            error: null,
-          });
-        },
-        error: (error) => {
-          patchState(store, {
-            loading: 'error',
-            error: error.message || 'Failed to create user',
-          });
-        },
-      });
+      repository
+        .create(dto)
+        .pipe(takeUntilDestroyed(destroyRef))
+        .subscribe({
+          next: (user) => {
+            patchState(store, {
+              users: [...store.users(), user],
+              loading: 'success',
+              error: null,
+            });
+          },
+          error: (error) => {
+            patchState(store, {
+              loading: 'error',
+              error: error.message || 'Failed to create user',
+            });
+          },
+        });
     },
     updateUser(id: string, dto: IUpdateUserDto): void {
       this._setLoading('loading');
 
-      repository.update(id, dto).subscribe({
-        next: (updatedUser) => {
-          const users = store.users();
-          const updatedUsers = users.map((u) => (u.id === id ? updatedUser : u));
+      repository
+        .update(id, dto)
+        .pipe(takeUntilDestroyed(destroyRef))
+        .subscribe({
+          next: (updatedUser) => {
+            const users = store.users();
+            const updatedUsers = users.map((u) => (u.id === id ? updatedUser : u));
 
-          patchState(store, {
-            users: updatedUsers,
-            selectedUser: store.selectedUser()?.id === id ? updatedUser : store.selectedUser(),
-            loading: 'success',
-            error: null,
-          });
-        },
-        error: (error) => {
-          patchState(store, {
-            loading: 'error',
-            error: error.message || 'Failed to update user',
-          });
-        },
-      });
+            patchState(store, {
+              users: updatedUsers,
+              selectedUser: store.selectedUser()?.id === id ? updatedUser : store.selectedUser(),
+              loading: 'success',
+              error: null,
+            });
+          },
+          error: (error) => {
+            patchState(store, {
+              loading: 'error',
+              error: error.message || 'Failed to update user',
+            });
+          },
+        });
     },
     deleteUser(id: string): void {
       this._setLoading('loading');
 
-      repository.delete(id).subscribe({
-        next: () => {
-          const users = store.users();
-          const updatedUsers = users.filter((u) => u.id !== id);
+      repository
+        .delete(id)
+        .pipe(takeUntilDestroyed(destroyRef))
+        .subscribe({
+          next: () => {
+            const users = store.users();
+            const updatedUsers = users.filter((u) => u.id !== id);
 
-          patchState(store, {
-            users: updatedUsers,
-            selectedUser: store.selectedUser()?.id === id ? null : store.selectedUser(),
-            loading: 'success',
-            error: null,
-          });
-        },
-        error: (error) => {
-          patchState(store, {
-            loading: 'error',
-            error: error.message || 'Failed to delete user',
-          });
-        },
-      });
+            patchState(store, {
+              users: updatedUsers,
+              selectedUser: store.selectedUser()?.id === id ? null : store.selectedUser(),
+              loading: 'success',
+              error: null,
+            });
+          },
+          error: (error) => {
+            patchState(store, {
+              loading: 'error',
+              error: error.message || 'Failed to delete user',
+            });
+          },
+        });
     },
     setFilters(filters: IUserFilters): void {
       patchState(store, { filters: { ...store.filters(), ...filters } });
