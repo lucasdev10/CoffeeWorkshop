@@ -228,13 +228,18 @@ describe('AuthStore', () => {
 
   describe('loading states', () => {
     it('should set loading during login', () => {
-      mockRepository.login.mockReturnValue(
-        new (class {
-          subscribe() {
-            // Never completes
-          }
-        })() as any,
-      );
+      // Create an Observable that never completes
+      const neverCompletes$ = new (class {
+        pipe() {
+          return this;
+        }
+        subscribe() {
+          // Never completes
+          return { unsubscribe: () => {} };
+        }
+      })() as any;
+
+      mockRepository.login.mockReturnValue(neverCompletes$);
 
       store.login({ email: 'test@test.com', password: 'pass' });
 
