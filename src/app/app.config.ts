@@ -5,6 +5,7 @@ import { provideStore } from '@ngrx/store';
 import { routes } from './app.routes';
 import { authInterceptor, cacheInterceptor, errorInterceptor, loadingInterceptor } from './core';
 import { GlobalErrorHandler } from './core/handlers/global-error.handler';
+import { provideEffects } from '@ngrx/effects';
 
 /**
  * Configuração da aplicação
@@ -38,5 +39,6 @@ export const appConfig: ApplicationConfig = {
       useClass: GlobalErrorHandler,
     },
     provideStore(),
+    provideEffects(),
   ],
 };
