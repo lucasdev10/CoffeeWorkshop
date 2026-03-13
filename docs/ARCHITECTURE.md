@@ -39,7 +39,7 @@ src/app/
 │   │   │   └── product-create-page/
 │   │   ├── repositories/          # Data access layer
 │   │   │   └── product.repository.ts
-│   │   ├── store/                 # State management (Signals)
+│   │   ├── store/                 # State management (NgRx)
 │   │   │   └── product.store.ts
 │   │   └── products.route.ts      # Feature routes
 │   │
@@ -124,17 +124,14 @@ export class ProductRepository {
 #### Store Pattern (State Management)
 
 ```typescript
-// Gerencia estado com Signals
-export class ProductStore {
-  private state = signal<ProductState>({...})
-
-  // Selectores (computed)
-  readonly products = computed(() => this.state().products)
-
-  // Actions
-  loadProducts(): void
-  createProduct(dto: CreateProductDto): void
-}
+// Gerencia estado com NgRx
+export const productFeature = createFeature({
+  name: 'product',
+  reducer: createReducer(initialState, ...),
+  extraSelectors: ({ selectProducts }) => ({
+    selectFilteredProducts: ...
+  })
+});
 ```
 
 #### Facade Pattern
@@ -259,28 +256,6 @@ import { DateUtils, StringUtils, ArrayUtils } from '@app/shared';
 const formatted = DateUtils.format(new Date(), 'dd/MM/yyyy');
 const slug = StringUtils.slugify('Hello World');
 const unique = ArrayUtils.unique([1, 2, 2, 3]);
-```
-
-## 🔮 Preparado para NgRx
-
-A arquitetura atual com Stores baseadas em Signals pode ser facilmente migrada para NgRx:
-
-```typescript
-// Atual (Signals)
-export class ProductStore {
-  private state = signal<ProductState>({...})
-  readonly products = computed(() => this.state().products)
-  loadProducts(): void { ... }
-}
-
-// Futuro (NgRx)
-export const productFeature = createFeature({
-  name: 'product',
-  reducer: createReducer(initialState, ...),
-  extraSelectors: ({ selectProducts }) => ({
-    selectFilteredProducts: ...
-  })
-});
 ```
 
 ## 📝 Convenções

@@ -40,7 +40,7 @@ jobs:
         uses: nwtgck/actions-netlify@v2
         with:
           publish-dir: './dist/CoffeeWorkshop/browser'
-          production-branch: feature/ngrx-signal-store
+          production-branch: feature/ngrx
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: 'Deploy preview from GitHub Actions'
           enable-pull-request-comment: false

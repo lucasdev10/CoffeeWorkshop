@@ -23,7 +23,7 @@ src/app/
 │   ├── products/          # Gerenciamento de produtos
 │   │   ├── components/    # Componentes específicos da feature
 │   │   ├── pages/         # Componentes de rota
-│   │   ├── store/         # Gerenciamento de estado (Signals)
+│   │   ├── store/         # Gerenciamento de estado (NgRx)
 │   │   ├── repositories/  # Camada de acesso a dados
 │   │   ├── models/        # Interfaces TypeScript
 │   │   └── integration/   # Testes de integração
@@ -43,7 +43,7 @@ src/app/
 
 ### Principais Decisões Arquiteturais
 
-**Gerenciamento de Estado**: Angular Signals (v16+)
+**Gerenciamento de Estado**: NgRx
 
 - Estado reativo com detecção automática de mudanças
 - Valores computados com memorização automática
@@ -72,7 +72,7 @@ src/app/
 
 - **Framework**: Angular 21
 - **UI Library**: Angular Material 21
-- **Gerenciamento de Estado**: Angular Signals
+- **Gerenciamento de Estado**: NgRx
 - **Formulários**: Signals Form
 - **HTTP Client**: Angular HttpClient
 - **Roteamento**: Angular Router com lazy loading
