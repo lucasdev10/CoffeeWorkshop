@@ -1,11 +1,13 @@
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, ErrorHandler, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
+import { provideEffects } from '@ngrx/effects';
 import { provideStore } from '@ngrx/store';
 import { routes } from './app.routes';
 import { authInterceptor, cacheInterceptor, errorInterceptor, loadingInterceptor } from './core';
 import { GlobalErrorHandler } from './core/handlers/global-error.handler';
-import { provideEffects } from '@ngrx/effects';
+import { UserEffects } from './features/user/store/user.effects';
+import { userReducer } from './features/user/store/user.reducer';
 
 /**
  * Configuração da aplicação
@@ -38,7 +40,7 @@ export const appConfig: ApplicationConfig = {
       provide: ErrorHandler,
       useClass: GlobalErrorHandler,
     },
-    provideStore(),
-    provideEffects(),
+    provideStore({ user: userReducer }),
+    provideEffects(UserEffects),
   ],
 };

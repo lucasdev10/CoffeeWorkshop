@@ -25,6 +25,7 @@ export * from './validators/custom-validators';
 
 // Models
 export * from './models/api-response.model';
+export * from './models/loading-state';
 
 // Enums
 export * from './enums/order-status.enum';

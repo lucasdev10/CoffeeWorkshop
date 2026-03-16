@@ -11,9 +11,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ILoginCredentials } from '@app/features/auth/models/auth.model';
 import { AuthStore } from '@app/features/auth/store/auth.store';
 import { FormError } from '@app/shared';
-import { EUserRole } from '../../models/user.model';
-import { UserStore } from '../../store/user.store';
-import { ICreateUserDto } from './../../models/user.model';
+import { EUserRole, ICreateUserDto } from '../../models/user.model';
+import { UserFacade } from '../../store';
 
 @Component({
   selector: 'app-user-form-page',
@@ -36,8 +35,8 @@ import { ICreateUserDto } from './../../models/user.model';
 export class UserFormPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly userStore = inject(UserStore);
   private readonly authStore = inject(AuthStore);
+  private readonly userFacade = inject(UserFacade);
 
   protected readonly isLoading = signal<boolean>(false);
   protected readonly userId = signal<string | null>(null);
@@ -76,14 +75,15 @@ export class UserFormPageComponent {
 
   private loadUser(id: string): void {
     this.isLoading.set(true);
-    const user = this.userStore.users().find((u) => u.id === id);
-
-    if (user) {
-      this.userModel.set({ ...(user as ICreateUserDto) });
-      this.isLoading.set(false);
-    } else {
-      this.router.navigate(['/admin/products']);
-    }
+    this.userFacade.loadUserById(id);
+    this.userFacade.selectedUser$.subscribe((user) => {
+      if (user) {
+        this.userModel.set({ ...(user as ICreateUserDto) });
+        this.isLoading.set(false);
+      } else {
+        this.router.navigate(['/admin/products']);
+      }
+    });
   }
 
   protected togglePasswordVisibility(): void {
@@ -102,10 +102,10 @@ export class UserFormPageComponent {
     const formValue = this.userForm().controlValue();
 
     if (this.isEditMode() && this.userId()) {
-      this.userStore.updateUser(this.userId()!, formValue);
+      this.userFacade.updateUser(this.userId()!, formValue);
     } else {
       const newUser: ICreateUserDto = formValue;
-      this.userStore.createUser(newUser);
+      this.userFacade.createUser(newUser);
     }
 
     if (!this.isEditMode()) {
