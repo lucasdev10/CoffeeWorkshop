@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
-import { UserActions } from './user.actions';
-import { initialUserState } from './user.state';
+import { UserActions } from '../user.actions';
+import { initialUserState } from '../user.state';
 
 /**
  * Reducer da feature de usuários

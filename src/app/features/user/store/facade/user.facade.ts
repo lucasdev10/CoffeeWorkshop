@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ICreateUserDto, IUpdateUserDto, IUserFilters } from '../models/user.model';
-import { UserActions } from './user.actions';
+import { combineLatest, map } from 'rxjs';
+import { ICreateUserDto, IUpdateUserDto, IUserFilters } from '../../models/user.model';
 import {
   selectError,
   selectFilteredUserCount,
@@ -13,7 +13,8 @@ import {
   selectSelectedUser,
   selectUserCount,
   selectUsers,
-} from './user.selectors';
+} from '../selectors/user.selectors';
+import { UserActions } from '../user.actions';
 
 /**
  * Facade para a User Store
@@ -41,6 +42,9 @@ export class UserFacade {
   readonly filteredUsers$ = this.store.select(selectFilteredUsers);
   readonly userCount$ = this.store.select(selectUserCount);
   readonly filteredUserCount$ = this.store.select(selectFilteredUserCount);
+  readonly userWithLoading$ = combineLatest([this.selectedUser$, this.isLoading$]).pipe(
+    map(([user, isLoading]) => ({ user, isLoading })),
+  );
 
   /**
    * Carrega todos os usuários

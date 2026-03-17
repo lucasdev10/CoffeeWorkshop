@@ -6,8 +6,8 @@ import { provideStore } from '@ngrx/store';
 import { routes } from './app.routes';
 import { authInterceptor, cacheInterceptor, errorInterceptor, loadingInterceptor } from './core';
 import { GlobalErrorHandler } from './core/handlers/global-error.handler';
-import { UserEffects } from './features/user/store/user.effects';
-import { userReducer } from './features/user/store/user.reducer';
+import { ProductEffects, productReducer } from './features/products/store';
+import { UserEffects, userReducer } from './features/user/store';
 
 /**
  * Configuração da aplicação
@@ -40,7 +40,7 @@ export const appConfig: ApplicationConfig = {
       provide: ErrorHandler,
       useClass: GlobalErrorHandler,
     },
-    provideStore({ user: userReducer }),
-    provideEffects(UserEffects),
+    provideStore({ user: userReducer, product: productReducer }),
+    provideEffects(UserEffects, ProductEffects),
   ],
 };

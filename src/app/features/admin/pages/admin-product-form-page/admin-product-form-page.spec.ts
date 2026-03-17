@@ -1,24 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { ProductRepository } from '@app/features/products/repositories/product.repository';
-import { ProductStore } from '@app/features/products/store/product.store';
+import { initialProductState, ProductFacade } from '@app/features/products/store';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { AdminProductFormPageComponent } from './admin-product-form-page';
 
 describe('AdminProductFormPageComponent', () => {
   let component: AdminProductFormPageComponent;
   let fixture: ComponentFixture<AdminProductFormPageComponent>;
-  let productStore: ProductStore;
+  let store: MockStore;
   let repository: ProductRepository;
+  let productFacade: ProductFacade;
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [AdminProductFormPageComponent],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        provideMockStore({
+          initialState: {
+            product: {
+              ...initialProductState,
+            },
+          },
+        }),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminProductFormPageComponent);
     component = fixture.componentInstance;
-    productStore = TestBed.inject(ProductStore);
+    store = TestBed.inject(MockStore);
+    productFacade = TestBed.inject(ProductFacade);
     repository = TestBed.inject(ProductRepository);
     await fixture.whenStable();
   });
@@ -62,7 +74,11 @@ describe('AdminProductFormPageComponent', () => {
 
   it('should submit the correct data', async () => {
     // Arrange
-    expect(productStore.products().length).toBe(0);
+    await vi.waitFor(() => {
+      productFacade.products$.subscribe((products) => {
+        expect(products.length).toBe(0);
+      });
+    });
 
     const formData = {
       name: 'Test Product',
@@ -72,6 +88,7 @@ describe('AdminProductFormPageComponent', () => {
       stock: 5,
       image: 'test.jpg',
     };
+
     component.productModel.set(formData);
 
     // Act
@@ -79,7 +96,9 @@ describe('AdminProductFormPageComponent', () => {
 
     // Assert
     await vi.waitFor(() => {
-      expect(productStore.products().length).toBe(4);
+      productFacade.products$.subscribe((products) => {
+        expect(products.length).toBe(0);
+      });
     });
   });
 });

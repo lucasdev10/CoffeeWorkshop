@@ -2,8 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { UserRepository } from '../repositories/user.repository';
-import { UserActions } from './user.actions';
+import { UserRepository } from '../../repositories/user.repository';
+import { UserActions } from '../user.actions';
 
 /**
  * Effects da feature de usuários

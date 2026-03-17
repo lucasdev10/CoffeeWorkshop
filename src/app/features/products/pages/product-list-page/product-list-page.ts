@@ -1,31 +1,29 @@
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CartStore } from '@app/features/cart/store/cart.store';
 import { ProductCardComponent } from '../../components/product-card/product-card';
 import { IProduct } from '../../models/product.model';
-import { ProductStore } from '../../store/product.store';
+import { ProductFacade } from '../../store';
 
 @Component({
   selector: 'app-product-list-page',
-  imports: [ProductCardComponent, MatProgressSpinnerModule],
+  imports: [ProductCardComponent, MatProgressSpinnerModule, AsyncPipe],
   templateUrl: './product-list-page.html',
   styleUrl: './product-list-page.scss',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductListPageComponent implements OnInit {
-  private readonly productStore = inject(ProductStore);
+  private readonly productFacade = inject(ProductFacade);
   private readonly cartStore = inject(CartStore);
 
-  // Expõe signals da store para o template
-  readonly products = this.productStore.filteredProducts;
-  readonly isLoading = this.productStore.isLoading;
-  readonly error = this.productStore.error;
+  readonly products$ = this.productFacade.filteredProducts$;
+  readonly isLoading$ = this.productFacade.isLoading$;
+  readonly error$ = this.productFacade.error$;
 
   ngOnInit(): void {
-    // Force reload of products to ensure data is synchronized with STORAGE_MOCK
-    // This is critical for Cypress tests that create products and navigate to /products
-    this.productStore.loadProducts();
+    this.productFacade.loadProducts();
   }
 
   onAddToCart(product: IProduct): void {

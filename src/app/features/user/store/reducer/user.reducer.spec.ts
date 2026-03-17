@@ -1,7 +1,7 @@
-import { EUserRole, IUser } from '../models/user.model';
-import { UserActions } from './user.actions';
+import { EUserRole, IUser } from '../../models/user.model';
+import { UserActions } from '../user.actions';
+import { initialUserState, IUserState } from '../user.state';
 import { userReducer } from './user.reducer';
-import { initialUserState, IUserState } from './user.state';
 
 describe('UserReducer', () => {
   const mockUsers: IUser[] = [

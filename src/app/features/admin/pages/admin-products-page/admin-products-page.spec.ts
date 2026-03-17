@@ -3,21 +3,21 @@ import { MatDialog } from '@angular/material/dialog';
 import { provideRouter, Router } from '@angular/router';
 import { ICreateProductDto, IProduct } from '@app/features/products/models/product.model';
 import { ProductRepository } from '@app/features/products/repositories/product.repository';
-import { ProductStore } from '@app/features/products/store/product.store';
-import { DateUtils } from '@app/shared';
-import { Utils } from '@app/shared/utils/utils';
-import { of } from 'rxjs';
+import { initialProductState, ProductFacade, selectProducts } from '@app/features/products/store';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { filter, firstValueFrom, of } from 'rxjs';
 import { AdminProductsPageComponent } from './admin-products-page';
 
 describe('AdminProductsPageComponent', () => {
   let component: AdminProductsPageComponent;
   let fixture: ComponentFixture<AdminProductsPageComponent>;
-  let storeProduct: ProductStore;
+  let store: MockStore;
   let repository: ProductRepository;
   let dialog: MatDialog;
   let router: Router;
+  let productFacade: ProductFacade;
 
-  const product: ICreateProductDto = {
+  const mockNewProduct: ICreateProductDto = {
     name: 'test',
     description: 'test',
     price: 10,
@@ -26,9 +26,9 @@ describe('AdminProductsPageComponent', () => {
     stock: 10,
   };
 
-  const products: IProduct[] = [
+  const mockProducts: IProduct[] = [
     {
-      id: Utils.generateId(),
+      id: 'product-id-1',
       name: 'Premium Coffee Beans',
       description: 'Arabica blend from Colombia with rich flavor notes',
       price: 29.99,
@@ -36,11 +36,11 @@ describe('AdminProductsPageComponent', () => {
       category: 'Food',
       stock: 50,
       rating: 4.5,
-      createdAt: DateUtils.fromDate(2026, 1, 1),
-      updatedAt: DateUtils.fromDate(2026, 1, 1),
+      createdAt: 1773760056,
+      updatedAt: 1773760056,
     },
     {
-      id: Utils.generateId(),
+      id: 'product-id-2',
       name: 'Low Stock Product',
       description: 'Product with low stock',
       price: 19.99,
@@ -48,11 +48,11 @@ describe('AdminProductsPageComponent', () => {
       category: 'Electronics',
       stock: 5,
       rating: 4.0,
-      createdAt: DateUtils.fromDate(2026, 1, 1),
-      updatedAt: DateUtils.fromDate(2026, 1, 1),
+      createdAt: 1773760056,
+      updatedAt: 1773760056,
     },
     {
-      id: Utils.generateId(),
+      id: 'product-id-3',
       name: 'Out of Stock Product',
       description: 'Product out of stock',
       price: 39.99,
@@ -60,25 +60,37 @@ describe('AdminProductsPageComponent', () => {
       category: 'Clothing',
       stock: 0,
       rating: 3.5,
-      createdAt: DateUtils.fromDate(2026, 1, 1),
-      updatedAt: DateUtils.fromDate(2026, 1, 1),
+      createdAt: 1773760056,
+      updatedAt: 1773760056,
     },
   ];
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [AdminProductsPageComponent],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        provideMockStore({
+          initialState: {
+            product: {
+              ...initialProductState,
+              products: mockProducts,
+              loading: 'success',
+            },
+          },
+        }),
+      ],
     }).compileComponents();
 
     repository = TestBed.inject(ProductRepository);
-    vi.spyOn(repository, 'findAll').mockReturnValue(of(products));
+    vi.spyOn(repository, 'findAll').mockReturnValue(of(mockProducts));
 
     fixture = TestBed.createComponent(AdminProductsPageComponent);
     component = fixture.componentInstance;
-    storeProduct = TestBed.inject(ProductStore);
+    store = TestBed.inject(MockStore);
     dialog = TestBed.inject(MatDialog);
     router = TestBed.inject(Router);
+    productFacade = TestBed.inject(ProductFacade);
 
     await fixture.whenStable();
   });
@@ -89,42 +101,53 @@ describe('AdminProductsPageComponent', () => {
 
   it('should update the list after creating the product', async () => {
     const newProduct: IProduct = {
-      ...product,
-      id: Utils.generateId(),
+      ...mockNewProduct,
+      id: 'new-product-id',
       rating: 0,
-      createdAt: DateUtils.now(),
-      updatedAt: DateUtils.now(),
+      createdAt: 1773760056,
+      updatedAt: 1773760056,
     };
 
-    vi.spyOn(repository, 'create').mockReturnValue(of(newProduct));
+    store.overrideSelector(selectProducts, [...mockProducts, newProduct]);
+    store.refreshState();
 
-    storeProduct.createProduct(product);
+    productFacade.createProduct(mockNewProduct);
 
-    await vi.waitFor(() => {
-      const hasProduct = component.products().some((p) => p.name === product.name);
-      expect(hasProduct).toBe(true);
-    });
+    // espera o loading terminar
+    await firstValueFrom(productFacade.isLoading$.pipe(filter((isLoading) => !isLoading)));
+
+    // agora verifica se o produto está na lista
+    const products = await firstValueFrom(productFacade.products$);
+    const hasProduct = products.some((p) => p.name === mockNewProduct.name);
+
+    expect(hasProduct).toBe(true);
   });
 
   it('should remove the product from the list after deleting it', async () => {
-    await vi.waitFor(() => {
-      expect(component.products().length).toBeGreaterThan(0);
-    });
+    let products = await firstValueFrom(productFacade.products$);
+    let productId = products[0].id;
 
-    const productId = component.products()[0].id;
+    expect(products.length).toBeGreaterThan(0);
+
     vi.spyOn(repository, 'delete').mockReturnValue(of(undefined));
 
-    storeProduct.deleteProduct(productId);
+    const updatedProducts = mockProducts.filter((p) => p.id !== productId);
+    store.overrideSelector(selectProducts, updatedProducts);
 
-    await vi.waitFor(() => {
-      const remainingProducts = component.products();
-      expect(remainingProducts.find((p) => p.id === productId)).toBeUndefined();
-    });
+    productFacade.deleteProduct(productId);
+
+    await firstValueFrom(productFacade.isLoading$.pipe(filter((isLoading) => !isLoading)));
+
+    store.refreshState();
+
+    products = await firstValueFrom(productFacade.products$);
+
+    expect(products.find((p) => p.id === productId)).toBeUndefined();
   });
 
   it('should navigate to edit page when onEdit is called', () => {
     const navigateSpy = vi.spyOn(router, 'navigate');
-    const testProduct = products[0];
+    const testProduct = mockProducts[0];
 
     component.onEdit(testProduct);
 
@@ -136,9 +159,9 @@ describe('AdminProductsPageComponent', () => {
       afterClosed: () => of(false),
     } as any);
 
-    const deleteProductSpy = vi.spyOn(storeProduct, 'deleteProduct');
+    const deleteProductSpy = vi.spyOn(productFacade, 'deleteProduct');
 
-    component.onDelete(products[0]);
+    component.onDelete(mockProducts[0]);
 
     expect(deleteProductSpy).not.toHaveBeenCalled();
   });
@@ -159,7 +182,7 @@ describe('AdminProductsPageComponent', () => {
   });
 
   it('should track products by id', () => {
-    const testProduct = products[0];
+    const testProduct = mockProducts[0];
     const trackId = component.trackByProductId(0, testProduct);
     expect(trackId).toBe(testProduct.id);
   });

@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { form, FormField, min, minLength, required } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,7 +18,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ICreateProductDto } from '@app/features/products/models/product.model';
-import { ProductStore } from '@app/features/products/store/product.store';
+import { ProductFacade } from '@app/features/products/store';
 import { FormError } from '@app/shared';
 
 @Component({
@@ -33,9 +41,10 @@ import { FormError } from '@app/shared';
   standalone: true,
 })
 export class AdminProductFormPageComponent {
-  private readonly productStore = inject(ProductStore);
+  private readonly productFacade = inject(ProductFacade);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly isLoading = signal(false);
   readonly isEditMode = signal(false);
@@ -83,14 +92,23 @@ export class AdminProductFormPageComponent {
 
   private loadProduct(id: string): void {
     this.isLoading.set(true);
-    const product = this.productStore.products().find((p) => p.id === id);
+    this.productFacade.loadProductById(id);
 
-    if (product) {
-      this.productModel.set({ ...product });
-      this.isLoading.set(false);
-    } else {
-      this.router.navigate(['/admin/products']);
-    }
+    this.productFacade.productWithLoading$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ product, isLoading }) => {
+        if (isLoading) {
+          return;
+        }
+
+        this.isLoading.set(false);
+
+        if (product) {
+          this.productModel.set({ ...(product as ICreateProductDto) });
+        } else {
+          this.router.navigate(['/admin/products']);
+        }
+      });
   }
 
   onSubmit(): void {
@@ -103,10 +121,10 @@ export class AdminProductFormPageComponent {
     const formValue = this.productForm().controlValue();
 
     if (this.isEditMode() && this.productId()) {
-      this.productStore.updateProduct(this.productId()!, formValue);
+      this.productFacade.updateProduct(this.productId()!, formValue);
     } else {
       const newProduct: ICreateProductDto = formValue;
-      this.productStore.createProduct(newProduct);
+      this.productFacade.createProduct(newProduct);
     }
 
     // Aguarda um pouco para simular salvamento

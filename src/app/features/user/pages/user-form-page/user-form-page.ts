@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { email, form, FormField, minLength, required } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -37,6 +45,7 @@ export class UserFormPageComponent {
   private readonly router = inject(Router);
   private readonly authStore = inject(AuthStore);
   private readonly userFacade = inject(UserFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly isLoading = signal<boolean>(false);
   protected readonly userId = signal<string | null>(null);
@@ -76,14 +85,20 @@ export class UserFormPageComponent {
   private loadUser(id: string): void {
     this.isLoading.set(true);
     this.userFacade.loadUserById(id);
-    this.userFacade.selectedUser$.subscribe((user) => {
-      if (user) {
-        this.userModel.set({ ...(user as ICreateUserDto) });
+
+    this.userFacade.userWithLoading$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ user, isLoading }) => {
+        if (isLoading) {
+          return;
+        }
+
         this.isLoading.set(false);
-      } else {
-        this.router.navigate(['/admin/products']);
-      }
-    });
+
+        if (user) {
+          this.userModel.set({ ...(user as ICreateUserDto) });
+        }
+      });
   }
 
   protected togglePasswordVisibility(): void {

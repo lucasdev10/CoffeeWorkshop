@@ -1,5 +1,5 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { IUserState } from './user.state';
+import { IUserState } from '../user.state';
 
 /**
  * Feature selector
