@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { ProductRepository } from '@app/features/products/repositories/product.repository';
 import { initialProductState, ProductFacade } from '@app/features/products/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { firstValueFrom } from 'rxjs';
 import { AdminProductFormPageComponent } from './admin-product-form-page';
 
 describe('AdminProductFormPageComponent', () => {
@@ -74,11 +75,9 @@ describe('AdminProductFormPageComponent', () => {
 
   it('should submit the correct data', async () => {
     // Arrange
-    await vi.waitFor(() => {
-      productFacade.products$.subscribe((products) => {
-        expect(products.length).toBe(0);
-      });
-    });
+    let products = await firstValueFrom(productFacade.products$);
+
+    expect(products.length).toBe(0);
 
     const formData = {
       name: 'Test Product',
@@ -95,10 +94,8 @@ describe('AdminProductFormPageComponent', () => {
     component.onSubmit();
 
     // Assert
-    await vi.waitFor(() => {
-      productFacade.products$.subscribe((products) => {
-        expect(products.length).toBe(0);
-      });
-    });
+    let newProducts = await firstValueFrom(productFacade.products$);
+
+    expect(products.length).toBe(0);
   });
 });

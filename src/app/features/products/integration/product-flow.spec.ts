@@ -3,8 +3,13 @@ import { CartStore } from '@app/features/cart/store/cart.store';
 import { IProduct } from '@app/features/products/models/product.model';
 import { ProductRepository } from '@app/features/products/repositories/product.repository';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { firstValueFrom } from 'rxjs';
-import { initialProductState, ProductFacade, selectFilteredProducts } from '../store';
+import { filter, firstValueFrom } from 'rxjs';
+import {
+  initialProductState,
+  ProductFacade,
+  selectFilteredProducts,
+  selectProducts,
+} from '../store';
 
 /**
  * Testes de integração para fluxo completo de produtos
@@ -65,6 +70,9 @@ describe('Product Flow Integration Tests', () => {
     productRepository = TestBed.inject(ProductRepository);
     productFacade = TestBed.inject(ProductFacade);
 
+    store.overrideSelector(selectProducts, mockProducts);
+    store.refreshState();
+
     cartStore.clear();
   });
 
@@ -76,6 +84,8 @@ describe('Product Flow Integration Tests', () => {
     it('should load products and add to cart', async () => {
       // Arrange
       productFacade.loadProducts();
+
+      await firstValueFrom(productFacade.isLoading$.pipe(filter((isLoading) => !isLoading)));
 
       let products = await firstValueFrom(productFacade.products$);
 
@@ -124,6 +134,8 @@ describe('Product Flow Integration Tests', () => {
   describe('Multiple Products in Cart', () => {
     it('should handle multiple products with correct calculations', async () => {
       productFacade.loadProducts();
+
+      await firstValueFrom(productFacade.isLoading$.pipe(filter((isLoading) => !isLoading)));
 
       let products = await firstValueFrom(productFacade.products$);
 
@@ -234,6 +246,8 @@ describe('Product Flow Integration Tests', () => {
       // Arrange
       productFacade.loadProducts();
 
+      await firstValueFrom(productFacade.isLoading$.pipe(filter((isLoading) => !isLoading)));
+
       let products = await firstValueFrom(productFacade.products$);
 
       expect(products.length).toBe(2);
@@ -258,6 +272,8 @@ describe('Product Flow Integration Tests', () => {
     it('should apply free shipping for orders over threshold', async () => {
       // Arrange
       productFacade.loadProducts();
+
+      await firstValueFrom(productFacade.isLoading$.pipe(filter((isLoading) => !isLoading)));
 
       let products = await firstValueFrom(productFacade.products$);
 
@@ -284,6 +300,8 @@ describe('Product Flow Integration Tests', () => {
     it('should remove item and recalculate totals', async () => {
       // Arrange
       productFacade.loadProducts();
+
+      await firstValueFrom(productFacade.isLoading$.pipe(filter((isLoading) => !isLoading)));
 
       let products = await firstValueFrom(productFacade.products$);
 

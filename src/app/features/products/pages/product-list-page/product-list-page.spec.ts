@@ -96,6 +96,8 @@ describe('ProductListPageComponent', () => {
 
   it('should render product cards when products are loaded', () => {
     setupTest(of(mockProducts));
+    productFacade.loadProducts();
+    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     const productCards = compiled.querySelectorAll('app-product-card');
     expect(productCards.length).toBe(2);
