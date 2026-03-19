@@ -50,7 +50,7 @@
           <mat-icon>shopping_cart</mat-icon>
         </div>
         <div class="stat-info">
-          <h3>{{ totalOrders() }}</h3>
+          <h3>{{ totalOrders$ | async }}</h3>
           <p>Items in Cart</p>
         </div>
       </mat-card-content>

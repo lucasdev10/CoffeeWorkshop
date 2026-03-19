@@ -6,6 +6,7 @@ import { provideStore } from '@ngrx/store';
 import { routes } from './app.routes';
 import { authInterceptor, cacheInterceptor, errorInterceptor, loadingInterceptor } from './core';
 import { GlobalErrorHandler } from './core/handlers/global-error.handler';
+import { CartEffects, cartReducer } from './features/cart/store';
 import { ProductEffects, productReducer } from './features/products/store';
 import { UserEffects, userReducer } from './features/user/store';
 
@@ -40,7 +41,7 @@ export const appConfig: ApplicationConfig = {
       provide: ErrorHandler,
       useClass: GlobalErrorHandler,
     },
-    provideStore({ user: userReducer, product: productReducer }),
-    provideEffects(UserEffects, ProductEffects),
+    provideStore({ user: userReducer, product: productReducer, cart: cartReducer }),
+    provideEffects(UserEffects, ProductEffects, CartEffects),
   ],
 };

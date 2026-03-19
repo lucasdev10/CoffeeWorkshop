@@ -1,67 +1,62 @@
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { DestroyRef, inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { StorageService } from '@app/core/storage/storage';
 import { CartDomainService } from '@app/domain/cart/cart-domain.service';
 import { IProduct } from '@app/features/products/models/product.model';
 import { APP_CONFIG } from '@app/shared/config/app.config';
-import { ICart, ICartItem } from '../models/cart.model';
+import { Store } from '@ngrx/store';
+import { firstValueFrom, map } from 'rxjs';
+import { ICart, ICartItem } from '../../models/cart.model';
+import { CartActions } from '../cart.actions';
+import {
+  selectIsEmpty,
+  selectItemCount,
+  selectItems,
+  selectShipping,
+  selectState,
+  selectSubtotal,
+  selectTax,
+  selectTotal,
+} from '../selectors/cart.selectors';
 
-/**
- * Store do carrinho usando Signals
- * Gerencia estado do carrinho com persistência em localStorage
- */
-@Injectable({
-  providedIn: 'root',
-})
-export class CartStore {
-  private readonly storageService = inject(StorageService<ICart>);
+@Injectable({ providedIn: 'root' })
+export class CartFacade {
+  private readonly store = inject(Store);
   private readonly cartDomainService = inject(CartDomainService);
+  private readonly storageService = inject(StorageService<ICart>);
   private readonly STORAGE_KEY = APP_CONFIG.storage.CART_KEY;
+  private readonly destroyRef = inject(DestroyRef);
 
-  // Estado privado
-  private readonly state = signal<ICart>(this.loadFromStorage());
+  private readonly state$ = this.store.select(selectState);
 
-  // Selectores públicos
-  readonly items = computed(() => this.state().items);
-  readonly subtotal = computed(() => this.state().subtotal);
-  readonly shipping = computed(() => this.state().shipping);
-  readonly tax = computed(() => this.state().tax);
-  readonly total = computed(() => this.state().total);
-  readonly itemCount = computed(() => this.state().itemCount);
-  readonly isEmpty = computed(() => this.items().length === 0);
-  readonly hasItems = computed(() => this.items().length > 0);
-  readonly hasFreeShipping = computed(() =>
-    this.cartDomainService.qualifiesForFreeShipping(this.subtotal()),
-  );
-  readonly amountForFreeShipping = computed(() =>
-    this.cartDomainService.amountNeededForFreeShipping(this.subtotal()),
+  readonly items$ = this.store.select(selectItems);
+  readonly subtotal$ = this.store.select(selectSubtotal);
+  readonly shipping$ = this.store.select(selectShipping);
+  readonly tax$ = this.store.select(selectTax);
+  readonly total$ = this.store.select(selectTotal);
+  readonly itemCount$ = this.store.select(selectItemCount);
+  readonly isEmpty$ = this.store.select(selectIsEmpty);
+  readonly hasFreeShipping$ = this.subtotal$.pipe(
+    map((subtotal) => this.cartDomainService.qualifiesForFreeShipping(subtotal)),
   );
 
   constructor() {
-    // Persiste no localStorage quando o estado muda
-    effect(() => {
-      const cart = this.state();
+    this.store.dispatch(CartActions.loadCartFromStorage({ cart: this.loadFromStorage() }));
+
+    this.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((cart) => {
       this.storageService.set(this.STORAGE_KEY, cart);
     });
   }
 
-  /**
-   * Actions
-   */
+  async addItem(product: IProduct, quantity = 1): Promise<void> {
+    const currentItems = await firstValueFrom(this.items$);
 
-  addItem(product: IProduct, quantity = 1): void {
-    // Usar domain service para validar se pode adicionar o produto
-    const validationResult = this.cartDomainService.canAddProductToCart(
-      product.id,
-      quantity,
-      this.items(),
-      product.stock,
-    );
+    const validationResult = this.canAddProduct(product.id, quantity, currentItems, product.stock);
 
     if (!validationResult.isValid) {
       throw new Error(validationResult.errors.join('; '));
     }
 
-    const currentItems = this.items();
     const existingItemIndex = currentItems.findIndex((item) => item.product.id === product.id);
 
     let updatedItems: ICartItem[];
@@ -70,7 +65,6 @@ export class CartStore {
       const existingItem = currentItems[existingItemIndex];
       const newQuantity = existingItem.quantity + quantity;
 
-      // Atualiza quantidade do item existente
       updatedItems = currentItems.map((item, index) =>
         index === existingItemIndex
           ? {
@@ -81,7 +75,6 @@ export class CartStore {
           : item,
       );
     } else {
-      // Adiciona novo item
       const newItem: ICartItem = {
         product,
         quantity,
@@ -93,16 +86,17 @@ export class CartStore {
     this.updateCart(updatedItems);
   }
 
-  removeItem(productId: string): void {
+  async removeItem(productId: string): Promise<void> {
     if (!productId?.trim()) {
       throw new Error('Product ID is required');
     }
 
-    const updatedItems = this.items().filter((item) => item.product.id !== productId);
+    const items = await firstValueFrom(this.items$);
+    const updatedItems = items.filter((item) => item.product.id !== productId);
     this.updateCart(updatedItems);
   }
 
-  updateQuantity(productId: string, quantity: number): void {
+  async updateQuantity(productId: string, quantity: number): Promise<void> {
     if (!productId?.trim()) {
       throw new Error('Product ID is required');
     }
@@ -112,7 +106,7 @@ export class CartStore {
       return;
     }
 
-    const currentItems = this.items();
+    const currentItems = await firstValueFrom(this.items$);
     const existingItem = currentItems.find((item) => item.product.id === productId);
 
     if (!existingItem) {
@@ -145,15 +139,17 @@ export class CartStore {
     this.updateCart(updatedItems);
   }
 
-  incrementQuantity(productId: string): void {
-    const item = this.items().find((i) => i.product.id === productId);
+  async incrementQuantity(productId: string): Promise<void> {
+    const items = await firstValueFrom(this.items$);
+    const item = items.find((i) => i.product.id === productId);
     if (item) {
       this.updateQuantity(productId, item.quantity + 1);
     }
   }
 
-  decrementQuantity(productId: string): void {
-    const item = this.items().find((i) => i.product.id === productId);
+  async decrementQuantity(productId: string): Promise<void> {
+    const items = await firstValueFrom(this.items$);
+    const item = items.find((i) => i.product.id === productId);
     if (item) {
       this.updateQuantity(productId, item.quantity - 1);
     }
@@ -163,28 +159,25 @@ export class CartStore {
     this.updateCart([]);
   }
 
-  /**
-   * Helpers privados
-   */
-
   private updateCart(items: ICartItem[]): void {
-    // Validar o carrinho usando domain service
-    const validationResult = this.cartDomainService.validateCart(items);
+    const validationResult = this.validateCurrentCart(items);
+
     if (!validationResult.isValid) {
       throw new Error(`Cart validation failed: ${validationResult.errors.join('; ')}`);
     }
 
-    // Usar domain service para calcular totais
     const calculations = this.cartDomainService.calculateCartTotals(items);
 
-    this.state.set({
+    const cart = {
       items,
       subtotal: calculations.subtotal,
       shipping: calculations.shipping,
       tax: calculations.tax,
       total: calculations.total,
       itemCount: calculations.itemCount,
-    });
+    };
+
+    this.store.dispatch(CartActions.updateCart({ cart }));
   }
 
   private loadFromStorage(): ICart {
@@ -212,45 +205,16 @@ export class CartStore {
     }
   }
 
-  /**
-   * Query helpers
-   */
-
-  getItemByProductId(productId: string): ICartItem | undefined {
-    return this.items().find((item) => item.product.id === productId);
+  private validateCurrentCart(items: ICartItem[]): { isValid: boolean; errors: string[] } {
+    return this.cartDomainService.validateCart(items);
   }
 
-  hasProduct(productId: string): boolean {
-    return this.items().some((item) => item.product.id === productId);
-  }
-
-  getProductQuantity(productId: string): number {
-    const item = this.getItemByProductId(productId);
-    return item?.quantity || 0;
-  }
-
-  /**
-   * Métodos que utilizam o domain service
-   */
-
-  formatCurrency(amount: number): string {
-    return this.cartDomainService.formatCurrency(amount);
-  }
-
-  validateCurrentCart(): { isValid: boolean; errors: string[] } {
-    return this.cartDomainService.validateCart(this.items());
-  }
-
-  canAddProduct(
+  private canAddProduct(
     productId: string,
     quantity: number,
+    items: ICartItem[],
     productStock: number,
   ): { isValid: boolean; errors: string[] } {
-    return this.cartDomainService.canAddProductToCart(
-      productId,
-      quantity,
-      this.items(),
-      productStock,
-    );
+    return this.cartDomainService.canAddProductToCart(productId, quantity, items, productStock);
   }
 }

@@ -1,10 +1,10 @@
 import { AsyncPipe, CurrencyPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
-import { CartStore } from '@app/features/cart/store/cart.store';
+import { CartFacade } from '@app/features/cart/store';
 import { ProductFacade } from '@app/features/products/store';
 
 @Component({
@@ -17,13 +17,13 @@ import { ProductFacade } from '@app/features/products/store';
 })
 export class AdminDashboardPageComponent {
   private readonly productFacade = inject(ProductFacade);
-  private readonly cartStore = inject(CartStore);
+  private readonly cartFacade = inject(CartFacade);
 
   readonly totalProducts$ = this.productFacade.totalProducts$;
   readonly totalValue$ = this.productFacade.totalValue$;
   readonly lowStockProducts$ = this.productFacade.lowStockProducts$;
 
-  readonly totalOrders = computed(() => this.cartStore.itemCount());
+  readonly totalOrders$ = this.cartFacade.itemCount$;
 
   constructor() {
     this.productFacade.loadProducts();

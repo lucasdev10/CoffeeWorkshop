@@ -1,6 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CartStore } from '@app/features/cart/store/cart.store';
+import { CartFacade } from '@app/features/cart/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { delay, of, throwError } from 'rxjs';
 import { IProduct } from '../../models/product.model';
@@ -18,9 +18,9 @@ describe('ProductListPageComponent', () => {
   let component: ProductListPageComponent;
   let fixture: ComponentFixture<ProductListPageComponent>;
   let store: MockStore;
-  let cartStore: CartStore;
   let productRepository: ProductRepository;
   let productFacade: ProductFacade;
+  let cartFacade: CartFacade;
 
   const mockProducts: IProduct[] = [
     {
@@ -54,7 +54,6 @@ describe('ProductListPageComponent', () => {
       imports: [ProductListPageComponent],
       providers: [
         provideHttpClient(),
-        CartStore,
         ProductRepository,
         provideMockStore({
           initialState: {
@@ -70,8 +69,8 @@ describe('ProductListPageComponent', () => {
 
     store = TestBed.inject(MockStore);
     productFacade = TestBed.inject(ProductFacade);
-    cartStore = TestBed.inject(CartStore);
     productRepository = TestBed.inject(ProductRepository);
+    cartFacade = TestBed.inject(CartFacade);
 
     vi.spyOn(productRepository, 'findAll').mockReturnValue(repositoryMock);
 
@@ -159,9 +158,9 @@ describe('ProductListPageComponent', () => {
     expect(emptyState?.textContent).toContain('No products found');
   });
 
-  it('should call cartStore.addItem when onAddToCart is called', () => {
+  it('should call cartFacade.addItem when onAddToCart is called', () => {
     setupTest(of(mockProducts));
-    const addItemSpy = vi.spyOn(cartStore, 'addItem');
+    const addItemSpy = vi.spyOn(cartFacade, 'addItem');
     const product = mockProducts[0];
 
     component.onAddToCart(product);

@@ -1,19 +1,21 @@
-import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { CartStore } from '@app/features/cart/store/cart.store';
+import { CartDomainService } from '@app/domain/cart/cart-domain.service';
 import { IProduct } from '@app/features/products/models/product.model';
-import { DateUtils } from '@app/shared';
-import { Utils } from '@app/shared/utils/utils';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { CartFacade, initialCartState, selectIsEmpty, selectItems } from '../../store';
+import { selectSubtotal } from '../../store/selectors/cart.selectors';
 import { CartPage } from './cart-page';
 
 describe('CartPage', () => {
   let component: CartPage;
   let fixture: ComponentFixture<CartPage>;
-  let mockCartStore: Partial<CartStore>;
+  let store: MockStore;
+  let cartFacade: CartFacade;
+  let cartDomainService: CartDomainService;
 
   const mockProduct: IProduct = {
-    id: Utils.generateId(),
+    id: 'product-id-1',
     name: 'Test Product',
     description: 'Test Description',
     price: 50,
@@ -21,36 +23,54 @@ describe('CartPage', () => {
     category: 'Test',
     stock: 10,
     rating: 4.5,
-    createdAt: DateUtils.now(),
-    updatedAt: DateUtils.now(),
+    createdAt: 1773856464,
+    updatedAt: 1773856464,
   };
 
   beforeEach(async () => {
-    mockCartStore = {
-      items: signal([
-        {
-          product: mockProduct,
-          quantity: 2,
-          subtotal: 100,
-        },
-      ]),
-      subtotal: signal(100),
-      tax: signal(10),
-      shipping: signal(10),
-      total: signal(120),
-      itemCount: signal(2),
-      isEmpty: signal(false),
-      hasItems: signal(true),
-      hasFreeShipping: signal(false),
-      updateQuantity: vi.fn(),
-      removeItem: vi.fn(),
-      clear: vi.fn(),
-    } as any;
-
     await TestBed.configureTestingModule({
       imports: [CartPage],
-      providers: [{ provide: CartStore, useValue: mockCartStore }, provideRouter([])],
+      providers: [
+        provideMockStore({
+          initialState: {
+            cart: {
+              ...initialCartState,
+              items: [
+                {
+                  product: mockProduct,
+                  quantity: 2,
+                  subtotal: 100,
+                },
+              ],
+              subtotal: 100,
+              tax: 10,
+              shipping: 10,
+              total: 120,
+              itemCount: 2,
+            },
+          },
+        }),
+        provideRouter([]),
+      ],
     }).compileComponents();
+
+    cartFacade = TestBed.inject(CartFacade);
+    cartDomainService = TestBed.inject(CartDomainService);
+
+    store = TestBed.inject(MockStore);
+    store.overrideSelector(selectItems, [
+      {
+        product: mockProduct,
+        quantity: 2,
+        subtotal: 100,
+      },
+    ]);
+    store.overrideSelector(selectIsEmpty, false);
+    store.refreshState();
+
+    vi.spyOn(cartDomainService, 'qualifiesForFreeShipping').mockReturnValue(false);
+
+    cartFacade.clear();
 
     fixture = TestBed.createComponent(CartPage);
     component = fixture.componentInstance;
@@ -89,21 +109,25 @@ describe('CartPage', () => {
   });
 
   it('should call updateQuantity when quantity changes', () => {
+    vi.spyOn(cartFacade, 'updateQuantity');
+
     component.onUpdateQuantity(mockProduct.id, 3);
 
-    expect(mockCartStore.updateQuantity).toHaveBeenCalledWith(mockProduct.id, 3);
+    expect(cartFacade.updateQuantity).toHaveBeenCalledWith(mockProduct.id, 3);
   });
 
   it('should call removeItem when remove button is clicked', () => {
+    vi.spyOn(cartFacade, 'removeItem');
+
     component.onRemoveItem(mockProduct.id);
 
-    expect(mockCartStore.removeItem).toHaveBeenCalledWith(mockProduct.id);
+    expect(cartFacade.removeItem).toHaveBeenCalledWith(mockProduct.id);
   });
 
   it('should display empty cart message when cart is empty', () => {
-    // Update signals
-    (mockCartStore.isEmpty as any).set(true);
-    (mockCartStore.items as any).set([]);
+    store.overrideSelector(selectIsEmpty, true);
+    store.overrideSelector(selectItems, []);
+    store.refreshState();
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
@@ -114,14 +138,16 @@ describe('CartPage', () => {
   });
 
   it('should show free shipping badge when applicable', () => {
-    // Update signal
-    (mockCartStore.hasFreeShipping as any).set(true);
+    vi.spyOn(cartDomainService, 'qualifiesForFreeShipping').mockReturnValue(true);
+    store.overrideSelector(selectSubtotal, 150);
+    store.refreshState();
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
     const freeShippingBadge = compiled.querySelector('.shipping-badge');
 
     expect(freeShippingBadge).toBeTruthy();
+    expect(freeShippingBadge?.textContent?.trim()).toBe('Free');
   });
 
   it('should have checkout button', () => {
@@ -132,8 +158,8 @@ describe('CartPage', () => {
   });
 
   it('should hidden checkout button when cart is empty', () => {
-    // Update signal
-    (mockCartStore.isEmpty as any).set(true);
+    store.overrideSelector(selectIsEmpty, true);
+    store.refreshState();
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
@@ -160,8 +186,10 @@ describe('CartPage', () => {
   });
 
   it('should allow clearing the cart', () => {
+    vi.spyOn(cartFacade, 'clear');
+
     component.onClearCart();
 
-    expect(mockCartStore.clear).toHaveBeenCalled();
+    expect(cartFacade.clear).toHaveBeenCalled();
   });
 });

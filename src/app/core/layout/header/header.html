@@ -30,10 +30,10 @@
     <button
       class="shopping-cart-button"
       mat-icon-button
-      [attr.aria-label]="'Shopping cart with ' + cartItemCount() + ' items'"
+      [attr.aria-label]="'Shopping cart with ' + (cartItemCount$ | async) + ' items'"
       [routerLink]="['/cart']"
-      [matBadge]="cartItemCount()"
-      [matBadgeHidden]="cartItemCount() === 0"
+      [matBadge]="cartItemCount$ | async"
+      [matBadgeHidden]="(cartItemCount$ | async) === 0"
       matBadgeColor="warn"
       tabindex="0"
     >

@@ -1,18 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { CartStore } from '@app/features/cart/store/cart.store';
+import { CartFacade, initialCartState, selectItemCount } from '@app/features/cart/store';
 import { IProduct } from '@app/features/products/models/product.model';
-import { DateUtils } from '@app/shared';
-import { Utils } from '@app/shared/utils/utils';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { firstValueFrom } from 'rxjs';
 import { HeaderComponent } from './header';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
-  let cartStore: CartStore;
+  let cartFacade: CartFacade;
+  let store: MockStore;
 
-  const product: IProduct = {
-    id: Utils.generateId(),
+  const mockProduct: IProduct = {
+    id: 'product-id-1',
     name: 'Premium Coffee Beans',
     description: 'Arabica blend from Colombia with rich flavor notes',
     price: 29.99,
@@ -20,20 +21,32 @@ describe('HeaderComponent', () => {
     category: 'Food',
     stock: 50,
     rating: 4.5,
-    createdAt: DateUtils.fromDate(2026, 1, 1),
-    updatedAt: DateUtils.fromDate(2026, 1, 1),
+    createdAt: 1773859273,
+    updatedAt: 1773859273,
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HeaderComponent],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        provideMockStore({
+          initialState: {
+            cart: {
+              ...initialCartState,
+            },
+          },
+        }),
+      ],
     }).compileComponents();
+
+    cartFacade = TestBed.inject(CartFacade);
+    cartFacade.clear();
+
+    store = TestBed.inject(MockStore);
 
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
-    cartStore = TestBed.inject(CartStore);
-    cartStore.clear();
     await fixture.whenStable();
   });
 
@@ -41,31 +54,42 @@ describe('HeaderComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should update the badge when an item is added', () => {
+  it('should update the badge when an item is added', async () => {
     // Arrange
+    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     const badge = compiled.querySelector('.mat-badge-content');
 
     expect(badge?.textContent).toBe('0');
 
+    store.overrideSelector(selectItemCount, 2);
+    store.refreshState();
+
     // Act
-    cartStore.addItem(product, 2);
+    await cartFacade.addItem(mockProduct, 2);
     fixture.detectChanges();
 
     // Assert
     expect(badge?.textContent).toBe('2');
   });
 
-  it('should react to the change of state', () => {
+  it('should react to the change of state', async () => {
+    store.overrideSelector(selectItemCount, 0);
+    store.refreshState();
+
     // Arrange
-    let cartItemCount = component.cartItemCount();
+    let cartItemCount = await firstValueFrom(component.cartItemCount$);
     expect(cartItemCount).toBe(0);
 
+    store.overrideSelector(selectItemCount, 4);
+    store.refreshState();
+
     // Act
-    cartStore.addItem(product, 4);
+    await cartFacade.addItem(mockProduct, 4);
+    fixture.detectChanges();
 
     // Assert
-    cartItemCount = component.cartItemCount();
+    cartItemCount = await firstValueFrom(component.cartItemCount$);
     expect(cartItemCount).toBe(4);
   });
 

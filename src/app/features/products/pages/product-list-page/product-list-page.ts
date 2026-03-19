@@ -1,7 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { CartStore } from '@app/features/cart/store/cart.store';
+import { CartFacade } from '@app/features/cart/store';
 import { ProductCardComponent } from '../../components/product-card/product-card';
 import { IProduct } from '../../models/product.model';
 import { ProductFacade } from '../../store';
@@ -16,7 +16,7 @@ import { ProductFacade } from '../../store';
 })
 export class ProductListPageComponent implements OnInit {
   private readonly productFacade = inject(ProductFacade);
-  private readonly cartStore = inject(CartStore);
+  private readonly cartFacade = inject(CartFacade);
 
   readonly products$ = this.productFacade.filteredProducts$;
   readonly isLoading$ = this.productFacade.isLoading$;
@@ -27,6 +27,6 @@ export class ProductListPageComponent implements OnInit {
   }
 
   onAddToCart(product: IProduct): void {
-    this.cartStore.addItem(product, 1);
+    this.cartFacade.addItem(product, 1);
   }
 }

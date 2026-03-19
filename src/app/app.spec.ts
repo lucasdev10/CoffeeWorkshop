@@ -1,12 +1,23 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideMockStore } from '@ngrx/store/testing';
 import { App } from './app';
+import { initialCartState } from './features/cart/store';
 
-describe('App', () => {
+describe.only('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        provideMockStore({
+          initialState: {
+            cart: {
+              ...initialCartState,
+            },
+          },
+        }),
+      ],
     }).compileComponents();
   });
 
