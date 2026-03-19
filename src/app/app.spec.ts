@@ -5,7 +5,7 @@ import { provideMockStore } from '@ngrx/store/testing';
 import { App } from './app';
 import { initialAuthState } from './features/auth/store';
 
-describe.only('App', () => {
+describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
