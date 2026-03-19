@@ -2,17 +2,18 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { StorageService } from '@app/core/storage/storage';
 import { AuthRepository } from '@app/features/auth/repositories/auth.repository';
-import { AuthStore } from '@app/features/auth/store/auth.store';
 import { EUserRole } from '@app/features/user/models/user.model';
-import { DateUtils } from '@app/shared';
+import { provideEffects } from '@ngrx/effects';
+import { provideStore } from '@ngrx/store';
 import { of, Subject, throwError } from 'rxjs';
+import { AuthEffects, AuthFacade, authReducer } from '../store';
 
 /**
  * Testes de integração para fluxo de autenticação
  * Testa o fluxo completo de login, persistência e logout
  */
 describe('Authentication Flow Integration Tests', () => {
-  let authStore: AuthStore;
+  let authFacade: AuthFacade;
   let authRepository: AuthRepository;
   let storageService: StorageService;
   let router: Router;
@@ -23,8 +24,8 @@ describe('Authentication Flow Integration Tests', () => {
     password: 'hashed',
     fullName: 'Admin User',
     role: EUserRole.ADMIN,
-    createdAt: DateUtils.now(),
-    updatedAt: DateUtils.now(),
+    createdAt: 1773942125,
+    updatedAt: 1773942125,
   };
 
   const mockRegularUser = {
@@ -33,14 +34,13 @@ describe('Authentication Flow Integration Tests', () => {
     password: 'hashed',
     fullName: 'Regular User',
     role: EUserRole.USER,
-    createdAt: DateUtils.now(),
-    updatedAt: DateUtils.now(),
+    createdAt: 1773942125,
+    updatedAt: 1773942125,
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        AuthStore,
         AuthRepository,
         StorageService,
         {
@@ -49,10 +49,14 @@ describe('Authentication Flow Integration Tests', () => {
             navigate: vi.fn(),
           },
         },
+        provideStore({
+          auth: authReducer,
+        }),
+        provideEffects(AuthEffects),
       ],
     });
 
-    authStore = TestBed.inject(AuthStore);
+    authFacade = TestBed.inject(AuthFacade);
     authRepository = TestBed.inject(AuthRepository);
     storageService = TestBed.inject(StorageService);
     router = TestBed.inject(Router);
@@ -76,17 +80,17 @@ describe('Authentication Flow Integration Tests', () => {
       loginSpy.mockReturnValue(of(mockResponse));
 
       // Act - Login
-      authStore.login({
+      authFacade.login({
         email: 'admin@test.com',
         password: 'password',
       });
 
       // Assert - Authentication state
-      await vi.waitFor(() => {
-        expect(authStore.isAuthenticated()).toBe(true);
-        expect(authStore.isAdmin()).toBe(true);
-        expect(authStore.user()?.email).toBe('admin@test.com');
-        expect(authStore.token()).toBe('admin-token-123');
+      await vi.waitFor(async () => {
+        expect(await authFacade.isAuthenticated()).toBe(true);
+        expect(await authFacade.isAdmin()).toBe(true);
+        expect((await authFacade.user()).email).toBe('admin@test.com');
+        expect(await authFacade.token()).toBe('admin-token-123');
       });
 
       // Assert - Storage persistence
@@ -111,22 +115,22 @@ describe('Authentication Flow Integration Tests', () => {
       loginSpy.mockReturnValue(of(mockResponse));
 
       // Act
-      authStore.login({
+      authFacade.login({
         email: 'user@test.com',
         password: 'password',
       });
 
       // Assert
-      await vi.waitFor(() => {
-        expect(authStore.isAuthenticated()).toBe(true);
-        expect(authStore.isAdmin()).toBe(false);
+      await vi.waitFor(async () => {
+        expect(await authFacade.isAuthenticated()).toBe(true);
+        expect(await authFacade.isAdmin()).toBe(false);
         expect(router.navigate).toHaveBeenCalledWith(['/products']);
       });
     });
   });
 
   describe('Session Persistence', () => {
-    it('should restore session from localStorage on init', () => {
+    it('should restore session from localStorage on init', async () => {
       // Arrange - Simulate stored session
       storageService.set('auth_token', 'stored-token');
       storageService.set('auth_user', mockRegularUser);
@@ -135,22 +139,25 @@ describe('Authentication Flow Integration Tests', () => {
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
         providers: [
-          AuthStore,
           AuthRepository,
           StorageService,
           { provide: Router, useValue: { navigate: vi.fn() } },
+          provideStore({
+            auth: authReducer,
+          }),
+          provideEffects(AuthEffects),
         ],
       });
 
-      const newAuthStore = TestBed.inject(AuthStore);
+      const newAuthFacade = TestBed.inject(AuthFacade);
 
       // Assert
-      expect(newAuthStore.isAuthenticated()).toBe(true);
-      expect(newAuthStore.user()).toEqual(mockRegularUser);
-      expect(newAuthStore.token()).toBe('stored-token');
+      expect(await newAuthFacade.isAuthenticated()).toBe(true);
+      expect(await newAuthFacade.user()).toEqual(mockRegularUser);
+      expect(await newAuthFacade.token()).toBe('stored-token');
     });
 
-    it('should start with empty state when no stored session', () => {
+    it('should start with empty state when no stored session', async () => {
       // Arrange - Clear storage
       localStorage.clear();
 
@@ -158,19 +165,22 @@ describe('Authentication Flow Integration Tests', () => {
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
         providers: [
-          AuthStore,
           AuthRepository,
           StorageService,
           { provide: Router, useValue: { navigate: vi.fn() } },
+          provideStore({
+            auth: authReducer,
+          }),
+          provideEffects(AuthEffects),
         ],
       });
 
-      const newAuthStore = TestBed.inject(AuthStore);
+      const newAuthFacade = TestBed.inject(AuthFacade);
 
       // Assert
-      expect(newAuthStore.isAuthenticated()).toBe(false);
-      expect(newAuthStore.user()).toBeNull();
-      expect(newAuthStore.token()).toBeNull();
+      expect(await newAuthFacade.isAuthenticated()).toBe(false);
+      expect(await newAuthFacade.user()).toBeNull();
+      expect(await newAuthFacade.token()).toBeNull();
     });
   });
 
@@ -185,26 +195,26 @@ describe('Authentication Flow Integration Tests', () => {
       const loginSpy = vi.spyOn(authRepository, 'login');
       loginSpy.mockReturnValue(of(mockResponse));
 
-      authStore.login({
+      authFacade.login({
         email: 'user@test.com',
         password: 'password',
       });
 
-      await vi.waitFor(() => {
-        expect(authStore.isAuthenticated()).toBe(true);
+      await vi.waitFor(async () => {
+        expect(await authFacade.isAuthenticated()).toBe(true);
       });
 
       // Act - Logout
       const logoutSpy = vi.spyOn(authRepository, 'logout');
       logoutSpy.mockReturnValue(of(void 0));
 
-      authStore.logout();
+      authFacade.logout();
 
       // Assert - State cleared
-      await vi.waitFor(() => {
-        expect(authStore.isAuthenticated()).toBe(false);
-        expect(authStore.user()).toBeNull();
-        expect(authStore.token()).toBeNull();
+      await vi.waitFor(async () => {
+        expect(await authFacade.isAuthenticated()).toBe(false);
+        expect(await authFacade.user()).toBeNull();
+        expect(await authFacade.token()).toBeNull();
       });
 
       // Assert - Storage cleared
@@ -225,24 +235,24 @@ describe('Authentication Flow Integration Tests', () => {
       const loginSpy = vi.spyOn(authRepository, 'login');
       loginSpy.mockReturnValue(of(mockResponse));
 
-      authStore.login({
+      authFacade.login({
         email: 'user@test.com',
         password: 'password',
       });
 
-      await vi.waitFor(() => {
-        expect(authStore.isAuthenticated()).toBe(true);
+      await vi.waitFor(async () => {
+        expect(await authFacade.isAuthenticated()).toBe(true);
       });
 
       // Act - Logout with error
       const logoutSpy = vi.spyOn(authRepository, 'logout');
       logoutSpy.mockReturnValue(throwError(() => new Error('Network error')));
 
-      authStore.logout();
+      authFacade.logout();
 
       // Assert - Still clears auth
-      await vi.waitFor(() => {
-        expect(authStore.isAuthenticated()).toBe(false);
+      await vi.waitFor(async () => {
+        expect(await authFacade.isAuthenticated()).toBe(false);
         expect(router.navigate).toHaveBeenCalledWith(['/auth/login']);
       });
     });
@@ -255,16 +265,16 @@ describe('Authentication Flow Integration Tests', () => {
       loginSpy.mockReturnValue(throwError(() => ({ message: 'Invalid email or password' })));
 
       // Act
-      authStore.login({
+      authFacade.login({
         email: 'wrong@test.com',
         password: 'wrong',
       });
 
       // Assert
-      await vi.waitFor(() => {
-        expect(authStore.error()).toBe('Invalid email or password');
-        expect(authStore.isAuthenticated()).toBe(false);
-        expect(authStore.isLoading()).toBe(false);
+      await vi.waitFor(async () => {
+        expect(await authFacade.error()).toBe('Invalid email or password');
+        expect(await authFacade.isAuthenticated()).toBe(false);
+        expect(await authFacade.isLoading()).toBe(false);
       });
 
       // Assert - No storage
@@ -278,15 +288,15 @@ describe('Authentication Flow Integration Tests', () => {
       loginSpy.mockReturnValue(throwError(() => ({ message: 'Network error' })));
 
       // Act
-      authStore.login({
+      authFacade.login({
         email: 'user@test.com',
         password: 'password',
       });
 
       // Assert
-      await vi.waitFor(() => {
-        expect(authStore.error()).toBe('Network error');
-        expect(authStore.isAuthenticated()).toBe(false);
+      await vi.waitFor(async () => {
+        expect(await authFacade.error()).toBe('Network error');
+        expect(await authFacade.isAuthenticated()).toBe(false);
       });
     });
   });
@@ -303,15 +313,15 @@ describe('Authentication Flow Integration Tests', () => {
       loginSpy.mockReturnValue(of(mockResponse));
 
       // Act
-      authStore.login({
+      authFacade.login({
         email: 'admin@test.com',
         password: 'password',
       });
 
       // Assert
-      await vi.waitFor(() => {
-        expect(authStore.isAdmin()).toBe(true);
-        expect(authStore.user()?.role).toBe(EUserRole.ADMIN);
+      await vi.waitFor(async () => {
+        expect(await authFacade.isAdmin()).toBe(true);
+        expect((await authFacade.user()).role).toBe(EUserRole.ADMIN);
       });
     });
 
@@ -326,32 +336,32 @@ describe('Authentication Flow Integration Tests', () => {
       loginSpy.mockReturnValue(of(mockResponse));
 
       // Act
-      authStore.login({
+      authFacade.login({
         email: 'user@test.com',
         password: 'password',
       });
 
       // Assert
-      await vi.waitFor(() => {
-        expect(authStore.isAdmin()).toBe(false);
-        expect(authStore.user()?.role).toBe(EUserRole.USER);
+      await vi.waitFor(async () => {
+        expect(await authFacade.isAdmin()).toBe(false);
+        expect((await authFacade.user()).role).toBe(EUserRole.USER);
       });
     });
   });
 
   describe('Loading States', () => {
-    it('should manage loading state during login', () => {
+    it('should manage loading state during login', async () => {
       const subject = new Subject<any>();
 
       vi.spyOn(authRepository, 'login').mockReturnValue(subject.asObservable());
 
-      authStore.login({
+      authFacade.login({
         email: 'user@test.com',
         password: 'hashed',
       });
 
       // Loading deve estar true imediatamente
-      expect(authStore.isLoading()).toBe(true);
+      expect(await authFacade.isLoading()).toBe(true);
 
       // Agora simulamos resposta do backend
       subject.next({
@@ -361,7 +371,7 @@ describe('Authentication Flow Integration Tests', () => {
       subject.complete();
 
       // Agora deve estar false
-      expect(authStore.isLoading()).toBe(false);
+      expect(await authFacade.isLoading()).toBe(false);
     });
   });
 });

@@ -17,7 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ILoginCredentials } from '@app/features/auth/models/auth.model';
-import { AuthStore } from '@app/features/auth/store/auth.store';
+import { AuthFacade } from '@app/features/auth/store';
 import { FormError } from '@app/shared';
 import { EUserRole, ICreateUserDto } from '../../models/user.model';
 import { UserFacade } from '../../store';
@@ -43,7 +43,7 @@ import { UserFacade } from '../../store';
 export class UserFormPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly authStore = inject(AuthStore);
+  private readonly authFacade = inject(AuthFacade);
   private readonly userFacade = inject(UserFacade);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -124,7 +124,7 @@ export class UserFormPageComponent {
     }
 
     if (!this.isEditMode()) {
-      this.authStore.login({ ...(formValue as ILoginCredentials) });
+      this.authFacade.login({ ...(formValue as ILoginCredentials) });
     }
 
     // Aguarda um pouco para simular salvamento

@@ -12,7 +12,7 @@
           >Products</a
         >
       </li>
-      @if (isAdmin()) {
+      @if (isAdmin$ | async) {
         <li role="none">
           <a
             [routerLink]="['/admin']"
@@ -40,11 +40,11 @@
       <mat-icon aria-hidden="true">shopping_cart</mat-icon>
     </button>
 
-    @if (isAuthenticated()) {
+    @if (isAuthenticated$ | async) {
       <button
         mat-icon-button
         [matMenuTriggerFor]="userMenu"
-        [attr.aria-label]="'User menu for ' + user()?.fullName"
+        [attr.aria-label]="'User menu for ' + (user$ | async)?.fullName"
         aria-haspopup="true"
         tabindex="0"
       >
@@ -52,11 +52,11 @@
       </button>
       <mat-menu #userMenu="matMenu" role="menu">
         <div class="user-info" role="presentation">
-          <strong aria-label="User name">{{ user()?.fullName }}</strong>
-          <small aria-label="User email">{{ user()?.email }}</small>
+          <strong aria-label="User name">{{ (user$ | async)?.fullName }}</strong>
+          <small aria-label="User email">{{ (user$ | async)?.email }}</small>
         </div>
         <mat-divider role="separator"></mat-divider>
-        @if (isAdmin()) {
+        @if (isAdmin$ | async) {
           <button mat-menu-item [routerLink]="['/admin']" role="menuitem" tabindex="0">
             <mat-icon aria-hidden="true">dashboard</mat-icon>
             <span>Dashboard</span>

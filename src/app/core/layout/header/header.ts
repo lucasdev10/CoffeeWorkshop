@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthStore } from '@app/features/auth/store/auth.store';
+import { AuthFacade } from '@app/features/auth/store';
 import { CartFacade } from '@app/features/cart/store';
 
 @Component({
@@ -30,14 +30,14 @@ import { CartFacade } from '@app/features/cart/store';
 })
 export class HeaderComponent {
   private readonly cartFacade = inject(CartFacade);
-  private readonly authStore = inject(AuthStore);
+  private readonly authFacade = inject(AuthFacade);
 
   readonly cartItemCount$ = this.cartFacade.itemCount$;
-  readonly isAuthenticated = this.authStore.isAuthenticated;
-  readonly isAdmin = this.authStore.isAdmin;
-  readonly user = this.authStore.user;
+  readonly isAuthenticated$ = this.authFacade.isAuthenticated$;
+  readonly isAdmin$ = this.authFacade.isAdmin$;
+  readonly user$ = this.authFacade.user$;
 
   onLogout(): void {
-    this.authStore.logout();
+    this.authFacade.logout();
   }
 }

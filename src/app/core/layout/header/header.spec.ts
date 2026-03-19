@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { initialAuthState } from '@app/features/auth/store';
 import { CartFacade, initialCartState, selectItemCount } from '@app/features/cart/store';
 import { IProduct } from '@app/features/products/models/product.model';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -34,6 +35,9 @@ describe('HeaderComponent', () => {
           initialState: {
             cart: {
               ...initialCartState,
+            },
+            auth: {
+              ...initialAuthState,
             },
           },
         }),

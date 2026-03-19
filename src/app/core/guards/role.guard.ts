@@ -1,15 +1,15 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthStore } from '@app/features/auth/store/auth.store';
+import { AuthFacade } from '@app/features/auth/store';
 
 /**
  * Guard para verificar permissões/roles do usuário
  * Exemplo de uso:
  * { path: 'admin', canActivate: [roleGuard], data: { roles: ['ADMIN'] } }
  */
-export const roleGuard: CanActivateFn = (route) => {
+export const roleGuard: CanActivateFn = async (route) => {
   const router = inject(Router);
-  const authStore = inject(AuthStore);
+  const authFacade = inject(AuthFacade);
 
   const requiredRoles = route.data['roles'] as string[];
 
@@ -17,7 +17,8 @@ export const roleGuard: CanActivateFn = (route) => {
     return true;
   }
 
-  const user = authStore.user();
+  const user = await authFacade.user();
+
   if (!user) {
     router.navigate(['/auth/login']);
     return false;

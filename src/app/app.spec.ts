@@ -1,8 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { initialCartState } from '@app/features/cart/store';
 import { provideMockStore } from '@ngrx/store/testing';
 import { App } from './app';
-import { initialCartState } from './features/cart/store';
+import { initialAuthState } from './features/auth/store';
 
 describe.only('App', () => {
   beforeEach(async () => {
@@ -14,6 +15,9 @@ describe.only('App', () => {
           initialState: {
             cart: {
               ...initialCartState,
+            },
+            auth: {
+              ...initialAuthState,
             },
           },
         }),

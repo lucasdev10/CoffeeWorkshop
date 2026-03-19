@@ -1,17 +1,19 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthStore } from '@app/features/auth/store/auth.store';
+import { AuthFacade } from '@app/features/auth/store';
 
 /**
  * Guard para proteger rotas que requerem autenticação
  * Exemplo de uso nas rotas:
  * { path: 'admin', canActivate: [authGuard], ... }
  */
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
-  const authStore = inject(AuthStore);
+  const authFacade = inject(AuthFacade);
 
-  if (!authStore.isAuthenticated()) {
+  const isAuthenticated = await authFacade.isAuthenticated();
+
+  if (!isAuthenticated) {
     router.navigate(['/auth/login'], {
       queryParams: { returnUrl: state.url },
     });

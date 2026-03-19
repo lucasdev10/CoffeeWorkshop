@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-describe('Cart Effects', () => {
+describe('Auth Reducer', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({}).compileComponents();
   });

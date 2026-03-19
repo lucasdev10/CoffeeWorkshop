@@ -1,14 +1,14 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { AuthStore } from '@app/features/auth/store/auth.store';
+import { AuthFacade } from '@app/features/auth/store';
 import { EUserRole, IUser } from '@app/features/user/models/user.model';
 import { DateUtils } from '@app/shared';
 import { roleGuard } from './role.guard';
 
 describe('roleGuard', () => {
   let mockRouter: Router;
-  let mockAuthStore: Partial<AuthStore>;
+  let mockAuthFacade: Partial<AuthFacade>;
 
   const mockAdminUser: IUser = {
     id: '1',
@@ -35,20 +35,20 @@ describe('roleGuard', () => {
       navigate: vi.fn(),
     } as any;
 
-    mockAuthStore = {
+    mockAuthFacade = {
       user: signal(null),
     } as any;
 
     TestBed.configureTestingModule({
       providers: [
         { provide: Router, useValue: mockRouter },
-        { provide: AuthStore, useValue: mockAuthStore },
+        { provide: AuthFacade, useValue: mockAuthFacade },
       ],
     });
   });
 
-  it('should allow access when user has required role', () => {
-    (mockAuthStore.user as any) = signal(mockAdminUser);
+  it('should allow access when user has required role', async () => {
+    (mockAuthFacade.user as any) = signal(mockAdminUser);
 
     const route: any = {
       data: { roles: [EUserRole.ADMIN] },
@@ -56,12 +56,12 @@ describe('roleGuard', () => {
 
     const result = TestBed.runInInjectionContext(() => roleGuard(route, {} as any));
 
-    expect(result).toBe(true);
+    expect(await result).toBe(true);
     expect(mockRouter.navigate).not.toHaveBeenCalled();
   });
 
-  it('should deny access when user does not have required role', () => {
-    (mockAuthStore.user as any) = signal(mockRegularUser);
+  it('should deny access when user does not have required role', async () => {
+    (mockAuthFacade.user as any) = signal(mockRegularUser);
 
     const route: any = {
       data: { roles: [EUserRole.ADMIN] },
@@ -69,12 +69,12 @@ describe('roleGuard', () => {
 
     const result = TestBed.runInInjectionContext(() => roleGuard(route, {} as any));
 
-    expect(result).toBe(false);
+    expect(await result).toBe(false);
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/products']);
   });
 
-  it('should redirect to login when user is not authenticated', () => {
-    (mockAuthStore.user as any) = signal(null);
+  it('should redirect to login when user is not authenticated', async () => {
+    (mockAuthFacade.user as any) = signal(null);
 
     const route: any = {
       data: { roles: [EUserRole.ADMIN] },
@@ -82,12 +82,12 @@ describe('roleGuard', () => {
 
     const result = TestBed.runInInjectionContext(() => roleGuard(route, {} as any));
 
-    expect(result).toBe(false);
+    expect(await result).toBe(false);
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
   });
 
-  it('should allow access when no roles are required', () => {
-    (mockAuthStore.user as any) = signal(mockRegularUser);
+  it('should allow access when no roles are required', async () => {
+    (mockAuthFacade.user as any) = signal(mockRegularUser);
 
     const route: any = {
       data: { roles: [] },
@@ -95,11 +95,11 @@ describe('roleGuard', () => {
 
     const result = TestBed.runInInjectionContext(() => roleGuard(route, {} as any));
 
-    expect(result).toBe(true);
+    expect(await result).toBe(true);
   });
 
-  it('should allow access when roles data is undefined', () => {
-    (mockAuthStore.user as any) = signal(mockRegularUser);
+  it('should allow access when roles data is undefined', async () => {
+    (mockAuthFacade.user as any) = signal(mockRegularUser);
 
     const route: any = {
       data: {},
@@ -107,11 +107,11 @@ describe('roleGuard', () => {
 
     const result = TestBed.runInInjectionContext(() => roleGuard(route, {} as any));
 
-    expect(result).toBe(true);
+    expect(await result).toBe(true);
   });
 
-  it('should allow access when user has one of multiple required roles', () => {
-    (mockAuthStore.user as any) = signal(mockRegularUser);
+  it('should allow access when user has one of multiple required roles', async () => {
+    (mockAuthFacade.user as any) = signal(mockRegularUser);
 
     const route: any = {
       data: { roles: [EUserRole.ADMIN, EUserRole.USER] },
@@ -119,11 +119,11 @@ describe('roleGuard', () => {
 
     const result = TestBed.runInInjectionContext(() => roleGuard(route, {} as any));
 
-    expect(result).toBe(true);
+    expect(await result).toBe(true);
   });
 
-  it('should deny access when user has none of the required roles', () => {
-    (mockAuthStore.user as any) = signal(mockRegularUser);
+  it('should deny access when user has none of the required roles', async () => {
+    (mockAuthFacade.user as any) = signal(mockRegularUser);
 
     const route: any = {
       data: { roles: [EUserRole.ADMIN] },
@@ -131,7 +131,7 @@ describe('roleGuard', () => {
 
     const result = TestBed.runInInjectionContext(() => roleGuard(route, {} as any));
 
-    expect(result).toBe(false);
+    expect(await result).toBe(false);
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/products']);
   });
 });
