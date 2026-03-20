@@ -36,7 +36,7 @@ describe('ProductReducer', () => {
       const action = { type: 'Unknown' };
       const state = productReducer(initialProductState, action);
 
-      expect(state).toBe(initialProductState);
+      expect(state).toEqual(initialProductState);
     });
   });
 

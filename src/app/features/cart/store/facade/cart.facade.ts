@@ -41,6 +41,10 @@ export class CartFacade {
   );
 
   constructor() {
+    this.loadInit();
+  }
+
+  loadInit(): void {
     this.store.dispatch(CartActions.loadCartFromStorage({ cart: this.loadFromStorage() }));
 
     this.state$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((cart) => {

@@ -16,7 +16,7 @@ import {
   selectTotalValue,
 } from './product.selectors';
 
-describe('Product Selectors', () => {
+describe('ProductSelectors', () => {
   let mockProducts: IProduct[] = [
     {
       id: 'product-id-1',

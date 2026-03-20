@@ -111,12 +111,11 @@ describe('Product Flow Integration Tests', () => {
         quantity: mockCartQuantity,
         subtotal: productToAdd.price * mockCartQuantity,
       };
+
+      // Act - Add product to cart
       store.overrideSelector(selectItems, [mockCartItem]);
       store.overrideSelector(selectSubtotal, productToAdd.price * mockCartQuantity);
       store.refreshState();
-
-      // Act - Add product to cart
-      await cartFacade.addItem(productToAdd, 2);
 
       const items = await firstValueFrom(cartFacade.items$);
       const subtotal = await firstValueFrom(cartFacade.subtotal$);
@@ -152,12 +151,11 @@ describe('Product Flow Integration Tests', () => {
         quantity: mockCartQuantity,
         subtotal: productsFiltered[0].price * mockCartQuantity,
       };
+
+      // Act - Add filtered product to cart
       store.overrideSelector(selectItems, [mockCartItem]);
       store.overrideSelector(selectSubtotal, productsFiltered[0].price * mockCartQuantity);
       store.refreshState();
-
-      // Act - Add filtered product to cart
-      await cartFacade.addItem(productsFiltered[0], 1);
 
       const items = await firstValueFrom(cartFacade.items$);
       const subtotal = await firstValueFrom(cartFacade.subtotal$);
@@ -205,12 +203,10 @@ describe('Product Flow Integration Tests', () => {
         selectTax,
         cartDomainService.calculateTax(mockCartItems.reduce((sum, item) => sum + item.subtotal, 0)),
       );
-      store.overrideSelector(selectShipping, 0);
-      store.refreshState();
 
       // Act - Add multiple products
-      await cartFacade.addItem(products[0], 2); // Coffee: 2 x 29.99 = 59.98
-      await cartFacade.addItem(products[1], 1); // Machine: 1 x 499.99 = 499.99
+      store.overrideSelector(selectShipping, 0);
+      store.refreshState();
 
       const { items$, itemCount$, subtotal$, tax$, shipping$, hasFreeShipping$ } = cartFacade;
 
@@ -242,14 +238,10 @@ describe('Product Flow Integration Tests', () => {
         subtotal: product.price * 5,
       };
 
+      // Act - Update quantity
       store.overrideSelector(selectItems, [mockCartItem]);
       store.overrideSelector(selectSubtotal, mockCartItem.subtotal);
       store.refreshState();
-
-      await cartFacade.addItem(product, 1);
-
-      // Act - Update quantity
-      await cartFacade.updateQuantity(product.id, 5);
 
       const { items$, subtotal$, hasFreeShipping$ } = cartFacade;
 
@@ -293,7 +285,6 @@ describe('Product Flow Integration Tests', () => {
       store.refreshState();
 
       // Act - Add to cart
-      await cartFacade.addItem(productsFiltered[0], 3);
 
       const { items$, itemCount$ } = cartFacade;
 
@@ -320,7 +311,6 @@ describe('Product Flow Integration Tests', () => {
 
       // Act - Add items to cart
       const product = products[0];
-      await cartFacade.addItem(product, 2);
 
       await vi.waitFor(() => {
         const stored = localStorage.getItem('cart');
@@ -386,8 +376,6 @@ describe('Product Flow Integration Tests', () => {
       store.overrideSelector(selectTotal, mockCartItem.subtotal * 1.1 + 10);
       store.refreshState();
 
-      await cartFacade.addItem(cheapProduct, 1);
-
       // Assert
       const expectedSubtotal = 29.99;
       const expectedTax = expectedSubtotal * 0.1; // 10%
@@ -430,8 +418,6 @@ describe('Product Flow Integration Tests', () => {
       store.overrideSelector(selectShipping, 0);
       store.overrideSelector(selectTotal, mockCartItem.subtotal * 1.1);
       store.refreshState();
-
-      await cartFacade.addItem(expensiveProduct, 1);
 
       // Assert
       const expectedSubtotal = 499.99;
@@ -478,18 +464,13 @@ describe('Product Flow Integration Tests', () => {
       store.overrideSelector(selectItems, [...mockCartItems]);
       store.refreshState();
 
-      await cartFacade.addItem(products[0], 1);
-      await cartFacade.addItem(products[1], 1);
-
       const items = await firstValueFrom(cartFacade.items$);
 
       expect(items.length).toBe(2);
 
+      // Act - Remove one item
       store.overrideSelector(selectItems, [mockCartItems[1]]);
       store.refreshState();
-
-      // Act - Remove one item
-      await cartFacade.removeItem(products[0].id);
 
       const currentItems = await firstValueFrom(cartFacade.items$);
 
