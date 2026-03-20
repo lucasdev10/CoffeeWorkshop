@@ -9,6 +9,7 @@ import {
   selectShipping,
   selectSubtotal,
   selectTax,
+  selectTotal,
 } from '../../store/selectors/cart.selectors';
 import { CartPage } from './cart-page';
 
@@ -74,6 +75,7 @@ describe('CartPage', () => {
     store.overrideSelector(selectTax, 10);
     store.overrideSelector(selectItemCount, 2);
     store.overrideSelector(selectShipping, 10);
+    store.overrideSelector(selectTotal, 120);
     store.refreshState();
 
     vi.spyOn(cartDomainService, 'qualifiesForFreeShipping').mockReturnValue(false);

@@ -60,7 +60,7 @@ export class AuthRepository {
    * Realiza logout
    */
   logout(): Observable<void> {
-    return of(void 0).pipe(delay(300));
+    return of(void 0).pipe(delay(301));
   }
 
   /**
