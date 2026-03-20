@@ -205,6 +205,7 @@ describe('Product Flow Integration Tests', () => {
         selectTax,
         cartDomainService.calculateTax(mockCartItems.reduce((sum, item) => sum + item.subtotal, 0)),
       );
+      store.overrideSelector(selectShipping, 0);
       store.refreshState();
 
       // Act - Add multiple products

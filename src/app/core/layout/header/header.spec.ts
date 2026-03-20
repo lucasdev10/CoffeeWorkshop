@@ -1,7 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { initialAuthState } from '@app/features/auth/store';
-import { CartFacade, initialCartState, selectItemCount } from '@app/features/cart/store';
+import {
+  CartFacade,
+  initialCartState,
+  selectItemCount,
+  selectItems,
+  selectShipping,
+  selectTax,
+} from '@app/features/cart/store';
 import { IProduct } from '@app/features/products/models/product.model';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { firstValueFrom } from 'rxjs';
@@ -35,18 +42,6 @@ describe('HeaderComponent', () => {
           initialState: {
             cart: {
               ...initialCartState,
-              items: [
-                {
-                  product: mockProduct,
-                  quantity: 2,
-                  subtotal: mockProduct.price * 2,
-                },
-              ],
-              itemCount: 2,
-              shipping: 0,
-              subtotal: mockProduct.price * 2,
-              total: mockProduct.price * 2,
-              tax: 10,
             },
             auth: {
               ...initialAuthState,
@@ -60,11 +55,22 @@ describe('HeaderComponent', () => {
     cartFacade.clear();
 
     store = TestBed.inject(MockStore);
+    store.overrideSelector(selectItems, [
+      {
+        product: mockProduct,
+        quantity: 2,
+        subtotal: 100,
+      },
+    ]);
     store.overrideSelector(selectItemCount, 0);
+    store.overrideSelector(selectTax, 10);
+    store.overrideSelector(selectItemCount, 0);
+    store.overrideSelector(selectShipping, 10);
     store.refreshState();
 
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 
@@ -74,7 +80,6 @@ describe('HeaderComponent', () => {
 
   it('should update the badge when an item is added', async () => {
     // Arrange
-    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     const badge = compiled.querySelector('.mat-badge-content');
 

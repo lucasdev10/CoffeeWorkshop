@@ -4,7 +4,12 @@ import { CartDomainService } from '@app/domain/cart/cart-domain.service';
 import { IProduct } from '@app/features/products/models/product.model';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { CartFacade, initialCartState, selectIsEmpty, selectItems } from '../../store';
-import { selectItemCount, selectSubtotal, selectTax } from '../../store/selectors/cart.selectors';
+import {
+  selectItemCount,
+  selectShipping,
+  selectSubtotal,
+  selectTax,
+} from '../../store/selectors/cart.selectors';
 import { CartPage } from './cart-page';
 
 describe('CartPage', () => {
@@ -68,6 +73,7 @@ describe('CartPage', () => {
     store.overrideSelector(selectIsEmpty, false);
     store.overrideSelector(selectTax, 10);
     store.overrideSelector(selectItemCount, 2);
+    store.overrideSelector(selectShipping, 10);
     store.refreshState();
 
     vi.spyOn(cartDomainService, 'qualifiesForFreeShipping').mockReturnValue(false);
