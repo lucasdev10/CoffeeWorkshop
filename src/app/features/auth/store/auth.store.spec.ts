@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { StorageService } from '@app/core/storage/storage';
+import { CookieService } from '@app/core/cookie/cookie.service';
 import { EUserRole } from '@app/features/user/models/user.model';
 import { DateUtils } from '@app/shared';
 import { of, throwError } from 'rxjs';
@@ -11,7 +11,7 @@ import { AuthStore } from './auth.store';
 describe('AuthStore', () => {
   let store: AuthStore;
   let mockRepository: Mocked<AuthRepository>;
-  let mockStorage: Mocked<StorageService>;
+  let mockCookie: Mocked<CookieService>;
   let mockRouter: Mocked<Router>;
 
   beforeEach(() => {
@@ -23,7 +23,7 @@ describe('AuthStore', () => {
       refreshToken: vi.fn(),
     } as any;
 
-    mockStorage = {
+    mockCookie = {
       get: vi.fn(),
       set: vi.fn(),
       remove: vi.fn(),
@@ -40,7 +40,7 @@ describe('AuthStore', () => {
       providers: [
         AuthStore,
         { provide: AuthRepository, useValue: mockRepository },
-        { provide: StorageService, useValue: mockStorage },
+        { provide: CookieService, useValue: mockCookie },
         { provide: Router, useValue: mockRouter },
       ],
     });
@@ -49,7 +49,7 @@ describe('AuthStore', () => {
   });
 
   afterEach(() => {
-    mockStorage.clear();
+    mockCookie.clear();
   });
 
   it('should be created', () => {
@@ -79,8 +79,8 @@ describe('AuthStore', () => {
         expect(store.isAuthenticated()).toBe(true);
         expect(store.isAdmin()).toBe(true);
         expect(store.user()?.email).toBe('admin@test.com');
-        expect(mockStorage.set).toHaveBeenCalledWith('auth_token', 'mock-token');
-        expect(mockStorage.set).toHaveBeenCalledWith('auth_user', mockResponse.user);
+        expect(mockCookie.set).toHaveBeenCalledWith('auth_token', 'mock-token');
+        expect(mockCookie.set).toHaveBeenCalledWith('auth_user', mockResponse.user);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/admin']);
       });
     });
@@ -131,8 +131,8 @@ describe('AuthStore', () => {
       await vi.waitFor(() => {
         expect(store.isAuthenticated()).toBe(false);
         expect(store.user()).toBeNull();
-        expect(mockStorage.remove).toHaveBeenCalledWith('auth_token');
-        expect(mockStorage.remove).toHaveBeenCalledWith('auth_user');
+        expect(mockCookie.remove).toHaveBeenCalledWith('auth_token');
+        expect(mockCookie.remove).toHaveBeenCalledWith('auth_user');
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
       });
     });
@@ -160,9 +160,9 @@ describe('AuthStore', () => {
         updatedAt: DateUtils.now(),
       };
 
-      mockStorage.get.mockImplementation((key: string) => {
-        if (key === 'auth_token') return 'stored-token';
-        if (key === 'auth_user') return mockUser;
+      mockCookie.get.mockImplementation((name: string) => {
+        if (name === 'auth_token') return 'stored-token';
+        if (name === 'auth_user') return mockUser;
         return null;
       });
 
@@ -171,7 +171,7 @@ describe('AuthStore', () => {
         providers: [
           AuthStore,
           { provide: AuthRepository, useValue: mockRepository },
-          { provide: StorageService, useValue: mockStorage },
+          { provide: CookieService, useValue: mockCookie },
           { provide: Router, useValue: mockRouter },
         ],
       });
@@ -184,7 +184,7 @@ describe('AuthStore', () => {
     });
 
     it('should start with empty state when no stored auth', () => {
-      mockStorage.get.mockReturnValue(null);
+      mockCookie.get.mockReturnValue(null);
 
       expect(store.isAuthenticated()).toBe(false);
       expect(store.user()).toBeNull();

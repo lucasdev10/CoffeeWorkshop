@@ -98,6 +98,10 @@ export const APP_CONFIG = {
     TOKEN_REFRESH_THRESHOLD: 5 * 60 * 1000, // 5 minutos antes do vencimento
     MAX_LOGIN_ATTEMPTS: 5,
     LOCKOUT_DURATION: 15 * 60 * 1000, // 15 minutos
+    // Configurações de cookies seguros
+    COOKIE_SECURE: true, // Apenas HTTPS em produção
+    COOKIE_SAME_SITE: 'strict' as const,
+    COOKIE_EXPIRES_DAYS: 7, // 7 dias
   },
 
   // URLs e rotas

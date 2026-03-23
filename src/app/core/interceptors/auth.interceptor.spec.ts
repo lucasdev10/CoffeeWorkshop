@@ -1,30 +1,35 @@
 import { HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
+import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
+import { CookieService } from '../cookie/cookie.service';
 import { authInterceptor } from './auth.interceptor';
 
 describe('authInterceptor', () => {
   let mockRequest: HttpRequest<unknown>;
   let mockNext: HttpHandlerFn;
+  let cookieService: CookieService;
 
   beforeEach(() => {
     mockRequest = new HttpRequest('GET', '/api/test');
 
     mockNext = vi.fn((req: HttpRequest<unknown>) => of({} as HttpEvent<unknown>));
 
-    localStorage.clear();
+    cookieService = TestBed.inject(CookieService);
+
+    cookieService.clear();
   });
 
   afterEach(() => {
-    localStorage.clear();
+    cookieService.clear();
   });
 
   it('should add Authorization header when token exists', () => {
     // Arrange
     const token = 'test-token-123';
-    localStorage.setItem('auth_token', token);
+    cookieService.set('auth_token', token);
 
     // Act
-    authInterceptor(mockRequest, mockNext);
+    TestBed.runInInjectionContext(() => authInterceptor(mockRequest, mockNext));
 
     // Assert
     expect(mockNext).toHaveBeenCalledWith(
@@ -43,7 +48,7 @@ describe('authInterceptor', () => {
 
   it('should not add Authorization header when token does not exist', () => {
     // Act
-    authInterceptor(mockRequest, mockNext);
+    TestBed.runInInjectionContext(() => authInterceptor(mockRequest, mockNext));
 
     // Assert
     expect(mockNext).toHaveBeenCalledWith(mockRequest);
@@ -51,7 +56,7 @@ describe('authInterceptor', () => {
 
   it('should pass request to next handler', () => {
     // Act
-    const result = authInterceptor(mockRequest, mockNext);
+    const result = TestBed.runInInjectionContext(() => authInterceptor(mockRequest, mockNext));
 
     // Assert
     expect(mockNext).toHaveBeenCalled();
@@ -61,10 +66,10 @@ describe('authInterceptor', () => {
   it('should clone request when adding token', () => {
     // Arrange
     const token = 'test-token-456';
-    localStorage.setItem('auth_token', token);
+    cookieService.set('auth_token', token);
 
     // Act
-    authInterceptor(mockRequest, mockNext);
+    TestBed.runInInjectionContext(() => authInterceptor(mockRequest, mockNext));
 
     // Assert
     const calledRequest = (mockNext as any).mock.calls[0][0];
@@ -74,10 +79,10 @@ describe('authInterceptor', () => {
 
   it('should handle empty token string', () => {
     // Arrange
-    localStorage.setItem('auth_token', '');
+    cookieService.set('auth_token', '');
 
     // Act
-    authInterceptor(mockRequest, mockNext);
+    TestBed.runInInjectionContext(() => authInterceptor(mockRequest, mockNext));
 
     // Assert
     expect(mockNext).toHaveBeenCalledWith(mockRequest);
@@ -86,11 +91,11 @@ describe('authInterceptor', () => {
   it('should work with different HTTP methods', () => {
     // Arrange
     const token = 'test-token-789';
-    localStorage.setItem('auth_token', token);
+    cookieService.set('auth_token', token);
     const postRequest = new HttpRequest('POST', '/api/test', { data: 'test' });
 
     // Act
-    authInterceptor(postRequest, mockNext);
+    TestBed.runInInjectionContext(() => authInterceptor(postRequest, mockNext));
 
     // Assert
     const calledRequest = (mockNext as any).mock.calls[0][0];

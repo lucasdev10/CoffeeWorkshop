@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { StorageService } from '@app/core/storage/storage';
+import { CookieService } from '@app/core/cookie/cookie.service';
 import { EUserRole, IUser } from '@app/features/user/models/user.model';
 import { ILoginCredentials } from '../models/auth.model';
 import { AuthRepository } from '../repositories/auth.repository';
@@ -14,7 +14,7 @@ import { AuthRepository } from '../repositories/auth.repository';
 })
 export class AuthStore {
   private readonly repository = inject(AuthRepository);
-  private readonly storage = inject(StorageService);
+  private readonly cookies = inject(CookieService);
   private readonly router = inject(Router);
 
   // State
@@ -36,11 +36,11 @@ export class AuthStore {
   }
 
   /**
-   * Inicializa autenticação do localStorage
+   * Inicializa autenticação do cookieService
    */
   private initializeAuth(): void {
-    const token = this.storage.get('auth_token') as string | null;
-    const user = this.storage.get('auth_user') as IUser | null;
+    const token = this.cookies.get('auth_token') as string | null;
+    const user = this.cookies.get('auth_user') as IUser | null;
 
     if (token && user) {
       this.tokenState.set(token);
@@ -60,9 +60,9 @@ export class AuthStore {
         this.userState.set(response.user);
         this.tokenState.set(response.token);
 
-        // Persiste no localStorage
-        this.storage.set('auth_token', response.token);
-        this.storage.set('auth_user', response.user);
+        // Persiste nos cookies
+        this.cookies.set<string>('auth_token', response.token);
+        this.cookies.set<IUser>('auth_user', response.user);
 
         this.loadingState.set(false);
 
@@ -108,8 +108,8 @@ export class AuthStore {
     this.loadingState.set(false);
     this.errorState.set(null);
 
-    this.storage.remove('auth_token');
-    this.storage.remove('auth_user');
+    this.cookies.remove('auth_token');
+    this.cookies.remove('auth_user');
   }
 
   /**

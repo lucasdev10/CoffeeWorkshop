@@ -23,7 +23,40 @@ As rotas administrativas estão protegidas por guards que verificam autenticaç�
 - Redirecionamento automático para login se não autenticado
 - Redirecionamento para /products se não tiver permissão
 
-## ✅ 2. Autenticação Simulada
+## ✅ 2. Armazenamento Seguro de Tokens
+
+O sistema migrou do localStorage para cookies seguros para maior proteção:
+
+### SecureStorageService (src/app/core/storage/secure-storage.service.ts)
+
+Estratégia híbrida de armazenamento:
+
+```typescript
+// Dados sensíveis → Cookies seguros
+auth_token: {
+  useSecureCookies: true,
+  cookieOptions: {
+    expires: 7, // 7 dias
+    secure: true, // Apenas HTTPS
+    sameSite: 'strict', // Proteção CSRF
+    path: '/',
+  }
+}
+
+// Dados não-sensíveis → localStorage
+theme: { useSecureCookies: false }
+cart: { useSecureCookies: false }
+```
+
+### Flags de Segurança Implementadas
+
+| Flag       | Valor    | Proteção                 |
+| ---------- | -------- | ------------------------ |
+| `Secure`   | `true`   | Apenas transmissão HTTPS |
+| `SameSite` | `strict` | Previne ataques CSRF     |
+| `Expires`  | `7 dias` | Expiração automática     |
+
+## ✅ 3. Autenticação Simulada
 
 O sistema possui autenticação completa com:
 
@@ -34,18 +67,18 @@ O sistema possui autenticação completa com:
 - logout(): Remove autenticação
 - isAuthenticated: Signal que indica se está autenticado
 - isAdmin: Signal que indica se é administrador
-- Persistência em localStorage (auth_token, auth_user)
+- Persistência em cookies seguros (auth_token, auth_user)
 ```
 
 ### Fluxo de Autenticação
 
 1. Usuário faz login com credenciais
 2. Sistema valida e retorna token + dados do usuário
-3. Token e usuário são salvos no localStorage
+3. Token e usuário são salvos em cookies seguros
 4. Token é adicionado automaticamente em todas as requisições HTTP
 5. Ao fazer logout, dados são removidos e usuário é redirecionado
 
-## ✅ 3. Guards / ProtectedRoute
+## ✅ 4. Guards / ProtectedRoute
 
 ### AuthGuard (src/app/core/guards/auth.guard.ts)
 

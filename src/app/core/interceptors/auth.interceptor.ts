@@ -1,4 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { CookieService } from '../cookie/cookie.service';
 
 /**
  * Interceptor para adicionar token de autenticação nas requisições
@@ -6,8 +8,8 @@ import { HttpInterceptorFn } from '@angular/common/http';
  * provideHttpClient(withInterceptors([authInterceptor]))
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // TODO: Buscar token do AuthService ou localStorage
-  const token = localStorage.getItem('auth_token');
+  const cookies = inject(CookieService);
+  const token = cookies.get('auth_token');
 
   if (token) {
     const clonedRequest = req.clone({

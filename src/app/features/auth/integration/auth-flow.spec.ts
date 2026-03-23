@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { CookieService } from '@app/core/cookie/cookie.service';
 import { StorageService } from '@app/core/storage/storage';
 import { AuthRepository } from '@app/features/auth/repositories/auth.repository';
 import { AuthStore } from '@app/features/auth/store/auth.store';
@@ -15,6 +16,7 @@ describe('Authentication Flow Integration Tests', () => {
   let authStore: AuthStore;
   let authRepository: AuthRepository;
   let storageService: StorageService;
+  let cookieService: CookieService;
   let router: Router;
 
   const mockAdminUser = {
@@ -55,6 +57,7 @@ describe('Authentication Flow Integration Tests', () => {
     authStore = TestBed.inject(AuthStore);
     authRepository = TestBed.inject(AuthRepository);
     storageService = TestBed.inject(StorageService);
+    cookieService = TestBed.inject(CookieService);
     router = TestBed.inject(Router);
 
     localStorage.clear();
@@ -90,8 +93,8 @@ describe('Authentication Flow Integration Tests', () => {
       });
 
       // Assert - Storage persistence
-      const storedToken = storageService.get('auth_token');
-      const storedUser = storageService.get('auth_user');
+      const storedToken = cookieService.get('auth_token');
+      const storedUser = cookieService.get('auth_user');
 
       expect(storedToken).toBe('admin-token-123');
       expect(storedUser).toEqual(mockAdminUser);
@@ -128,8 +131,8 @@ describe('Authentication Flow Integration Tests', () => {
   describe('Session Persistence', () => {
     it('should restore session from localStorage on init', () => {
       // Arrange - Simulate stored session
-      storageService.set('auth_token', 'stored-token');
-      storageService.set('auth_user', mockRegularUser);
+      cookieService.set('auth_token', 'stored-token');
+      cookieService.set('auth_user', mockRegularUser);
 
       // Act - Create new store instance (simulates page reload)
       TestBed.resetTestingModule();
@@ -152,7 +155,7 @@ describe('Authentication Flow Integration Tests', () => {
 
     it('should start with empty state when no stored session', () => {
       // Arrange - Clear storage
-      localStorage.clear();
+      cookieService.clear();
 
       // Act - Create new store instance
       TestBed.resetTestingModule();
