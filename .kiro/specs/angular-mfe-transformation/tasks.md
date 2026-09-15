@@ -141,7 +141,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - Move ProductCreatePage from monolith to MFE
     - Update all imports to use coffee-shared-lib
     - _Requirements: 2.2, 2.3, 2.9_
-  - [ ] 4.4 Extract Products repository and store
+  - [x] 4.4 Extract Products repository and store
     - Move ProductRepository to MFE
     - Create ProductState with products, selectedProduct, loading, error, filters
     - Create ProductActions for CRUD operations
