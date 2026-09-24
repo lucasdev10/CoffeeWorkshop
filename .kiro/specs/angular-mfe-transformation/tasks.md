@@ -149,7 +149,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - Create ProductEffects for async operations
     - Wire up NgRx store slice for products
     - _Requirements: 2.4, 2.5_
-  - [ ] 4.5 Create Products MFE routing
+  - [x] 4.5 Create Products MFE routing
     - Create products.routes.ts exporting PRODUCT_ROUTES
     - Configure route "" for ProductListPage
     - Configure route ":id" for ProductDetailPage
