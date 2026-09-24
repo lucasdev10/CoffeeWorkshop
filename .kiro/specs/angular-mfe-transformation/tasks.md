@@ -117,7 +117,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
 - [x] 3. Checkpoint - Verify Shell App foundation
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Create Products MFE
+- [x] 4. Create Products MFE
   - [x] 4.1 Create coffee-products-mfe repository with Angular structure
     - Initialize new Git repository
     - Create Angular application using Angular CLI
@@ -163,7 +163,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - Update test imports to use coffee-shared-lib
     - Ensure all tests pass with `npm test`
     - _Requirements: 2.10, 15.2_
-  - [ ] 4.7 Create Products MFE development and build scripts
+  - [x] 4.7 Create Products MFE development and build scripts
     - Add "start" script to serve on port 4201
     - Add "build" script for production build
     - Add "test" and "test:coverage" scripts
