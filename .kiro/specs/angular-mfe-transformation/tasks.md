@@ -172,7 +172,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - _Requirements: 13.2, 13.8, 13.12, 15.4, 12.9_
 
 - [ ] 5. Create Cart MFE
-  - [ ] 5.1 Create coffee-cart-mfe repository with Angular structure
+  - [x] 5.1 Create coffee-cart-mfe repository with Angular structure
     - Initialize new Git repository
     - Create Angular application using Angular CLI
     - Install @angular-architects/module-federation
