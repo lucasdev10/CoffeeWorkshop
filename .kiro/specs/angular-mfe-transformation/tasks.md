@@ -156,7 +156,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - Configure route "new" for ProductCreatePage
     - Inject global Store to access auth and cart state
     - _Requirements: 2.6, 2.12_
-  - [ ]\* 4.6 Migrate Products MFE unit tests
+  - [x] 4.6 Migrate Products MFE unit tests
     - Move product.repository.spec.ts
     - Move product-flow.spec.ts
     - Move component tests for ProductCard, ProductForm
