@@ -368,7 +368,7 @@ END
     - _Requirements: 13.3, 13.8, 15.4, 12.9_
 
 - [ ] 6. Create Admin MFE
-  - [ ] 6.1 Create coffee-admin-mfe repository with Angular structure
+  - [x] 6.1 Create coffee-admin-mfe repository with Angular structure
     - Initialize new Git repository
     - Create Angular application using Angular CLI
     - Install @angular-architects/module-federation
