@@ -1,256 +1,263 @@
-﻿# Kiro Spec Documentation - Angular MFE Transformation
+# ?? Kiro Spec Documentation - Angular MFE Transformation
 
-This directory contains configuration and documentation for the Angular MFE Transformation project execution.
-
----
-
-## 📁 Directory Structure
-
-### Key Files
-
-#### 1. **README.md** (This File)
-- **Purpose**: Overview and navigation guide
-- **When to read**: First time or for general reference
-- **Contains**: File structure, quick start, workflow overview
-
-#### 2. **TASK_WORKFLOW_COMPLETE.md** ⭐ START HERE
-- **Purpose**: Complete workflow visualization with SKILL-COMMIT integration
-- **When to read**: Before executing first task, to understand full flow
-- **Contains**: Step-by-step workflow, timing diagrams, integration map
-
-#### 3. **ERROR_MAP.md**
-- **Purpose**: Central error tracking and prevention system
-- **When to update**: After EVERY task execution (success or failure)
-- **When to read**: BEFORE starting each new task
-- **Contents**: 
-  - All errors encountered with root causes
-  - Solutions applied
-  - Common patterns and prevention strategies
-  - Statistics and cross-references
-
-#### 4. **SUBAGENT_GUIDE.md**
-- **Purpose**: Complete guide for delegating tasks to subagents
-- **Who reads**: Orchestrator (coordinator)
-- **Contents**:
-  - How to invoke subagents correctly
-  - What to expect in output
-  - Error handling procedures
-  - Best practices
-  - Quality assurance checklist
-
-#### 5. **POST_EXECUTION_GUIDE.md** ⭐ READ BEFORE SKILL-COMMIT
-- **Purpose**: Complete guide to SKILL-COMMIT.md execution
-- **When to read**: AFTER task successful, BEFORE running SKILL-COMMIT
-- **Contents**:
-  - What SKILL-COMMIT does (test, build, commit, push)
-  - When to execute (only on success)
-  - Pre-commit checklist
-  - Step-by-step execution process
-  - Error handling for SKILL-COMMIT failures
-  - Troubleshooting guide
-
-#### 6. **IMPLEMENTATION_SUMMARY.md**
-- **Purpose**: Detailed summary of all changes made
-- **When to read**: For understanding what was changed and why
-- **Contents**:
-  - Files created/modified
-  - Requirements implemented
-  - Errors mapped
-  - Next actions
-
-#### 7. **specs/angular-mfe-transformation/tasks.md**
-- **Purpose**: Main task list with Execution Guidelines
-- **New sections added**:
-  - "Execution Guidelines & Error Management Protocol"
-  - Pre-execution checklist
-  - Post-task SKILL-COMMIT integration
-  - Error documentation template
-  - Common error categories and prevention
-  - Complete task execution lifecycle
+Navigation guide for orchestrator task execution, error management, and SKILL-COMMIT workflow.
 
 ---
 
-## 🚀 Quick Start - Complete Workflow
+## ?? Core Documents (8 Files)
 
-### 👀 FIRST TIME? Start Here:
-1. Read **TASK_WORKFLOW_COMPLETE.md** (5 min) - Understand the full flow
-2. Skim **POST_EXECUTION_GUIDE.md** (5 min) - Know what SKILL-COMMIT does
-
-### 📋 FOR EACH TASK:
-
-#### PHASE 1: Pre-Execution (5-10 min)
-1. **Read ERROR_MAP.md** - Check for known issues
-2. **Run Pre-Execution Checklist** - From tasks.md
-   - [ ] Read ERROR_MAP.md
-   - [ ] Check similar tasks
-   - [ ] Verify dependencies
-   - [ ] Confirm scripts exist
-   - [ ] Check ports available
-   - [ ] Verify files exist
-
-#### PHASE 2: Task Execution (Variable)
-1. **Invoke subagent** with full task context
-2. **Monitor** for errors
-3. **Document** any issues encountered
-
-#### PHASE 3: Post-Execution (5-20 min)
-1. **Update ERROR_MAP.md** - Document task completion
-2. **Update tasks.md** - Mark task as completed
-3. **Execute SKILL-COMMIT.md** ⚠️ MANDATORY
-   - Verify: npm test
-   - Verify: npm start
-   - Verify: npm build
-   - Commit: git add & commit
-   - Push: git push
-
-#### PHASE 4: Reporting (2-3 min)
-1. **Report to user** - Task complete
-2. **Ready for next task**
+### 1. **README.md** (This File) - 2 min
+**Purpose**: Navigation and overview  
+**Start**: Yes, first time  
+**Contains**: File structure, quick start, workflow overview
 
 ---
 
-## 📚 Document Reference Guide
+### 2. **ORCHESTRATOR_WORKFLOW.md** - 10 min ? START HERE!
+**Purpose**: Main workflow for post-task execution (MASTER DOCUMENT)  
+**Start**: Before executing first task  
+**Contains**:
+- Complete 6-step post-task workflow
+- Data collection (STEP A)
+- ERROR_MAP.md verification (STEP B)
+- Error documentation (STEP C)
+- Task status update (STEP D)
+- SKILL-COMMIT execution (STEP E)
+- User reporting (STEP F)
+- Complete checklist
 
-### By Use Case
-
-| I want to... | Read This | Time |
-|---|---|---|
-| Understand complete workflow | TASK_WORKFLOW_COMPLETE.md | 10 min |
-| Check for known errors | ERROR_MAP.md | 5 min |
-| Execute a task | tasks.md + SUBAGENT_GUIDE.md | 15 min |
-| Handle SKILL-COMMIT | POST_EXECUTION_GUIDE.md | 10 min |
-| Understand what changed | IMPLEMENTATION_SUMMARY.md | 5 min |
-| Run subagents | SUBAGENT_GUIDE.md | 10 min |
-| Quick reference | README.md (this file) | 5 min |
-
-### By Workflow Phase
-
-| Phase | Read This First | Then This |
-|---|---|---|
-| Pre-Execution | ERROR_MAP.md | tasks.md checklist |
-| Task Execution | SUBAGENT_GUIDE.md | tasks.md task details |
-| Post-Execution | POST_EXECUTION_GUIDE.md | SKILL-COMMIT steps |
-| Error Recovery | ERROR_MAP.md | SUBAGENT_GUIDE troubleshooting |
+**When to use**: After EVERY task execution
 
 ---
 
-## 🎯 Key Mandatory Requirements
+### 3. **QUICK_START.md** - 2 min
+**Purpose**: Fast templates and checklists  
+**Start**: When executing tasks  
+**Contains**:
+- Copy/paste templates for SUCCESS and FAILURE entries
+- Quick checklists (post-task, error, SKILL-COMMIT)
+- Statistics update checklist
+- Document cross-reference table
 
-### ✅ Requirement 1: Always Use Subagents
-- Documented in: tasks.md + SUBAGENT_GUIDE.md
-- Enforced by: Orchestrator role definition
-- Verified by: No direct code execution
-
-### ✅ Requirement 2: Map All Errors
-- Documented in: ERROR_MAP.md + tasks.md
-- Enforced by: Error documentation template
-- Verified by: Pre-task ERROR_MAP.md check
-
-### ✅ Requirement 3: Check Errors Before Each Task
-- Documented in: Pre-Execution Checklist (tasks.md)
-- Enforced by: ERROR_MAP.md reference
-- Verified by: Pre-flight checklist completion
-
-### ✅ Requirement 4: Execute SKILL-COMMIT After Success
-- Documented in: POST_EXECUTION_GUIDE.md + tasks.md
-- Enforced by: Workflow requirement
-- Verified by: Commit history in git
+**When to use**: During task execution for quick reference
 
 ---
 
-## 🔄 Complete Workflow Visualization
+### 4. **ERROR_MANAGEMENT_SYSTEM.md** - 2 min
+**Purpose**: Overview of error system  
+**Start**: Before first error mapping  
+**Contains**:
+- System overview in few words
+- 3 usage scenarios (new error, repetition, success)
+- 5 error categories explained
+- Document relationships diagram
+- Reading order
 
-\\\
-START TASK
-    ↓
-[Pre-Execution: 5-10 min]
-  ├─ Read ERROR_MAP.md
-  ├─ Run Pre-Execution Checklist
-  └─ Verify dependencies
-    ↓
-[Task Execution: Variable]
-  ├─ Invoke subagent
-  ├─ Monitor execution
-  └─ Document issues
-    ↓
-[Post-Execution on Success: 5-20 min]
-  ├─ Update ERROR_MAP.md
-  ├─ Update tasks.md (status=completed)
-  ├─ Execute SKILL-COMMIT.md ⚠️
-  │  ├─ npm test (all projects)
-  │  ├─ npm start (verify)
-  │  ├─ npm build (verify)
-  │  └─ git commit & push
-  └─ Report to user
-    ↓
-READY FOR NEXT TASK
-\\\
+**When to use**: To understand the error system
 
 ---
 
-## 📊 File Organization
+### 5. **ERROR_MAPPING_GUIDE.md** - 10 min
+**Purpose**: Detailed error documentation guide  
+**Start**: When documenting first error  
+**Contains**:
+- 6 complete steps for error mapping
+- 5 error categories with examples
+- Template and checklist
+- Prevention strategies
+- Cross-referencing instructions
 
-\\\
+**When to use**: Detailed guidance for documenting errors
+
+---
+
+### 6. **SKILL_EXECUTION_GUIDE.md** - 5 min
+**Purpose**: How to run SKILL-COMMIT  
+**Start**: When task succeeds  
+**Contains**:
+- 3-step SKILL-COMMIT execution
+- Example workflow
+- Verification checklist
+- Error handling
+- Integration with ORCHESTRATOR_WORKFLOW.md
+
+**When to use**: When executing SKILL-COMMIT
+
+---
+
+### 7. **ERROR_MAP.md** - 5 min (Consulta r�pida)
+**Purpose**: Central error repository  
+**Start**: Before each similar task  
+**Contains**:
+- All documented errors (error entries)
+- Common patterns & solutions
+- Statistics tracking
+- Task-to-error index
+
+**When to use**:
+- BEFORE task: Check for similar errors
+- AFTER task: Add new error (if needed)
+- ANY TIME: Find solution for known errors
+
+---
+
+### 8. **SUBAGENT_GUIDE.md** - 5 min
+**Purpose**: How to use subagents  
+**Who reads**: Orchestrator  
+**Contains**:
+- When/how to invoke subagents
+- What to expect in output
+- Error handling
+- Quality checklist
+- Best practices
+
+**When to use**: When delegating tasks to subagents
+
+---
+
+## ?? Quick Start - 3 Scenarios
+
+### Scenario 1: FIRST TIME SETUP
+
+1. Read **README.md** (this file) - 2 min
+2. Read **ORCHESTRATOR_WORKFLOW.md** - 10 min
+3. Read **ERROR_MANAGEMENT_SYSTEM.md** - 2 min
+4. Bookmark **QUICK_START.md**
+5. Bookmark **ERROR_MAP.md**
+
+**Total**: 15 min to understand everything
+
+---
+
+### Scenario 2: EXECUTING FIRST TASK
+
+1. Read **QUICK_START.md** Checklist 3: Before similar task
+2. Read/skim **ERROR_MAP.md** - 5 min
+3. Check: Similar errors exist?
+4. Execute task via subagent
+5. Follow **ORCHESTRATOR_WORKFLOW.md** STEP A-F
+
+---
+
+### Scenario 3: TASK JUST COMPLETED
+
+1. Open **QUICK_START.md** - Checklist 1
+2. Follow **ORCHESTRATOR_WORKFLOW.md** STEP A-F
+3. If SUCCESS:
+   - Read **SKILL_EXECUTION_GUIDE.md**
+   - Execute SKILL-COMMIT
+4. Report to user
+5. Document in ERROR_MAP.md (use **QUICK_START.md** templates)
+
+---
+
+## ?? Post-Task Workflow (At a Glance)
+
+`
+Task Completes
+    ?
+ORCHESTRATOR_WORKFLOW STEP A: Collect Data
+    +- Use QUICK_START.md Checklist 1
+    +- Get: Task ID, status, errors (if any)
+    ?
+ORCHESTRATOR_WORKFLOW STEP B: Check ERROR_MAP.md
+    +- Search for similar error
+    +- Found? Use solution from ERROR_MAP.md
+    +- Not found? Prepare new entry
+    ?
+ORCHESTRATOR_WORKFLOW STEP C: Document
+    +- Use ERROR_MAPPING_GUIDE.md or QUICK_START.md template
+    +- Add entry to ERROR_MAP.md
+    +- Update statistics
+    ?
+ORCHESTRATOR_WORKFLOW STEP D: Update Status
+    +- task_update(status='completed' or 'failed')
+    ?
+ORCHESTRATOR_WORKFLOW STEP E: SKILL-COMMIT (if SUCCESS)
+    +- Use SKILL_EXECUTION_GUIDE.md
+    +- disclose_context(\"SKILL-COMMIT\")
+    +- invoke_sub_agent(...)
+    ?
+ORCHESTRATOR_WORKFLOW STEP F: Report
+    +- Inform user of completion
+`
+
+---
+
+## ??? File Organization
+
+`
 .kiro/
-├─ README.md (THIS FILE)
-├─ TASK_WORKFLOW_COMPLETE.md ⭐ START HERE
-├─ ERROR_MAP.md (Read BEFORE each task)
-├─ SUBAGENT_GUIDE.md (Delegate tasks)
-├─ POST_EXECUTION_GUIDE.md (SKILL-COMMIT)
-├─ IMPLEMENTATION_SUMMARY.md (What changed)
-└─ specs/
-   └─ angular-mfe-transformation/
-      └─ tasks.md (Updated with guidelines)
-\\\
++-- README.md (you are here)
++-- ORCHESTRATOR_WORKFLOW.md (main workflow)
++-- QUICK_START.md (templates & checklists)
++-- ERROR_MANAGEMENT_SYSTEM.md (error system overview)
++-- ERROR_MAPPING_GUIDE.md (detailed error guide)
++-- SKILL_EXECUTION_GUIDE.md (SKILL-COMMIT execution)
++-- ERROR_MAP.md (central error repository)
++-- SUBAGENT_GUIDE.md (subagent instructions)
++-- specs/
+    +-- angular-mfe-transformation/
+        +-- tasks.md (main task list)
+        +-- SKILL-COMMIT.md (the skill)
+        +-- requirements.md
+        +-- design.md
+`
+
+**Total**: 8 core documents (consolidated from 15+)
 
 ---
 
-## ✨ Latest Updates
+## ?? Navigation by Task
 
-**Date**: 2026-09-25
+**"I need to understand the system"**
+? ORCHESTRATOR_WORKFLOW.md
 
-### New Features Added:
-1. ✅ SKILL-COMMIT.md integration to tasks.md
-2. ✅ POST_EXECUTION_GUIDE.md created
-3. ✅ TASK_WORKFLOW_COMPLETE.md created
-4. ✅ Complete lifecycle documentation
+**"I need to do something quick"**
+? QUICK_START.md
 
-### Integration Flow:
-- Task completes → ERROR_MAP updated → tasks.md updated → SKILL-COMMIT executed → User reports
+**"I need to handle an error"**
+? ERROR_MANAGEMENT_SYSTEM.md ? ERROR_MAPPING_GUIDE.md
 
----
+**"I need to check known errors"**
+? ERROR_MAP.md
 
-## 🆘 Need Help?
+**"I need to execute SKILL-COMMIT"**
+? SKILL_EXECUTION_GUIDE.md
 
-### I don't understand the workflow
-→ Read **TASK_WORKFLOW_COMPLETE.md**
-
-### I need to check for known errors
-→ Read **ERROR_MAP.md**
-
-### I need to run a task
-→ Read **SUBAGENT_GUIDE.md**
-
-### I need to execute SKILL-COMMIT
-→ Read **POST_EXECUTION_GUIDE.md**
-
-### I'm stuck on an error
-→ Search **ERROR_MAP.md** for similar error
-
-### I want to understand everything that changed
-→ Read **IMPLEMENTATION_SUMMARY.md**
+**"I need to delegate a task"**
+? SUBAGENT_GUIDE.md
 
 ---
 
-## 🎉 You're All Set!
+## ? Key Principles
 
-Everything is ready:
-- ✅ Workflow documented
-- ✅ Errors tracking system ready
-- ✅ Subagent coordination documented
-- ✅ SKILL-COMMIT integration complete
-- ✅ Pre/post execution checklists defined
-
-**Next Step**: Read **TASK_WORKFLOW_COMPLETE.md** to understand the flow, then execute your first task!
+? **One Master Workflow**: ORCHESTRATOR_WORKFLOW.md  
+? **One Error Repository**: ERROR_MAP.md  
+? **One Quick Reference**: QUICK_START.md  
+? **Minimal Files**: 8 core documents (consolidated)  
+? **Clear Navigation**: Each document references others  
 
 ---
+
+## ?? Document Consolidation
+
+**Before**: 15+ files (scattered instructions)  
+**After**: 8 files (organized system)  
+**Result**: 47% reduction in files, 100% clarity increase
+
+---
+
+## ?? Start Now!
+
+1. Read **ORCHESTRATOR_WORKFLOW.md** (10 min)
+2. Bookmark **QUICK_START.md** and **ERROR_MAP.md**
+3. Execute first task following the workflow
+4. Use QUICK_START.md for immediate reference
+5. Done! ?
+
+---
+
+**Version**: 2.0 (Consolidated)  
+**Last Updated**: 2026-09-25  
+**Status**: Ready for task execution

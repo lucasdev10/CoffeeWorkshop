@@ -1,4 +1,4 @@
-﻿# Implementation Plan: Angular MFE Transformation
+# Implementation Plan: Angular MFE Transformation
 
 ## Overview
 
@@ -6,7 +6,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
 
 ## Execution Guidelines & Error Management Protocol
 
-### ⚠️ MANDATORY REQUIREMENTS FOR ALL TASK EXECUTIONS
+### ?? MANDATORY REQUIREMENTS FOR ALL TASK EXECUTIONS
 
 #### 1. Always Use Subagents
 
@@ -50,7 +50,7 @@ When adding to ERROR_MAP.md, use this format:
 ## Task: [Task ID] - [Task Name]
 
 **Date**: [YYYY-MM-DD]  
-**Status**: [✅ SUCCESS / ❌ FAILURE]  
+**Status**: [? SUCCESS / ? FAILURE]  
 **Duration**: [X minutes]
 
 ### Errors Encountered
@@ -103,6 +103,13 @@ When adding to ERROR_MAP.md, use this format:
 
 #### 4. Post-Task Commit Skill Execution (MANDATORY)
 
+**?? IMPORTANT: See .kiro/ORCHESTRATOR_SKILL_INVOKE.md for explicit instructions**
+
+The orchestrator MUST:
+1. Call \disclose_context(name="SKILL-COMMIT")\ to load SKILL-COMMIT instructions
+2. Then invoke the skill to run tests, build, and commit changes
+3. This ensures all changes from completed tasks are properly committed
+
 - **After every successful task completion**, execute SKILL-COMMIT.md
 - **Location**: Run SKILL-COMMIT.md as documented in .kiro/POST_EXECUTION_GUIDE.md
 - **Purpose**: Commit all changes from the task to version control
@@ -126,22 +133,22 @@ When adding to ERROR_MAP.md, use this format:
 
 \\\
 START TASK
-↓
+?
 
 1. Check ERROR_MAP.md & Pre-Execution Checklist
-   ↓
+   ?
 2. Invoke subagent with task details
-   ↓
+   ?
 3. Monitor execution
-   ↓
+   ?
 4. Document in ERROR_MAP.md
-   ↓
-5. ✅ TASK SUCCESSFUL?
-   ├─→ YES → Execute SKILL-COMMIT.md (commit changes)
-   │ ↓
-   │ Report to user & continue to next task
-   │
-   └─→ NO → Document error in ERROR_MAP.md
+   ?
+5. ? TASK SUCCESSFUL?
+   +-? YES ? Execute SKILL-COMMIT.md (commit changes)
+   � ?
+   � Report to user & continue to next task
+   �
+   +-? NO ? Document error in ERROR_MAP.md
    Report to user & await decision
 
 END
@@ -375,7 +382,7 @@ END
     - Configure package.json with scripts for port 4203
     - Add coffee-shared-lib as dependency
     - _Requirements: 4.1, 4.10, 12.4, 17.1_
-  - [ ] 6.2 Configure Admin MFE Module Federation as remote
+  - [x] 6.2 Configure Admin MFE Module Federation as remote
     - Create webpack.config.js with ModuleFederationPlugin as remote
     - Set name to "admin" and filename to "remoteEntry.js"
     - Expose './Routes' pointing to admin.routes.ts
@@ -643,7 +650,7 @@ END
     - _Requirements: 20.2, 20.3_
   - [ ] 15.3 Document migration strategy
     - Create docs/MIGRATION_STRATEGY.md
-    - Document phased rollout plan: Products â†’ Cart â†’ Auth â†’ User â†’ Admin
+    - Document phased rollout plan: Products → Cart → Auth → User → Admin
     - Document success criteria for each phase
     - Document rollback procedures
     - _Requirements: 20.9, 20.10_
@@ -713,7 +720,7 @@ END
     - Update baseUrl and environment configuration
     - _Requirements: 15.6, 15.7_
   - [ ]\* 18.2 Create E2E test for complete user flow
-    - Test flow: login â†’ products â†’ add to cart â†’ admin dashboard
+    - Test flow: login → products → add to cart → admin dashboard
     - Verify state persistence across MFE boundaries
     - Verify guards work correctly
     - Verify cart count updates in header
@@ -757,7 +764,7 @@ END
 
 - Tasks marked with `*` are optional testing and validation tasks and can be skipped for faster MVP
 - Each task references specific requirements from requirements.md for traceability
-- The transformation follows a phased approach: Shared Library â†’ Shell â†’ MFEs â†’ Integration â†’ Testing â†’ Documentation
+- The transformation follows a phased approach: Shared Library → Shell → MFEs → Integration → Testing → Documentation
 - Independent repositories enable autonomous development and deployment for each MFE
 - NgRx store and custom events provide decoupled communication between MFEs
 - Feature flags enable gradual migration with rollback capabilities
@@ -798,3 +805,4 @@ END
   ]
 }
 ```
+
