@@ -4,21 +4,23 @@
 
 This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a Micro Frontend architecture using Webpack 5 Module Federation. The implementation creates six independent applications (Shell App + 5 MFEs) and a Shared Library, enabling autonomous development, testing, and deployment. The transformation maintains all existing functionality while establishing clear MFE boundaries and communication patterns.
 
-
 ## Execution Guidelines & Error Management Protocol
 
 ### ⚠️ MANDATORY REQUIREMENTS FOR ALL TASK EXECUTIONS
 
 #### 1. Always Use Subagents
+
 - **ALL implementation tasks MUST be delegated** to the spec-task-execution subagent
 - Orchestrator role: only manages task status, coordinates execution, and tracks errors
 - **Never** execute code, run tests, or build anything directly
 - Subagent handles: code writing, test runs, builds, file modifications
 
 #### 2. Error Mapping & Prevention Protocol
+
 Each task execution MUST follow this pattern:
 
 **Before Starting:**
+
 1. Read .kiro/ERROR_MAP.md to check for known issues
 2. Review similar completed tasks for error patterns
 3. Verify dependencies alignment (requirement 17.1)
@@ -26,11 +28,13 @@ Each task execution MUST follow this pattern:
 5. Check port availability (for MFE startup tasks)
 
 **During Execution:**
+
 1. Monitor for errors via subagent output
 2. Capture error details (command, message, context)
 3. Note patterns and root causes
 
 **After Execution (Success or Failure):**
+
 1. **Update .kiro/ERROR_MAP.md** with all encountered issues
 2. Document error, root cause, and solution
 3. Link related errors from previous tasks
@@ -42,46 +46,53 @@ Each task execution MUST follow this pattern:
 When adding to ERROR_MAP.md, use this format:
 
 `markdown
+
 ## Task: [Task ID] - [Task Name]
+
 **Date**: [YYYY-MM-DD]  
 **Status**: [✅ SUCCESS / ❌ FAILURE]  
-**Duration**: [X minutes]  
+**Duration**: [X minutes]
 
 ### Errors Encountered
+
 - **[Error Type]**: [Error message]
   - Root Cause: [Why it happened]
   - Solution: [What fixed it]
   - Task(s) Affected: [Previous/related tasks]
 
 ### Commands Used
+
 - [Command 1]
 - [Command 2]
 
 ### Related Errors
+
 - [Link to ERROR_MAP.md entry if similar error occurred before]
 
 ### Learnings
+
 - [What we learned]
 - [Pattern to avoid]
 - [Best practice established]
-`
+  `
 
 ---
 
 ### Common Recurring Error Categories
 
-| Category | Typical Issues | Prevention Strategy |
-|----------|---|---|
-| **Invalid Commands** | npm scripts missing, incorrect CLI syntax, typos | Verify package.json scripts, test commands locally first |
-| **Code/Import Errors** | Missing exports, wrong paths, barrel file issues | Check public-api.ts exports, verify import paths |
-| **Test Failures** | Mock setup, async handling, store provider issues | Use provideMockStore correctly, handle observables properly |
-| **Build Errors** | Module Federation conflicts, shared deps mismatch | Verify webpack.config.js, align dependencies (req. 17.1) |
-| **Port Conflicts** | Port already in use during dev startup | Kill process, verify port config in package.json |
-| **Dependency Issues** | Version mismatches, peer dependency conflicts | Ensure all MFEs use Angular 21.x, NgRx 21.x |
+| Category               | Typical Issues                                    | Prevention Strategy                                         |
+| ---------------------- | ------------------------------------------------- | ----------------------------------------------------------- |
+| **Invalid Commands**   | npm scripts missing, incorrect CLI syntax, typos  | Verify package.json scripts, test commands locally first    |
+| **Code/Import Errors** | Missing exports, wrong paths, barrel file issues  | Check public-api.ts exports, verify import paths            |
+| **Test Failures**      | Mock setup, async handling, store provider issues | Use provideMockStore correctly, handle observables properly |
+| **Build Errors**       | Module Federation conflicts, shared deps mismatch | Verify webpack.config.js, align dependencies (req. 17.1)    |
+| **Port Conflicts**     | Port already in use during dev startup            | Kill process, verify port config in package.json            |
+| **Dependency Issues**  | Version mismatches, peer dependency conflicts     | Ensure all MFEs use Angular 21.x, NgRx 21.x                 |
 
 ---
 
 ### Error Map File Location
+
 - **File**: .kiro/ERROR_MAP.md (in workspace root)
 - **Purpose**: Central registry of all errors across all task executions
 - **Updated**: After every task execution
@@ -91,6 +102,7 @@ When adding to ERROR_MAP.md, use this format:
 ---
 
 #### 4. Post-Task Commit Skill Execution (MANDATORY)
+
 - **After every successful task completion**, execute SKILL-COMMIT.md
 - **Location**: Run SKILL-COMMIT.md as documented in .kiro/POST_EXECUTION_GUIDE.md
 - **Purpose**: Commit all changes from the task to version control
@@ -111,29 +123,32 @@ When adding to ERROR_MAP.md, use this format:
 ---
 
 #### 5. Complete Task Execution Lifecycle
+
 \\\
 START TASK
-    ↓
+↓
+
 1. Check ERROR_MAP.md & Pre-Execution Checklist
-    ↓
+   ↓
 2. Invoke subagent with task details
-    ↓
+   ↓
 3. Monitor execution
-    ↓
+   ↓
 4. Document in ERROR_MAP.md
-    ↓
+   ↓
 5. ✅ TASK SUCCESSFUL?
-    ├─→ YES → Execute SKILL-COMMIT.md (commit changes)
-    │         ↓
-    │         Report to user & continue to next task
-    │
-    └─→ NO  → Document error in ERROR_MAP.md
-               Report to user & await decision
+   ├─→ YES → Execute SKILL-COMMIT.md (commit changes)
+   │ ↓
+   │ Report to user & continue to next task
+   │
+   └─→ NO → Document error in ERROR_MAP.md
+   Report to user & await decision
 
 END
 \\\
 
 ---
+
 ## Tasks
 
 - [x] 1. Create Shared Library foundation
@@ -301,7 +316,7 @@ END
     - Create README.md with setup instructions
     - _Requirements: 13.2, 13.8, 13.12, 15.4, 12.9_
 
-- [ ] 5. Create Cart MFE
+- [x] 5. Create Cart MFE
   - [x] 5.1 Create coffee-cart-mfe repository with Angular structure
     - Initialize new Git repository
     - Create Angular application using Angular CLI
@@ -346,7 +361,7 @@ END
     - Test event emission logic
     - Ensure all tests pass
     - _Requirements: 3.9, 15.4_
-  - [ ] 5.8 Create Cart MFE development and build scripts
+  - [x] 5.8 Create Cart MFE development and build scripts
     - Add "start" script to serve on port 4202
     - Add "build", "test", "test:coverage" scripts
     - Create README.md with setup instructions
@@ -783,5 +798,3 @@ END
   ]
 }
 ```
-
-
