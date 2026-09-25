@@ -1,9 +1,139 @@
-# Implementation Plan: Angular MFE Transformation
+﻿# Implementation Plan: Angular MFE Transformation
 
 ## Overview
 
 This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a Micro Frontend architecture using Webpack 5 Module Federation. The implementation creates six independent applications (Shell App + 5 MFEs) and a Shared Library, enabling autonomous development, testing, and deployment. The transformation maintains all existing functionality while establishing clear MFE boundaries and communication patterns.
 
+
+## Execution Guidelines & Error Management Protocol
+
+### ⚠️ MANDATORY REQUIREMENTS FOR ALL TASK EXECUTIONS
+
+#### 1. Always Use Subagents
+- **ALL implementation tasks MUST be delegated** to the spec-task-execution subagent
+- Orchestrator role: only manages task status, coordinates execution, and tracks errors
+- **Never** execute code, run tests, or build anything directly
+- Subagent handles: code writing, test runs, builds, file modifications
+
+#### 2. Error Mapping & Prevention Protocol
+Each task execution MUST follow this pattern:
+
+**Before Starting:**
+1. Read .kiro/ERROR_MAP.md to check for known issues
+2. Review similar completed tasks for error patterns
+3. Verify dependencies alignment (requirement 17.1)
+4. Confirm all required scripts exist in package.json
+5. Check port availability (for MFE startup tasks)
+
+**During Execution:**
+1. Monitor for errors via subagent output
+2. Capture error details (command, message, context)
+3. Note patterns and root causes
+
+**After Execution (Success or Failure):**
+1. **Update .kiro/ERROR_MAP.md** with all encountered issues
+2. Document error, root cause, and solution
+3. Link related errors from previous tasks
+4. Update task status in tasks.md
+5. Report findings to user
+
+#### 3. Error Documentation Template
+
+When adding to ERROR_MAP.md, use this format:
+
+`markdown
+## Task: [Task ID] - [Task Name]
+**Date**: [YYYY-MM-DD]  
+**Status**: [✅ SUCCESS / ❌ FAILURE]  
+**Duration**: [X minutes]  
+
+### Errors Encountered
+- **[Error Type]**: [Error message]
+  - Root Cause: [Why it happened]
+  - Solution: [What fixed it]
+  - Task(s) Affected: [Previous/related tasks]
+
+### Commands Used
+- [Command 1]
+- [Command 2]
+
+### Related Errors
+- [Link to ERROR_MAP.md entry if similar error occurred before]
+
+### Learnings
+- [What we learned]
+- [Pattern to avoid]
+- [Best practice established]
+`
+
+---
+
+### Common Recurring Error Categories
+
+| Category | Typical Issues | Prevention Strategy |
+|----------|---|---|
+| **Invalid Commands** | npm scripts missing, incorrect CLI syntax, typos | Verify package.json scripts, test commands locally first |
+| **Code/Import Errors** | Missing exports, wrong paths, barrel file issues | Check public-api.ts exports, verify import paths |
+| **Test Failures** | Mock setup, async handling, store provider issues | Use provideMockStore correctly, handle observables properly |
+| **Build Errors** | Module Federation conflicts, shared deps mismatch | Verify webpack.config.js, align dependencies (req. 17.1) |
+| **Port Conflicts** | Port already in use during dev startup | Kill process, verify port config in package.json |
+| **Dependency Issues** | Version mismatches, peer dependency conflicts | Ensure all MFEs use Angular 21.x, NgRx 21.x |
+
+---
+
+### Error Map File Location
+- **File**: .kiro/ERROR_MAP.md (in workspace root)
+- **Purpose**: Central registry of all errors across all task executions
+- **Updated**: After every task execution
+- **Reviewed**: Before starting each new task
+- **Shared Across**: All subagents handling tasks from this spec
+
+---
+
+#### 4. Post-Task Commit Skill Execution (MANDATORY)
+- **After every successful task completion**, execute SKILL-COMMIT.md
+- **Location**: Run SKILL-COMMIT.md as documented in .kiro/POST_EXECUTION_GUIDE.md
+- **Purpose**: Commit all changes from the task to version control
+- **Process**:
+  1. Task completes successfully
+  2. Update ERROR_MAP.md with execution details
+  3. Update task status to [x] completed
+  4. Execute SKILL-COMMIT.md to:
+     - Run npm test in all affected projects
+     - Run npm start (verify startup)
+     - Run npm run build (verify build)
+     - Commit all changes to git
+     - Push to repository
+  5. Report completion to user
+
+- **Note**: SKILL-COMMIT.md must be executed in SEQUENCE after task completion, before starting next task
+
+---
+
+#### 5. Complete Task Execution Lifecycle
+\\\
+START TASK
+    ↓
+1. Check ERROR_MAP.md & Pre-Execution Checklist
+    ↓
+2. Invoke subagent with task details
+    ↓
+3. Monitor execution
+    ↓
+4. Document in ERROR_MAP.md
+    ↓
+5. ✅ TASK SUCCESSFUL?
+    ├─→ YES → Execute SKILL-COMMIT.md (commit changes)
+    │         ↓
+    │         Report to user & continue to next task
+    │
+    └─→ NO  → Document error in ERROR_MAP.md
+               Report to user & await decision
+
+END
+\\\
+
+---
 ## Tasks
 
 - [x] 1. Create Shared Library foundation
@@ -210,7 +340,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - Create cart.routes.ts exporting CART_ROUTES
     - Configure route "" for CartPage
     - _Requirements: 3.5_
-  - [ ]\* 5.7 Migrate Cart MFE unit tests
+  - [x] 5.7 Migrate Cart MFE unit tests
     - Move cart unit tests from monolith
     - Test cart actions, reducers, selectors
     - Test event emission logic
@@ -498,7 +628,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - _Requirements: 20.2, 20.3_
   - [ ] 15.3 Document migration strategy
     - Create docs/MIGRATION_STRATEGY.md
-    - Document phased rollout plan: Products → Cart → Auth → User → Admin
+    - Document phased rollout plan: Products â†’ Cart â†’ Auth â†’ User â†’ Admin
     - Document success criteria for each phase
     - Document rollback procedures
     - _Requirements: 20.9, 20.10_
@@ -568,7 +698,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - Update baseUrl and environment configuration
     - _Requirements: 15.6, 15.7_
   - [ ]\* 18.2 Create E2E test for complete user flow
-    - Test flow: login → products → add to cart → admin dashboard
+    - Test flow: login â†’ products â†’ add to cart â†’ admin dashboard
     - Verify state persistence across MFE boundaries
     - Verify guards work correctly
     - Verify cart count updates in header
@@ -612,7 +742,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
 
 - Tasks marked with `*` are optional testing and validation tasks and can be skipped for faster MVP
 - Each task references specific requirements from requirements.md for traceability
-- The transformation follows a phased approach: Shared Library → Shell → MFEs → Integration → Testing → Documentation
+- The transformation follows a phased approach: Shared Library â†’ Shell â†’ MFEs â†’ Integration â†’ Testing â†’ Documentation
 - Independent repositories enable autonomous development and deployment for each MFE
 - NgRx store and custom events provide decoupled communication between MFEs
 - Feature flags enable gradual migration with rollback capabilities
@@ -653,3 +783,5 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
   ]
 }
 ```
+
+

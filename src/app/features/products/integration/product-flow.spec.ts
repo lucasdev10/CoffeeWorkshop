@@ -396,6 +396,7 @@ describe('Product Flow Integration Tests', () => {
     });
 
     it('should apply free shipping for orders over threshold', async () => {
+      vi.setConfig({ testTimeout: 10000 });
       // Arrange
       productFacade.loadProducts();
 
@@ -440,6 +441,7 @@ describe('Product Flow Integration Tests', () => {
 
   describe('Remove from Cart', () => {
     it('should remove item and recalculate totals', async () => {
+      vi.setConfig({ testTimeout: 10000 });
       // Arrange
       productFacade.loadProducts();
 

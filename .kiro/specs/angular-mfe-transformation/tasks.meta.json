@@ -235,6 +235,18 @@
         "chatSessionId": "sess_4a787276-5b8a-4c41-bbab-abd29798ca3d",
         "timestamp": 1790357264672
       }
+    ],
+    "5.7 Migrate Cart MFE unit tests": [
+      {
+        "executionId": "f98e8270-d137-4427-810d-475a5139c896",
+        "chatSessionId": "sess_48cd6f89-80bc-415e-90b6-698b2bd5a5b2",
+        "timestamp": 1790357432506
+      },
+      {
+        "executionId": "f98e8270-d137-4427-810d-475a5139c896",
+        "chatSessionId": "sess_48cd6f89-80bc-415e-90b6-698b2bd5a5b2",
+        "timestamp": 1790357815229
+      }
     ]
   }
 }
