@@ -200,7 +200,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - Subscribe to global cart state changes
     - Implement localStorage persistence via StorageService
     - _Requirements: 3.4, 3.11, 10.7_
-  - [ ] 5.5 Implement Cart MFE custom event emission
+  - [x] 5.5 Implement Cart MFE custom event emission
     - Inject EventBusService
     - Emit "cart:item-added" event with product and quantity
     - Emit "cart:item-removed" event with productId
