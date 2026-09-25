@@ -206,7 +206,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - Emit "cart:item-removed" event with productId
     - Emit "cart:cleared" event when cart is cleared
     - _Requirements: 3.12, 11.1, 11.2, 11.3_
-  - [ ] 5.6 Create Cart MFE routing
+  - [x] 5.6 Create Cart MFE routing
     - Create cart.routes.ts exporting CART_ROUTES
     - Configure route "" for CartPage
     - _Requirements: 3.5_

@@ -223,6 +223,18 @@
         "chatSessionId": "sess_98cb5f3a-699e-4d67-a675-b66547054fa3",
         "timestamp": 1790356776092
       }
+    ],
+    "5.6 Create Cart MFE routing": [
+      {
+        "executionId": "0b09bfa0-b34e-43e2-a2a9-940710ea37ac",
+        "chatSessionId": "sess_4a787276-5b8a-4c41-bbab-abd29798ca3d",
+        "timestamp": 1790357212038
+      },
+      {
+        "executionId": "0b09bfa0-b34e-43e2-a2a9-940710ea37ac",
+        "chatSessionId": "sess_4a787276-5b8a-4c41-bbab-abd29798ca3d",
+        "timestamp": 1790357264672
+      }
     ]
   }
 }
