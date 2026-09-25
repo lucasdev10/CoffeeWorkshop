@@ -194,7 +194,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - Wire up NgRx store slice for cart
     - Update imports to use coffee-shared-lib
     - _Requirements: 3.2, 3.3, 3.8_
-  - [ ] 5.4 Implement Cart MFE store synchronization with global store
+  - [x] 5.4 Implement Cart MFE store synchronization with global store
     - Inject global Store from Shell App
     - Dispatch actions to update global cart slice
     - Subscribe to global cart state changes
