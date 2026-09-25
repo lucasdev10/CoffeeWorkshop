@@ -186,7 +186,7 @@ This plan transforms the monolithic CoffeeWorkshop Angular 21 application into a
     - Configure shared dependencies as singletons
     - Set publicPath to "auto" and uniqueName to "cart"
     - _Requirements: 3.6, 3.7, 8.3, 8.4, 8.8_
-  - [ ] 5.3 Extract Cart page and implement local store
+  - [x] 5.3 Extract Cart page and implement local store
     - Move CartPage from monolith to MFE
     - Create CartState with items, total, count, loading, error
     - Create CartActions: addItem, removeItem, clearCart, updateQuantity
