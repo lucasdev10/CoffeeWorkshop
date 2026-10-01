@@ -396,11 +396,11 @@ END
     - Move AdminProductFormPage from monolith to MFE
     - Update imports to use coffee-shared-lib
     - _Requirements: 4.2, 4.8_
-  - [ ] 6.4 Implement Admin MFE repository access
+  - [x] 6.4 Implement Admin MFE repository access
     - Create or import ProductRepository for CRUD operations
     - Wire repository to Admin pages for product management
     - _Requirements: 4.3_
-  - [ ] 6.5 Create Admin MFE routing with role protection
+  - [x] 6.5 Create Admin MFE routing with role protection
     - Create admin.routes.ts exporting ADMIN_ROUTES
     - Configure route "" for AdminDashboardPage
     - Configure route "products" for AdminProductsPage
