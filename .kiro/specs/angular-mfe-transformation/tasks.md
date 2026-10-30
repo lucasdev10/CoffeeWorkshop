@@ -420,7 +420,7 @@ END
     - _Requirements: 13.4, 13.8, 15.4, 12.9_
 
 - [ ] 7. Create Auth MFE
-  - [ ] 7.1 Create coffee-auth-mfe repository with Angular structure
+  - [x] 7.1 Create coffee-auth-mfe repository with Angular structure
     - Initialize new Git repository
     - Create Angular application using Angular CLI
     - Install @angular-architects/module-federation

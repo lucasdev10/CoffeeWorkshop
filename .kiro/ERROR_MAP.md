@@ -7,8 +7,8 @@ Central registry of all errors encountered during task execution. Use this docum
 - Prevent repeating mistakes
 - Learn from past execution attempts
 
-**Last Updated**: 2026-09-25 16:00:18
-**Total Entries**: 1
+**Last Updated**: 2026-10-30
+**Total Entries**: 2
 
 ---
 
@@ -25,7 +25,8 @@ Central registry of all errors encountered during task execution. Use this docum
 
 | Task ID      | Task Name                         | Status     | Error Count | Last Updated |
 | ------------ | --------------------------------- | ---------- | ----------- | ------------ |
-| SKILL-COMMIT | Test Failures During Commit Skill | ? FAILURE | 2           | 2026-09-25   |
+| SKILL-COMMIT | Test Failures During Commit Skill | ❌ FAILURE | 2           | 2026-09-25   |
+| 7.1          | Create coffee-auth-mfe repository | ✅ SUCCESS | 1 (minor)   | 2026-10-30   |
 
 ---
 
@@ -219,3 +220,55 @@ providers: [provideMockStore({ initialState: ... })]
   - Build Errors: 0
   - Dependency Errors: 0
 
+---
+
+### Entry 2: npm install fails with `Cannot read properties of null (reading 'edgesOut')`
+
+**Task ID**: 7.1 - Create coffee-auth-mfe repository  
+**Date**: 2026-10-30  
+**Status**: ✅ SUCCESS (resolved with workaround)  
+**Severity**: ⚠️ MINOR
+
+#### Error Details
+
+- **Error Type**: Dependency Error
+- **Error Message**: `npm error Cannot read properties of null (reading 'edgesOut')`
+- **Context**: Running `npm install` in the new coffee-auth-mfe directory that has local file dependencies (`coffee-shared` and `coffee-shared-lib` via `file:../...`)
+
+#### Root Cause Analysis
+
+- **Why it happened**: npm arborist (tree builder) encounters a null reference when resolving peer dependencies for `vitest@4.x` in combination with local `file:` protocol dependencies.
+- **Environment factors**: Node.js v22.12.0, npm v10.9.0, Windows
+- **Common pattern**: This is a known npm peer resolution bug with `file:` protocol local packages and newer vitest versions.
+
+#### Solution Applied
+
+- **What was tried**: `npm install` (failed)
+- **Final solution**: `npm install --legacy-peer-deps` — bypasses the strict peer dependency resolution that triggers the null reference
+- **Workaround**: Always use `--legacy-peer-deps` for MFE repositories that have `file:` local dependencies
+
+#### Prevention Strategy
+
+- **How to avoid**: When creating new MFE repositories that reference local packages via `file:` protocol, always use `npm install --legacy-peer-deps`
+- **Pre-flight checklist**: Check if `coffee-shared-lib` local file dependency is in `package.json` → use `--legacy-peer-deps`
+- **Similar tasks affected**: 8.1 (User MFE setup) — will encounter the same issue
+
+#### Related Errors
+
+- Pattern: All MFE repositories with `"coffee-shared-lib": "file:../coffee-shared-lib"` dependency will need `--legacy-peer-deps`
+
+---
+
+## Statistics
+
+- **Total Errors Recorded**: 2
+- **By Severity**:
+  - 🔴 Critical: 0
+  - 🟠 Major: 1
+  - 🟡 Minor: 1
+- **By Category**:
+  - Command Errors: 0
+  - Code Errors: 1
+  - Test Errors: 1
+  - Build Errors: 0
+  - Dependency Errors: 1
