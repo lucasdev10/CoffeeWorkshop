@@ -23,10 +23,11 @@ Central registry of all errors encountered during task execution. Use this docum
 
 ## Index of Tasks with Errors
 
-| Task ID      | Task Name                         | Status     | Error Count | Last Updated |
-| ------------ | --------------------------------- | ---------- | ----------- | ------------ |
-| SKILL-COMMIT | Test Failures During Commit Skill | ❌ FAILURE | 2           | 2026-09-25   |
-| 7.1          | Create coffee-auth-mfe repository | ✅ SUCCESS | 1 (minor)   | 2026-10-30   |
+| Task ID      | Task Name                                      | Status     | Error Count | Last Updated |
+| ------------ | ---------------------------------------------- | ---------- | ----------- | ------------ |
+| SKILL-COMMIT | Test Failures During Commit Skill              | ❌ FAILURE | 2           | 2026-09-25   |
+| 7.1          | Create coffee-auth-mfe repository              | ✅ SUCCESS | 1 (minor)   | 2026-10-30   |
+| 7.2          | Configure Auth MFE Module Federation as remote | ✅ SUCCESS | 1 (info)    | 2026-10-30   |
 
 ---
 
@@ -259,13 +260,52 @@ providers: [provideMockStore({ initialState: ... })]
 
 ---
 
+### Entry 3: @angular-architects/module-federation:build is a stub builder (v21.2.x)
+
+**Task ID**: 7.2 - Configure Auth MFE Module Federation as remote  
+**Date**: 2026-10-30  
+**Status**: ✅ SUCCESS (expected behavior)  
+**Severity**: ℹ️ INFO
+
+#### Error Details
+
+- **Error Type**: Build Behavior (not an error — expected)
+- **Error Message**: `Builder ran for build` — exits 0 with no dist output
+- **Context**: Running `npm run build` after configuring angular.json with `@angular-architects/module-federation:build`
+
+#### Root Cause Analysis
+
+- **Why it happened**: In `@angular-architects/module-federation` v21.2.x, the `build` builder is intentionally a stub (`builder.js` simply returns `{ success: true }` and logs). The actual Module Federation webpack bundling is handled separately (e.g., via Webpack serve/build toolchain directly).
+- **Environment factors**: @angular-architects/module-federation v21.2.3, Angular 21
+- **Common pattern**: All MFEs in this project (products, cart, admin, auth) use this stub builder consistently — it is the correct, project-wide pattern
+
+#### Solution Applied
+
+- **What was tried**: Ran `npm run build` — returned exit 0 with stub message, no dist folder produced
+- **Final solution**: This IS the correct state. The angular.json builder config is used for Module Federation integration; actual webpack bundling happens when serving via dev-server or custom build scripts
+- **Workaround**: N/A — no workaround needed
+
+#### Prevention Strategy
+
+- **How to avoid**: Do not expect `npm run build` to produce a `dist/` folder in these MFEs. Verify build success by exit code 0 and "Builder ran for build" message
+- **Pre-flight checklist**: Confirm exit code 0 — that means the builder registered successfully
+- **Similar tasks affected**: 8.2 (User MFE Module Federation config) — same behavior expected
+
+#### Related Errors
+
+- Entry 1 in this file (Task 7.1) — same npm/package setup
+- Pattern applies to all MFE build tasks in this workspace
+
+---
+
 ## Statistics
 
-- **Total Errors Recorded**: 2
+- **Total Errors Recorded**: 3
 - **By Severity**:
   - 🔴 Critical: 0
   - 🟠 Major: 1
   - 🟡 Minor: 1
+  - ℹ️ Info: 1
 - **By Category**:
   - Command Errors: 0
   - Code Errors: 1

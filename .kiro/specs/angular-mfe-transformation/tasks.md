@@ -427,7 +427,7 @@ END
     - Configure package.json with scripts for port 4204
     - Add coffee-shared-lib as dependency
     - _Requirements: 5.1, 5.10, 12.5, 17.1_
-  - [ ] 7.2 Configure Auth MFE Module Federation as remote
+  - [x] 7.2 Configure Auth MFE Module Federation as remote
     - Create webpack.config.js with ModuleFederationPlugin as remote
     - Set name to "auth" and filename to "remoteEntry.js"
     - Expose './Routes' pointing to auth.routes.ts
