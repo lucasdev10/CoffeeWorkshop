@@ -28,6 +28,7 @@ Central registry of all errors encountered during task execution. Use this docum
 | SKILL-COMMIT | Test Failures During Commit Skill              | ❌ FAILURE | 2           | 2026-09-25   |
 | 7.1          | Create coffee-auth-mfe repository              | ✅ SUCCESS | 1 (minor)   | 2026-10-30   |
 | 7.2          | Configure Auth MFE Module Federation as remote | ✅ SUCCESS | 1 (info)    | 2026-10-30   |
+| 7.3          | Extract Auth pages                             | ✅ SUCCESS | 1 (minor)   | 2026-10-30   |
 
 ---
 
@@ -298,17 +299,64 @@ providers: [provideMockStore({ initialState: ... })]
 
 ---
 
+---
+
+### Entry 4: tsconfig.app.json paths for coffee-shared-lib incorrect
+
+**Task ID**: 7.3 - Extract Auth pages  
+**Date**: 2026-10-30  
+**Status**: ✅ SUCCESS (resolved)  
+**Severity**: 🟡 MINOR
+
+#### Error Details
+
+- **Error Type**: Code Error (TypeScript path resolution)
+- **Error Message**: `error TS2307: Cannot find module 'coffee-shared-lib' or its corresponding type declarations.`
+- **Context**: Running `npx tsc --noEmit --project tsconfig.app.json` in coffee-auth-mfe after importing `FormErrorComponent` from `coffee-shared-lib`
+
+#### Root Cause Analysis
+
+- **Why it happened**: The `tsconfig.app.json` `paths` mapping for `coffee-shared-lib` referenced two non-existent files:
+  - `../coffee-shared-lib/dist/coffee-shared/index.d.ts` — no `index.d.ts` exists; the actual types file is at `types/coffee-shared.d.ts`
+  - `../coffee-shared-lib/src/public-api.ts` — no `src/` root-level file; it's at `projects/coffee-shared/src/public-api.ts`
+- **Environment factors**: The same incorrect paths exist in all other MFEs (admin, products, cart, auth). Previous MFEs didn't trigger this because none imported from `coffee-shared-lib` directly
+- **Common pattern**: First MFE to import from `coffee-shared-lib` exposes this latent config issue
+
+#### Solution Applied
+
+- **What was tried**: `npx tsc --noEmit` — reproduced error
+- **Final solution**: Fixed `tsconfig.app.json` paths:
+  ```json
+  "coffee-shared-lib": [
+    "../coffee-shared-lib/dist/coffee-shared/types/coffee-shared.d.ts",
+    "../coffee-shared-lib/projects/coffee-shared/src/public-api.ts"
+  ]
+  ```
+- **Verification**: `npx tsc --noEmit --project tsconfig.app.json` now exits 0; all 7 tests pass
+
+#### Prevention Strategy
+
+- **How to avoid**: When any MFE first imports from `coffee-shared-lib`, update `tsconfig.app.json` with the correct path before running type-check
+- **Pre-flight checklist**: Verify paths in tsconfig.app.json match actual file structure of coffee-shared-lib
+- **Similar tasks affected**: 8.3 (User MFE pages) will need the same fix in coffee-user-mfe's tsconfig.app.json
+
+#### Related Errors
+
+- Entry 3 (Task 7.2) — related to same MFE setup; same `tsconfig.app.json` was created with incorrect paths
+
+---
+
 ## Statistics
 
-- **Total Errors Recorded**: 3
+- **Total Errors Recorded**: 4
 - **By Severity**:
   - 🔴 Critical: 0
   - 🟠 Major: 1
-  - 🟡 Minor: 1
+  - 🟡 Minor: 2
   - ℹ️ Info: 1
 - **By Category**:
   - Command Errors: 0
-  - Code Errors: 1
+  - Code Errors: 2
   - Test Errors: 1
   - Build Errors: 0
   - Dependency Errors: 1

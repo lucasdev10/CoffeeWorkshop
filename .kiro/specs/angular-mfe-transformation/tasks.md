@@ -434,7 +434,7 @@ END
     - Configure shared dependencies as singletons
     - Set publicPath to "auto" and uniqueName to "auth"
     - _Requirements: 5.6, 5.7, 8.3, 8.4, 8.8_
-  - [ ] 7.3 Extract Auth pages
+  - [x] 7.3 Extract Auth pages
     - Move LoginPage from monolith to MFE
     - Move RegisterPage from monolith to MFE
     - Update imports to use coffee-shared-lib

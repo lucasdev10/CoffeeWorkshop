@@ -391,6 +391,18 @@
         "chatSessionId": "sess_5b1fb54f-46ff-482a-b08d-0d06af93f2ed",
         "timestamp": 1793367847417
       }
+    ],
+    "7.3 Extract Auth pages": [
+      {
+        "executionId": "c94bf8e8-67c8-4aaa-a6c2-945992754abe",
+        "chatSessionId": "sess_2287dff7-8b15-4614-b16e-32d0e491b720",
+        "timestamp": 1793368012526
+      },
+      {
+        "executionId": "c94bf8e8-67c8-4aaa-a6c2-945992754abe",
+        "chatSessionId": "sess_2287dff7-8b15-4614-b16e-32d0e491b720",
+        "timestamp": 1793369573590
+      }
     ]
   }
 }
