@@ -375,7 +375,7 @@ END
     - Create README.md with setup instructions
     - _Requirements: 13.3, 13.8, 15.4, 12.9_
 
-- [ ] 6. Create Admin MFE
+- [x] 6. Create Admin MFE
   - [x] 6.1 Create coffee-admin-mfe repository with Angular structure
     - Initialize new Git repository
     - Create Angular application using Angular CLI
@@ -413,7 +413,7 @@ END
     - Test role-based access logic
     - Ensure all tests pass
     - _Requirements: 4.9, 15.4_
-  - [ ] 6.7 Create Admin MFE development and build scripts
+  - [x] 6.7 Create Admin MFE development and build scripts
     - Add "start" script to serve on port 4203
     - Add "build", "test", "test:coverage" scripts
     - Create README.md with setup instructions
