@@ -408,7 +408,7 @@ END
     - Configure route "products/:id/edit" for AdminProductFormPage
     - Inject global Store to verify ADMIN role from auth state
     - _Requirements: 4.4, 4.7, 4.11, 9.5_
-  - [ ]\* 6.6 Migrate Admin MFE unit tests
+  - [x] 6.6 Migrate Admin MFE unit tests
     - Move admin page unit tests from monolith
     - Test role-based access logic
     - Ensure all tests pass

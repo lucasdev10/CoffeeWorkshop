@@ -321,6 +321,33 @@
         "chatSessionId": "sess_1bfeaba8-3668-4178-9052-287b48ca0f1c",
         "timestamp": 1790871223159
       }
+    ],
+    "6.6 Migrate Admin MFE unit tests": [
+      {
+        "executionId": "a1587660-3b8c-485e-bb08-38030d494b96",
+        "chatSessionId": "sess_488ed0de-e616-4731-9875-365027feb775",
+        "timestamp": 1790871396802
+      },
+      {
+        "executionId": "d84c3176-6b97-46a4-9b6d-8964c9ed7264",
+        "chatSessionId": "sess_d596665e-ce34-4a44-96ab-e29ea838276d",
+        "timestamp": 1790871683550
+      },
+      {
+        "executionId": "be4d42c0-ae6b-4cc4-8d69-9f640a995632",
+        "chatSessionId": "sess_3bbafcc2-1d46-4f8f-9fff-5375165b9f6e",
+        "timestamp": 1790872037969
+      },
+      {
+        "executionId": "c5fd818b-9a0d-4612-8b10-7227c8f07b59",
+        "chatSessionId": "sess_15b13e52-6274-4991-8ba3-a0cd53b8cedc",
+        "timestamp": 1793364995266
+      },
+      {
+        "executionId": "c5fd818b-9a0d-4612-8b10-7227c8f07b59",
+        "chatSessionId": "sess_15b13e52-6274-4991-8ba3-a0cd53b8cedc",
+        "timestamp": 1793365978911
+      }
     ]
   }
 }
