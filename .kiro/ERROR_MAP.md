@@ -34,6 +34,7 @@ Central registry of all errors encountered during task execution. Use this docum
 | 7.6          | Create Auth MFE routing                        | ✅ SUCCESS | 0           | 2026-11-08   |
 | 7.7          | Migrate Auth MFE unit tests                    | ✅ SUCCESS | 3 (minor)   | 2025-01-14   |
 | 7.8          | Create Auth MFE development and build scripts  | ✅ SUCCESS | 0           | 2025-01-14   |
+| 8.2          | Configure User MFE Module Federation as remote | ✅ SUCCESS | 0           | 2025-01-14   |
 
 ---
 
@@ -606,6 +607,47 @@ All 9 test files, 110 tests:
 
 ---
 
+## Task: 8.2 - Configure User MFE Module Federation as remote
+
+**Date**: 2025-01-14
+**Status**: ✅ SUCCESS
+**Duration**: ~5 minutes
+
+### Summary
+
+All Module Federation configuration was already fully in place from task 8.1. No new files needed to be created or modified. Verified builder exits 0 with the expected stub message.
+
+### Configuration Verified
+
+| File                | Key Setting                                                                                        | Status               |
+| ------------------- | -------------------------------------------------------------------------------------------------- | -------------------- |
+| `webpack.config.js` | `name: 'user'`, `filename: 'remoteEntry.js'`, exposes `./Routes` → `user.routes.ts`                | ✅ Already correct   |
+| `angular.json`      | `builder: '@angular-architects/module-federation:build'` for `build` target, port 4205 for `serve` | ✅ Already correct   |
+| `package.json`      | `"@angular-architects/module-federation": "^21.2.2"` in devDependencies                            | ✅ Already installed |
+
+### webpack.config.js Pattern
+
+Matches the auth-mfe reference exactly:
+
+- Uses `mf.share()` helper from `@angular-architects/module-federation/webpack`
+- All shared dependencies: `@angular/core`, `@angular/common`, `@angular/router`, `@angular/forms`, `@angular/material`, `@ngrx/store`, `@ngrx/effects`, `rxjs`, `coffee-shared-lib` — all `singleton: true, strictVersion: false`
+- `output.uniqueName: 'user'`, `output.publicPath: 'auto'`
+- `optimization.runtimeChunk: false`
+
+### Build Verification
+
+`npx ng build` → exit 0, "Builder ran for build" (expected stub behavior per Entry 3 in this file)
+
+### Errors Encountered
+
+- None
+
+### Known Patterns Applied from ERROR_MAP
+
+- ✅ Entry 3 — stub builder exit 0 is correct and expected
+
+---
+
 ## Task: 8.1 - Create coffee-user-mfe repository with Angular structure
 
 **Date**: 2025-01-14
@@ -666,3 +708,58 @@ Tests  2 passed (2)
 
 - When initial `npm install` times out on Windows (PowerShell 120s default), jsdom and other large packages may not be installed. Always verify with `Test-Path node_modules/jsdom` and re-run install if needed.
 - Creating MFEs manually (copying from auth-mfe pattern) is faster and more reliable than `ng new` since we already have the exact config needed.
+
+---
+
+## Task: 8.3 - Extract User pages
+
+**Date**: 2025-01-14
+**Status**: ✅ SUCCESS
+**Duration**: ~10 minutes
+
+### Summary
+
+Created ProfilePage and SettingsPage in coffee-user-mfe, copied user models from the monolith, and updated user.routes.ts with lazy-loaded routes. All 28 tests pass across 3 test files.
+
+### Files Created
+
+| File                                                | Purpose                                                                                                  |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `src/app/models/user.model.ts`                      | IUser, ICreateUserDto, IUpdateUserDto, IUserFilters, EUserRole — copied from monolith                    |
+| `src/app/pages/profile-page/profile-page.ts`        | ProfilePageComponent — signals form with fullName + email validation, Store injected (stub for task 8.4) |
+| `src/app/pages/profile-page/profile-page.html`      | Profile form template with accessibility attributes                                                      |
+| `src/app/pages/profile-page/profile-page.scss`      | Profile page styles matching auth-mfe gradient pattern                                                   |
+| `src/app/pages/profile-page/profile-page.spec.ts`   | 14 tests: creation, form structure, validation, canSubmit, submit                                        |
+| `src/app/pages/settings-page/settings-page.ts`      | SettingsPageComponent — theme, notifications, language preferences using signals                         |
+| `src/app/pages/settings-page/settings-page.html`    | Settings template with mat-slide-toggle, mat-select, theme buttons                                       |
+| `src/app/pages/settings-page/settings-page.scss`    | Settings page styles                                                                                     |
+| `src/app/pages/settings-page/settings-page.spec.ts` | 12 tests: creation, defaults, theme/language/notification toggles, reset, save                           |
+| `src/app/user.routes.ts`                            | Updated with profile and settings lazy-loaded routes                                                     |
+
+### Design Decisions
+
+- `ProfilePageComponent`: Adapted from `UserFormPageComponent` pattern but scoped to "my profile" (fullName + email only, no role selection, no admin user management). Uses `Store` from `@ngrx/store` injected as a stub — task 8.4 will wire actual actions.
+- `SettingsPageComponent`: New page with theme (light/dark/system), push/email notifications (mat-slide-toggle), and language (mat-select). No equivalent in monolith — created fresh for MFE context.
+- Both pages use `FormErrorComponent` from `coffee-shared-lib` (ProfilePage) and Angular Material components.
+- Both use `ChangeDetectionStrategy.OnPush` and are standalone.
+- Both use Angular signals (`signal()`, `computed()`) consistently.
+
+### Test Results
+
+```
+✓ src/app/app.spec.ts (2 tests)
+✓ src/app/pages/profile-page/profile-page.spec.ts (14 tests)
+✓ src/app/pages/settings-page/settings-page.spec.ts (12 tests)
+Test Files  3 passed (3)
+Tests  28 passed (28)
+```
+
+### Errors Encountered
+
+- None
+
+### Known Patterns Applied from ERROR_MAP
+
+- ✅ Entry 4 — tsconfig.app.json coffee-shared-lib paths already correct from task 8.1
+- ✅ Entry 5 — vitest.config.ts resolve.alias for coffee-shared-lib already in place from task 8.1
+- ✅ Entry 2 — no npm install needed (dependencies already installed from task 8.1)

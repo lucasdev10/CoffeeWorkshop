@@ -477,14 +477,14 @@ END
     - Configure package.json with scripts for port 4205
     - Add coffee-shared-lib as dependency
     - _Requirements: 6.1, 6.10, 12.6, 17.1_
-  - [ ] 8.2 Configure User MFE Module Federation as remote
+  - [x] 8.2 Configure User MFE Module Federation as remote
     - Create webpack.config.js with ModuleFederationPlugin as remote
     - Set name to "user" and filename to "remoteEntry.js"
     - Expose './Routes' pointing to user.routes.ts
     - Configure shared dependencies as singletons
     - Set publicPath to "auto" and uniqueName to "user"
     - _Requirements: 6.6, 6.7, 8.3, 8.4, 8.8_
-  - [ ] 8.3 Extract User pages
+  - [x] 8.3 Extract User pages
     - Move ProfilePage from monolith to MFE
     - Move SettingsPage from monolith to MFE
     - Update imports to use coffee-shared-lib
