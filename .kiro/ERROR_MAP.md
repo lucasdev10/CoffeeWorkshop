@@ -831,3 +831,58 @@ Test Files  7 passed (7)
      Tests  79 passed (79)
   Duration  6.99s
 ```
+
+---
+
+## SKILL-COMMIT Execution — After Tasks 8.3 & 8.4
+
+**Date**: 2026-11-08
+**Status**: ✅ SUCCESS
+**Duration**: ~10 minutes
+
+### Projects Checked for Changes
+
+| Project             | Changes | Action                                 |
+| ------------------- | ------- | -------------------------------------- |
+| coffee-products-mfe | None    | Skipped                                |
+| coffee-cart-mfe     | None    | Skipped                                |
+| coffee-admin-mfe    | None    | Skipped                                |
+| coffee-auth-mfe     | None    | Skipped                                |
+| coffee-shared-lib   | None    | Skipped                                |
+| coffee-user-mfe     | ✅ Yes  | Tests + build run → committed + pushed |
+| CoffeeWorkshop      | ✅ Yes  | Tests + build run → committed + pushed |
+
+### Test Results
+
+**coffee-user-mfe**: `npx vitest --run` → 7 test files, 79 tests — all pass ✅
+
+**CoffeeWorkshop**: `npm run test -- --run` → 59 test files, 768 tests — all pass ✅
+
+- Known pre-existing unhandled rejection in `app.routes.spec.ts` (ESM URL scheme — documented in Entry 1 of this file). Not a new failure.
+
+### Build Results
+
+**coffee-user-mfe**: `npm run build` → exit 0 ("Builder ran for build" stub — expected, per Entry 3) ✅
+**CoffeeWorkshop**: `npm run build` → exit 0 ("Builder ran for build" stub) ✅
+
+### Commits Made
+
+**CoffeeWorkshop** (branch `feature/micro-frontend`):
+
+- `chore: update ERROR_MAP, tasks and tasks metadata after tasks 8.1-8.4 completion`
+- Pushed to `origin/feature/micro-frontend` ✅
+
+**coffee-user-mfe** (branch `master`):
+
+- `feat: implement User MFE store, pages, and repository (tasks 8.3-8.4)`
+- 17 files changed, 1171 insertions (+22 deletions)
+- Pushed to `origin/master` ✅
+
+### Important Notes
+
+- Running `npx vitest --run` directly in CoffeeWorkshop FAILS because it bypasses the Angular TestBed setup (no `test.ts` / `TestBed.initTestEnvironment()` called). Always use `npm run test -- --run` for CoffeeWorkshop.
+- The LF→CRLF warnings from git on Windows are cosmetic and do not affect the commit.
+
+### Learnings
+
+- **CRITICAL**: For CoffeeWorkshop, always run `npm run test -- --run` (not `npx vitest --run`). The Angular `@angular/build:unit-test` builder loads `test.ts` which calls `TestBed.initTestEnvironment()`. Without it, all tests fail with "Need to call TestBed.initTestEnvironment() first".
