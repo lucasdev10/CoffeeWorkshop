@@ -1,5 +1,15 @@
 <div role="application">
   <app-header></app-header>
+
+  @if (loadingService.isLoading()) {
+    <div class="mfe-loading-overlay" role="status" aria-live="polite" aria-label="Loading">
+      <mat-progress-bar mode="indeterminate" color="accent" aria-hidden="true"></mat-progress-bar>
+      @if (mfeLoadingMessage()) {
+        <p class="mfe-loading-message">{{ mfeLoadingMessage() }}</p>
+      }
+    </div>
+  }
+
   <main class="main-container" role="main" aria-label="Main content">
     <router-outlet />
   </main>

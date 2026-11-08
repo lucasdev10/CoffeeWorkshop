@@ -1214,3 +1214,64 @@ All Shell App configurations were already correct from prior task work (Tasks 2-
 - When running `npx vitest --run` directly (without Angular build pipeline), path aliases like `@app/*` cannot be resolved — always use `npx ng test` for the Shell App
 - `ng test --include="src/app/core/guards/**"` causes vitest to report "No test suite found" for the `.ts` (non-spec) files included in the glob — these are false failures; actual spec results are correct
 - The 5 integration test timeouts in `product-flow.spec.ts` are a known/pre-existing issue and are unrelated to MFE routing
+
+---
+
+## Task: 10.2 - Implement Shell App loading indicators for MFE loading
+
+**Date**: 2025-01-14
+**Status**: ✅ SUCCESS
+**Duration**: ~20 minutes
+
+### Summary
+
+Implemented MFE loading indicators in the Shell App by wiring Angular Router events (`NavigationStart`, `NavigationEnd`, `NavigationCancel`, `NavigationError`) to the existing `LoadingService`. Added a `mat-progress-bar` overlay with a friendly "Loading feature..." message to the `AppComponent` template. All 778 tests pass (59 test files).
+
+### Files Modified
+
+| File                  | Change                                                                                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/app.ts`      | Implemented `OnInit`/`OnDestroy`, subscribed to `Router.events`, calls `LoadingService.show()`/`hide()` and sets `mfeLoadingMessage` signal |
+| `src/app/app.html`    | Added `@if (loadingService.isLoading())` block with `mat-progress-bar` and loading message                                                  |
+| `src/app/app.scss`    | Added `.mfe-loading-overlay` and `.mfe-loading-message` styles                                                                              |
+| `src/app/app.spec.ts` | Updated and expanded tests from 2 to 12, covering template rendering, signal wiring, and real-router navigation lifecycle                   |
+
+### Errors Encountered
+
+**Error Type**: Test setup — Cannot override `Router` token with a custom stub
+
+- **Error Message**: `TypeError: Cannot read properties of undefined (reading 'root')` and later `TypeError: this.router.createUrlTree is not a function`
+- **Root Cause**: Angular's router DI infrastructure involves many internal tokens beyond `Router` itself (e.g., `ActivatedRoute`, internal URL serializers). Providing a minimal stub object for `Router` caused cascading failures in Angular internals.
+- **Solution**: Kept `provideRouter([])` for all router tests. For event-wiring tests, used the real `Router` from `provideRouter([])` and called `router.navigate(['/'])` to trigger real `NavigationStart`/`NavigationEnd` events. Used `vi.spyOn` to verify `show/hide` were called.
+- **Alternative approach**: Tests for signal-based template rendering (`@if (loadingService.isLoading())`) use `loadingService.show()/hide()` directly — this is simpler and more deterministic.
+
+### Pattern Established
+
+**LoadingService + Router Events pattern for Angular Shell Apps:**
+
+```typescript
+ngOnInit(): void {
+  this.routerSubscription = this.router.events.subscribe((event) => {
+    if (event instanceof NavigationStart) {
+      this.loadingService.show();
+      this.mfeLoadingMessage.set('Loading feature...');
+    } else if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
+      this.loadingService.hide();
+      this.mfeLoadingMessage.set(null);
+    }
+  });
+}
+```
+
+**Testing Angular Router events:** Do NOT override the `Router` token with a stub — use the real router from `provideRouter([])` and call `router.navigate()` to trigger events. For template-based tests, drive them via the service directly (e.g., `loadingService.show()`).
+
+### Related Errors
+
+- None — no pre-existing errors in ERROR_MAP.md related to this task
+
+### Learnings
+
+- `loadingService.isLoading` is an Angular signal (not an Observable). In OnPush components, signals are reactive and update the template automatically — no `async` pipe needed.
+- `MatProgressBarModule` must be added to the component's `imports` array for standalone components.
+- The `@if` control flow syntax (Angular 17+) is used throughout this project — use it consistently rather than `*ngIf`.
+- Using `NavigationStart` → `NavigationEnd/Cancel/Error` covers all cases including MFE lazy-loading failures, guard redirects, and successful navigation.
