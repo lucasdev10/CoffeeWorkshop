@@ -929,3 +929,47 @@ Implemented `user:profile-updated` custom event emission (req 11.6) by creating 
 
 - ✅ Entry 5 — EventBusService local implementation pattern (same as Auth MFE task 7.5)
 - ✅ Entry 3 — stub builder exit 0 is correct (not tested here, N/A)
+
+---
+
+## Task: 8.6 - Create User MFE routing with auth protection
+
+**Date**: 2025-01-14
+**Status**: ✅ SUCCESS
+**Duration**: ~10 minutes
+
+### Summary
+
+`user.routes.ts` implemented with `USER_ROUTES` constant and `userAuthGuard` functional guard. All 100 tests pass (9 test files), including 11 new route tests.
+
+### Files Created / Modified
+
+| File                          | Change               | Notes                                    |
+| ----------------------------- | -------------------- | ---------------------------------------- |
+| `src/app/user.routes.ts`      | Rewritten (was stub) | `USER_ROUTES` + `userAuthGuard`          |
+| `src/app/user.routes.spec.ts` | Created              | 11 tests for routes config + guard logic |
+
+### Implementation Details
+
+- `USER_ROUTES` exports two routes: `profile` → `ProfilePageComponent`, `settings` → `SettingsPageComponent`
+- Both routes use `component:` (direct, not lazy-loaded) consistent with design.md pattern and Admin MFE reference
+- `userAuthGuard` is a `CanActivateFn` that injects `Store` and `Router`
+- Reads `appState.authGlobal.isAuthenticated` — matching Shell App's global auth feature key `'authGlobal'` (`selectAuthIsAuthenticated` in `core/store/auth/auth.selectors.ts`)
+- Uses `.pipe(take(1))` to complete the observable after first emission
+- Redirects to `/auth/login` when not authenticated (Req 6.11)
+- Falls back gracefully to `false` when `authGlobal` slice is absent (standalone/test mode)
+
+### Test Results
+
+- 9 test files, **100 tests — all passed**
+- `user.routes.spec.ts` (11 tests): route config structure + guard allow/deny/redirect scenarios
+
+### Known Patterns Applied from ERROR_MAP
+
+- ✅ Entry 3 — Admin MFE `admin.routes.ts` used as reference implementation for functional CanActivateFn pattern
+- ✅ Entry 4 — No tsconfig.app.json path issues (pages already import-checked in task 8.3)
+- ✅ Entry 5 — vitest.config.ts alias for coffee-shared-lib already in place from prior tasks
+
+### Errors Encountered
+
+- None

@@ -540,6 +540,18 @@
         "chatSessionId": "sess_089aa32d-7ac0-4761-b684-d308a4248302",
         "timestamp": 1794160920470
       }
+    ],
+    "8.6 Create User MFE routing with auth protection": [
+      {
+        "executionId": "17c89e74-423b-447d-838b-d367fb33a793",
+        "chatSessionId": "sess_c1a68074-10e5-48fb-8702-5d323e1a265e",
+        "timestamp": 1794161157669
+      },
+      {
+        "executionId": "17c89e74-423b-447d-838b-d367fb33a793",
+        "chatSessionId": "sess_c1a68074-10e5-48fb-8702-5d323e1a265e",
+        "timestamp": 1794161259918
+      }
     ]
   }
 }

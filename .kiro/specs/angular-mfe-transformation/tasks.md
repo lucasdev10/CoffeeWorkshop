@@ -500,7 +500,7 @@ END
     - Inject EventBusService
     - Emit "user:profile-updated" event when profile is updated
     - _Requirements: 11.6_
-  - [ ] 8.6 Create User MFE routing with auth protection
+  - [x] 8.6 Create User MFE routing with auth protection
     - Create user.routes.ts exporting USER_ROUTES
     - Configure route "profile" for ProfilePage
     - Configure route "settings" for SettingsPage
