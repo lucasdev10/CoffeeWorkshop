@@ -452,7 +452,7 @@ END
     - Emit "auth:login" event with user and token on successful login
     - Emit "auth:logout" event on logout
     - _Requirements: 5.11, 11.4, 11.5_
-  - [ ] 7.6 Create Auth MFE routing
+  - [x] 7.6 Create Auth MFE routing
     - Create auth.routes.ts exporting AUTH_ROUTES
     - Configure route "login" for LoginPage
     - Configure route "register" for RegisterPage
