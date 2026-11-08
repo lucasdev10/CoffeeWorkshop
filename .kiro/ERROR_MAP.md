@@ -29,6 +29,7 @@ Central registry of all errors encountered during task execution. Use this docum
 | 7.1          | Create coffee-auth-mfe repository              | ✅ SUCCESS | 1 (minor)   | 2026-10-30   |
 | 7.2          | Configure Auth MFE Module Federation as remote | ✅ SUCCESS | 1 (info)    | 2026-10-30   |
 | 7.3          | Extract Auth pages                             | ✅ SUCCESS | 1 (minor)   | 2026-10-30   |
+| 7.4          | Implement Auth MFE store and synchronization   | ✅ SUCCESS | 1 (info)    | 2026-10-30   |
 
 ---
 
@@ -346,17 +347,105 @@ providers: [provideMockStore({ initialState: ... })]
 
 ---
 
+### Entry 5: coffee-shared-lib unresolvable by Vite in test environment
+
+**Task ID**: 7.4 - Implement Auth MFE store and synchronization  
+**Date**: 2026-10-30  
+**Status**: ✅ SUCCESS (resolved)  
+**Severity**: 🟡 MINOR
+
+#### Error Details
+
+- **Error Type**: Build Error (Vite module resolution)
+- **Error Message**: `Failed to resolve entry for package "coffee-shared-lib". The package may have incorrect main/module/exports specified in its package.json.`
+- **Context**: Running new store spec files that import `EUserRole` from `coffee-shared-lib`
+
+#### Root Cause Analysis
+
+- **Why it happened**: The `coffee-shared-lib` workspace root `package.json` has no `main`/`module`/`exports` field. It's a workspace root, not the publishable library. Vite (used by Vitest) cannot resolve the package entry. The Angular compiler uses tsconfig `paths` which bypasses this, but Vite resolves packages through Node's normal algorithm.
+- **Environment factors**: Vitest 4.x uses Vite for module resolution; `coffee-shared-lib` is a `file:` local dependency pointing to the workspace root.
+- **Common pattern**: Any MFE spec file that directly imports from `coffee-shared-lib` will hit this issue.
+
+#### Solution Applied
+
+- **What was tried**: tsconfig.spec.json paths addition (fixes TypeScript type-checking but not Vite runtime resolution)
+- **Final solution**: Added a `resolve.alias` entry in `vitest.config.ts` pointing `coffee-shared-lib` to the library's `public-api.ts` source file:
+  ```ts
+  resolve: {
+    alias: {
+      'coffee-shared-lib': resolve(__dirname, '../coffee-shared-lib/projects/coffee-shared/src/public-api.ts'),
+    },
+  }
+  ```
+- **Verification**: All 39 tests pass after this change
+
+#### Prevention Strategy
+
+- **How to avoid**: When writing spec files for Auth/User/Admin/Cart MFEs that import from `coffee-shared-lib`, always ensure `vitest.config.ts` has the alias.
+- **Pre-flight checklist**: Verify `vitest.config.ts` has `resolve.alias` for `coffee-shared-lib` before writing specs that use it.
+- **Similar tasks affected**: 7.7 (Auth MFE tests), 8.7 (User MFE tests) — same alias fix will be needed.
+
+#### Related Errors
+
+- Entry 4 (Task 7.3) — same root cause, different resolution layer (tsc vs Vite)
+
+---
+
 ## Statistics
 
-- **Total Errors Recorded**: 4
+---
+
+### Entry 6: dispatchToGlobalStore used wrong action type for register
+
+**Task ID**: 7.4 - Implement Auth MFE store and synchronization  
+**Date**: 2026-10-30  
+**Status**: ✅ SUCCESS (fixed during implementation)  
+**Severity**: ℹ️ INFO
+
+#### Error Details
+
+- **Error Type**: Code Error (wrong global action type string for register)
+- **Error Message**: N/A — not a runtime error, but a logical mismatch
+- **Context**: The `auth.effects.ts` file used `dispatchToGlobalStore()` for both login AND register, which dispatched `'[Auth] Login Success'` for both operations.
+
+#### Root Cause Analysis
+
+- **Why it happened**: A single `dispatchToGlobalStore()` helper method was written for login and reused for register without updating the action `type` string.
+- **Environment factors**: The Shell App's global auth reducer handles `'[Auth] Login Success'` and `'[Auth] Register Success'` as separate actions with separate reducers.
+- **Common pattern**: Single-helper anti-pattern when multiple actions share the same data shape but have different type strings.
+
+#### Solution Applied
+
+- **What was tried**: Read Shell App's `core/store/auth/auth.actions.ts` to verify action type strings
+- **Final solution**: Split into `dispatchGlobalLoginSuccess()` and `dispatchGlobalRegisterSuccess()` methods with correct type strings matching the Shell's global actions:
+  - Login: `'[Auth] Login Success'`
+  - Register: `'[Auth] Register Success'`
+  - Logout: `'[Auth] Logout Success'`
+- **Verification**: 53 tests pass (14 new effects tests + 39 existing tests); `tsc --noEmit` exits 0
+
+#### Prevention Strategy
+
+- **How to avoid**: When dispatching plain-object actions to the global Shell store, always verify the exact action type string from `CoffeeWorkshop/src/app/core/store/auth/auth.actions.ts`
+- **Pre-flight checklist**: Cross-check global action type strings before implementing effects that bridge to global store
+- **Similar tasks affected**: 8.4 (User MFE store), 10.1 (Integration validation)
+
+#### Related Errors
+
+- Entry 4 (Task 7.3) — same MFE setup context
+
+---
+
+## Statistics
+
+- **Total Errors Recorded**: 6
 - **By Severity**:
   - 🔴 Critical: 0
   - 🟠 Major: 1
-  - 🟡 Minor: 2
-  - ℹ️ Info: 1
+  - 🟡 Minor: 3
+  - ℹ️ Info: 2
 - **By Category**:
   - Command Errors: 0
-  - Code Errors: 2
+  - Code Errors: 3
   - Test Errors: 1
-  - Build Errors: 0
+  - Build Errors: 1
   - Dependency Errors: 1

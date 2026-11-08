@@ -439,7 +439,7 @@ END
     - Move RegisterPage from monolith to MFE
     - Update imports to use coffee-shared-lib
     - _Requirements: 5.2, 5.8_
-  - [ ] 7.4 Implement Auth MFE store and synchronization
+  - [x] 7.4 Implement Auth MFE store and synchronization
     - Create AuthState with token, user, isAuthenticated, loading, error
     - Create AuthActions: login, logout, register, updateToken
     - Create AuthSelectors for auth queries
