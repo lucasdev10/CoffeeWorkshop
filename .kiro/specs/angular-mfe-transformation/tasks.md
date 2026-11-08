@@ -470,7 +470,7 @@ END
     - _Requirements: 13.5, 13.8, 15.4, 12.9_
 
 - [ ] 8. Create User MFE
-  - [ ] 8.1 Create coffee-user-mfe repository with Angular structure
+  - [x] 8.1 Create coffee-user-mfe repository with Angular structure
     - Initialize new Git repository
     - Create Angular application using Angular CLI
     - Install @angular-architects/module-federation

@@ -603,3 +603,66 @@ All 9 test files, 110 tests:
 - Angular Forms Signals `form()` API: field path accessors (e.g., `form.email`) are for schema/validators, NOT for setting values in tests. Use `form().value.set({...})` to update field values.
 - `TestBed.overrideComponent` inside `beforeEach` conflicts with the global `resolveComponentResources()` run in `test.ts`'s `beforeAll`. Avoid `overrideComponent` unless the component truly needs a different template.
 - Always use `BehaviorSubject` for mocking observables in Angular tests when you need to update mock values between tests.
+
+---
+
+## Task: 8.1 - Create coffee-user-mfe repository with Angular structure
+
+**Date**: 2025-01-14
+**Status**: ✅ SUCCESS
+**Duration**: ~15 minutes
+
+### Summary
+
+`coffee-user-mfe` repository created at `C:\Users\lusca\Desktop\coffee-user-mfe` following the exact same pattern as `coffee-auth-mfe`. Repository initialized with git, all config files created manually (not via `ng new`) to match the established project structure, and 2/2 tests pass.
+
+### File Structure Created
+
+| File                                                         | Purpose                                                             |
+| ------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `package.json`                                               | Port 4205, Angular 21.1.x, NgRx 21.0.1, coffee-shared-lib file: dep |
+| `angular.json`                                               | MF builder, port 4205 in serve options                              |
+| `webpack.config.js`                                          | Remote: name='user', exposes './Routes' → user.routes.ts            |
+| `tsconfig.json` / `tsconfig.app.json` / `tsconfig.spec.json` | TS config with coffee-shared-lib paths fix (from task 7.3)          |
+| `vitest.config.ts`                                           | Vite alias for coffee-shared-lib (from task 7.4)                    |
+| `src/bootstrap.ts` + `main.ts`                               | MFE bootstrap entry pattern                                         |
+| `src/test.ts`                                                | Vitest/Angular test setup with resolveComponentResources            |
+| `src/app/user.routes.ts`                                     | Stub USER_ROUTES (filled in task 8.6)                               |
+| `src/app/app.spec.ts`                                        | 2 bootstrap tests - both pass                                       |
+
+### Errors Encountered
+
+- **jsdom not installed after initial `npm install --legacy-peer-deps`**: The initial install timed out before completing. When `npx vitest --run` was attempted, it prompted to install jsdom (not present). Ran `npm install jsdom --save-dev --legacy-peer-deps` to install it explicitly.
+  - Root Cause: The first `npm install` timed out at 180s before completing all packages; jsdom wasn't in node_modules yet.
+  - Solution: Run `npm install jsdom --save-dev --legacy-peer-deps` after the main install if jsdom is missing.
+  - Prevention: Increase install timeout or check for jsdom after install. The package.json already has `"jsdom": "^28.1.0"` in devDependencies — if install doesn't complete, re-run `npm install --legacy-peer-deps`.
+
+### Known Patterns Applied from ERROR_MAP
+
+- ✅ Used `npm install --legacy-peer-deps` (Entry 2 — file: local dep npm bug)
+- ✅ Applied correct tsconfig.app.json paths for coffee-shared-lib (Entry 4 — task 7.3 fix)
+- ✅ Applied vitest.config.ts resolve.alias for coffee-shared-lib (Entry 5 — task 7.4 fix)
+
+### Commands Used
+
+- `git init && git add .`
+- `npm install --legacy-peer-deps`
+- `npm install jsdom --save-dev --legacy-peer-deps`
+- `npx vitest --run`
+- `git add . && git commit`
+
+### Test Results
+
+```
+✓ src/app/app.spec.ts (2 tests) 74ms
+  ✓ App (2)
+    ✓ should create the app
+    ✓ should have the 'coffee-user-mfe' title
+Test Files  1 passed (1)
+Tests  2 passed (2)
+```
+
+### Learnings
+
+- When initial `npm install` times out on Windows (PowerShell 120s default), jsdom and other large packages may not be installed. Always verify with `Test-Path node_modules/jsdom` and re-run install if needed.
+- Creating MFEs manually (copying from auth-mfe pattern) is faster and more reliable than `ng new` since we already have the exact config needed.
