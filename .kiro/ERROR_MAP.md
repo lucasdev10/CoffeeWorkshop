@@ -763,3 +763,71 @@ Tests  28 passed (28)
 - ✅ Entry 4 — tsconfig.app.json coffee-shared-lib paths already correct from task 8.1
 - ✅ Entry 5 — vitest.config.ts resolve.alias for coffee-shared-lib already in place from task 8.1
 - ✅ Entry 2 — no npm install needed (dependencies already installed from task 8.1)
+
+---
+
+## Task: 8.4 - Implement User MFE store and synchronization
+
+**Date**: 2025-01-14
+**Status**: ✅ SUCCESS
+**Duration**: ~25 minutes
+
+### Summary
+
+Complete NgRx store slice created for the User MFE. All 79 tests pass across 7 test files.
+
+### Files Created
+
+| File                                      | Purpose                                                                                                                                                                                            |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/store/user.state.ts`             | `IUserState`, `IUserPreferences`, `initialUserState`                                                                                                                                               |
+| `src/app/store/user.actions.ts`           | `userLoadProfile`, `userUpdateProfile`, `userUpdatePreferences`, `userSetProfile`, `userClearProfile`, `userClearError` + success/failure variants                                                 |
+| `src/app/store/user.reducer.ts`           | Handles all 11 actions                                                                                                                                                                             |
+| `src/app/store/user.selectors.ts`         | `selectUserState`, `selectUserProfile`, `selectUserPreferences`, `selectUserLoading`, `selectUserIsLoading`, `selectUserError`, `selectUserTheme`, `selectUserLanguage`, `selectUserNotifications` |
+| `src/app/store/user.effects.ts`           | Async effects for loadProfile, updateProfile, updatePreferences; dispatches to global Shell store                                                                                                  |
+| `src/app/store/user.facade.ts`            | Public surface for pages; `@Injectable({ providedIn: 'root' })`                                                                                                                                    |
+| `src/app/store/index.ts`                  | Barrel export                                                                                                                                                                                      |
+| `src/app/repositories/user.repository.ts` | In-memory mock repository with localStorage auth hydration                                                                                                                                         |
+| `src/app/store/user.reducer.spec.ts`      | 13 reducer tests                                                                                                                                                                                   |
+| `src/app/store/user.selectors.spec.ts`    | 16 selector tests                                                                                                                                                                                  |
+| `src/app/store/user.facade.spec.ts`       | 14 facade tests                                                                                                                                                                                    |
+| `src/app/store/user.effects.spec.ts`      | 8 effects tests                                                                                                                                                                                    |
+
+### Files Modified
+
+| File                                                | Change                                                                      |
+| --------------------------------------------------- | --------------------------------------------------------------------------- |
+| `src/app/app.config.ts`                             | Added `userReducer` to `provideStore` and `UserEffects` to `provideEffects` |
+| `src/app/pages/profile-page/profile-page.ts`        | Wired to `UserFacade`; dispatches `updateProfile` on submit                 |
+| `src/app/pages/settings-page/settings-page.ts`      | Wired to `UserFacade`; dispatches `updatePreferences` on save               |
+| `src/app/pages/profile-page/profile-page.spec.ts`   | Updated to use `provideMockStore` with `{ user: initialUserState }`         |
+| `src/app/pages/settings-page/settings-page.spec.ts` | Updated to use `provideMockStore` with `{ user: initialUserState }`         |
+
+### Errors Encountered
+
+- **`provideStore({})` in existing specs caused `TypeError: Cannot read properties of undefined (reading 'preferences')`**: The feature selector `createFeatureSelector('user')` returned `undefined` because the user slice wasn't registered in the test store.
+  - Root Cause: Existing specs used `provideStore({})` (empty store). After wiring `UserFacade`, the selectors expected a `user` key in state.
+  - Solution: Changed both page specs to use `provideMockStore({ initialState: { user: initialUserState } })`.
+  - Prevention: Whenever a component injects a Facade that uses feature selectors, always use `provideMockStore` with the correct initial state structure.
+
+- **Settings default `theme: 'system'` overwritten by store initial `theme: 'light'` in test**: `ngOnInit` subscribed to `preferences$` which emitted synchronously from MockStore, overwriting the component's `'system'` local default before the assertion ran.
+  - Root Cause: The store's `initialUserState.preferences.theme` is `'light'` (valid store value), but the component's local UI default is `'system'` (supports "auto" system theme). The sync happened even when no user was loaded.
+  - Solution: Guarded the preferences sync in `ngOnInit` behind `profile$` — only sync preferences when a profile is present, meaning a user is actually authenticated.
+  - Prevention: When syncing store state to component signals in `ngOnInit`, guard on whether the relevant entity (profile) is actually loaded.
+
+### Global Store Sync Pattern (req 10.8)
+
+Global action type strings verified from `CoffeeWorkshop/src/app/core/store/user/user.actions.ts`:
+
+- `updateProfile` → dispatches `{ type: '[User] Update Profile Success', profile }`
+- `updatePreferences` → dispatches `{ type: '[User] Update Preferences Success', preferences }`
+
+Both effects dispatch plain-object actions (no Shell import at compile time) — same pattern as AuthEffects (Entry 6).
+
+### Test Results
+
+```
+Test Files  7 passed (7)
+     Tests  79 passed (79)
+  Duration  6.99s
+```

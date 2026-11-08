@@ -489,7 +489,7 @@ END
     - Move SettingsPage from monolith to MFE
     - Update imports to use coffee-shared-lib
     - _Requirements: 6.2, 6.8_
-  - [ ] 8.4 Implement User MFE store and synchronization
+  - [x] 8.4 Implement User MFE store and synchronization
     - Create UserState with profile, preferences, loading, error
     - Create UserActions: updateProfile, updatePreferences
     - Create UserSelectors for user data queries
