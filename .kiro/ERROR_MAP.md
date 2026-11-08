@@ -30,6 +30,7 @@ Central registry of all errors encountered during task execution. Use this docum
 | 7.2          | Configure Auth MFE Module Federation as remote | ✅ SUCCESS | 1 (info)    | 2026-10-30   |
 | 7.3          | Extract Auth pages                             | ✅ SUCCESS | 1 (minor)   | 2026-10-30   |
 | 7.4          | Implement Auth MFE store and synchronization   | ✅ SUCCESS | 1 (info)    | 2026-10-30   |
+| 7.5          | Implement Auth MFE custom event emission       | ✅ SUCCESS | 0           | 2026-11-08   |
 
 ---
 
@@ -449,3 +450,28 @@ providers: [provideMockStore({ initialState: ... })]
   - Test Errors: 1
   - Build Errors: 1
   - Dependency Errors: 1
+
+---
+
+### Task 7.5: Implement Auth MFE custom event emission
+
+**Task ID**: 7.5 - Implement Auth MFE custom event emission  
+**Date**: 2026-11-08  
+**Status**: ✅ SUCCESS  
+**Severity**: N/A (no errors)
+
+#### Work Done
+
+- Created `src/app/services/event-bus.service.ts` — local Auth MFE implementation of `EventBusService` matching the Shell App's interface
+- Injected `EventBusService` into `AuthEffects` via `inject(EventBusService, { optional: true })`
+- Added `emitAuthLoginEvent(user, token)` called after successful login and register effects
+- Added `emitAuthLogoutEvent()` called after logout effects (both success and API failure paths)
+- Both methods use `EventBusService.emit()` when injected, falling back to `window.dispatchEvent` directly
+- Created `src/app/services/event-bus.service.spec.ts` with 9 tests for the service itself
+- Extended `auth.effects.spec.ts` with 5 new tests: 2 for login event, 1 for negative case (no event on failure), 1 for register event, 2 for logout events
+
+#### Learnings
+
+- `inject(Token, { optional: true })` is the correct way to optionally inject in Angular with `inject()` (not `@Optional()` decorator)
+- `done()` callback style is deprecated in Vitest 4.x — use `async/await` with `new Promise()` instead
+- The Cart MFE used `@Optional() private eventBus?: IEventBusService` via constructor injection; for the Auth MFE we used the modern `inject()` API which is simpler and testable

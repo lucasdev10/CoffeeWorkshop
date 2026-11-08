@@ -447,7 +447,7 @@ END
     - Inject global Store and dispatch to global auth slice
     - Implement token persistence via StorageService
     - _Requirements: 5.3, 5.4, 5.12, 10.6_
-  - [ ] 7.5 Implement Auth MFE custom event emission
+  - [x] 7.5 Implement Auth MFE custom event emission
     - Inject EventBusService
     - Emit "auth:login" event with user and token on successful login
     - Emit "auth:logout" event on logout
