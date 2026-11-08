@@ -419,7 +419,7 @@ END
     - Create README.md with setup instructions
     - _Requirements: 13.4, 13.8, 15.4, 12.9_
 
-- [ ] 7. Create Auth MFE
+- [x] 7. Create Auth MFE
   - [x] 7.1 Create coffee-auth-mfe repository with Angular structure
     - Initialize new Git repository
     - Create Angular application using Angular CLI
@@ -463,7 +463,7 @@ END
     - Test event emission
     - Ensure all tests pass
     - _Requirements: 5.9, 15.4_
-  - [ ] 7.8 Create Auth MFE development and build scripts
+  - [x] 7.8 Create Auth MFE development and build scripts
     - Add "start" script to serve on port 4204
     - Add "build", "test", "test:coverage" scripts
     - Create README.md with setup instructions

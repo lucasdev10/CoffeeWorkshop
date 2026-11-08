@@ -7,8 +7,8 @@ Central registry of all errors encountered during task execution. Use this docum
 - Prevent repeating mistakes
 - Learn from past execution attempts
 
-**Last Updated**: 2026-10-30
-**Total Entries**: 2
+**Last Updated**: 2025-01-14
+**Total Entries**: 8
 
 ---
 
@@ -33,6 +33,7 @@ Central registry of all errors encountered during task execution. Use this docum
 | 7.5          | Implement Auth MFE custom event emission       | ✅ SUCCESS | 0           | 2026-11-08   |
 | 7.6          | Create Auth MFE routing                        | ✅ SUCCESS | 0           | 2026-11-08   |
 | 7.7          | Migrate Auth MFE unit tests                    | ✅ SUCCESS | 3 (minor)   | 2025-01-14   |
+| 7.8          | Create Auth MFE development and build scripts  | ✅ SUCCESS | 0           | 2025-01-14   |
 
 ---
 
@@ -452,6 +453,53 @@ providers: [provideMockStore({ initialState: ... })]
   - Test Errors: 1
   - Build Errors: 1
   - Dependency Errors: 1
+
+---
+
+## Task: 7.8 - Create Auth MFE development and build scripts
+
+**Date**: 2025-01-14
+**Status**: ✅ SUCCESS
+**Duration**: ~5 minutes
+
+### Summary
+
+All required scripts were already in place from prior tasks (7.1–7.7). README.md was significantly enhanced with missing sections. No errors encountered.
+
+### Scripts Verified (package.json)
+
+| Script          | Command                               | Requirement |
+| --------------- | ------------------------------------- | ----------- |
+| `start`         | `ng serve --port 4204`                | 13.5, 13.8  |
+| `build`         | `ng build`                            | 14.x        |
+| `build:prod`    | `ng build --configuration production` | 14.x        |
+| `test`          | `vitest --run`                        | 15.4        |
+| `test:coverage` | `vitest --coverage --run`             | 15.4        |
+
+### README.md Enhancements
+
+Added the following sections (previously missing or incomplete):
+
+- **Port Assignments Table** — maps all 6 MFEs to their ports and remoteEntry URLs
+- **Installation section** — explicit `--legacy-peer-deps` instruction with explanation
+- **Environment Configuration** — table of env files and key variables
+- **Testing table** — maps each spec file to test count and coverage area
+- **Project Structure** — directory tree with annotations
+- **Live-reload note** — `ng serve` enables HMR by default (req 13.12)
+- **Expanded Troubleshooting** — added `coffee-shared-lib` Vite alias fix, port kill command, version check
+
+### Errors Encountered
+
+- None
+
+### Commands Used
+
+- No commands run; all changes were file writes
+
+### Learnings
+
+- When prior tasks complete cleanly, script setup tasks are often pre-satisfied; verify before reimplementing
+- README should include port assignments table for quick cross-MFE reference
 
 ---
 
