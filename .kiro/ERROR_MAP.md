@@ -886,3 +886,46 @@ Test Files  7 passed (7)
 ### Learnings
 
 - **CRITICAL**: For CoffeeWorkshop, always run `npm run test -- --run` (not `npx vitest --run`). The Angular `@angular/build:unit-test` builder loads `test.ts` which calls `TestBed.initTestEnvironment()`. Without it, all tests fail with "Need to call TestBed.initTestEnvironment() first".
+
+---
+
+## Task: 8.5 - Implement User MFE custom event emission
+
+**Date**: 2025-01-14
+**Status**: ✅ SUCCESS
+**Duration**: ~10 minutes
+
+### Summary
+
+Implemented `user:profile-updated` custom event emission (req 11.6) by creating a local `EventBusService` in the User MFE and injecting it into `UserEffects`. The event is emitted after a successful `updateProfile` repository call. All 89 tests pass across all 8 test files.
+
+### Files Created / Modified
+
+| File                                         | Action   | Purpose                                                                                        |
+| -------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `src/app/services/event-bus.service.ts`      | Created  | Local EventBusService implementation matching Shell App interface                              |
+| `src/app/services/event-bus.service.spec.ts` | Created  | 8 tests for EventBusService (emit/listen)                                                      |
+| `src/app/store/user.effects.ts`              | Modified | Injected EventBusService; added `emitProfileUpdatedEvent()` called on `updateProfile$` success |
+| `src/app/store/user.effects.spec.ts`         | Modified | Added 2 new tests: emit event on success, no event on failure                                  |
+
+### Implementation Pattern
+
+- `EventBusService` created at `src/app/services/event-bus.service.ts` — exact copy of Auth MFE's local implementation
+- Injected via `inject(EventBusService, { optional: true })` in `UserEffects`
+- `emitProfileUpdatedEvent(user)` calls `this.eventBus.emit('user:profile-updated', { user }, 'user')` when EventBusService is available; falls back to `window.dispatchEvent` for standalone environments
+- Event emitted in the `updateProfile$` effect's `map()` after `dispatchGlobalUpdateProfile()` call
+
+### Test Results
+
+- **8 test files, 89 tests — all passed**
+- New: `event-bus.service.spec.ts` (8 tests)
+- Updated: `user.effects.spec.ts` (10 tests total, +2 new: event emission on success and no emission on failure)
+
+### Errors Encountered
+
+- None
+
+### Known Patterns Applied from ERROR_MAP
+
+- ✅ Entry 5 — EventBusService local implementation pattern (same as Auth MFE task 7.5)
+- ✅ Entry 3 — stub builder exit 0 is correct (not tested here, N/A)

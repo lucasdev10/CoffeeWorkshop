@@ -496,7 +496,7 @@ END
     - Create UserEffects for async user operations
     - Inject global Store and dispatch to global user slice
     - _Requirements: 6.3, 6.4, 10.8_
-  - [ ] 8.5 Implement User MFE custom event emission
+  - [x] 8.5 Implement User MFE custom event emission
     - Inject EventBusService
     - Emit "user:profile-updated" event when profile is updated
     - _Requirements: 11.6_
