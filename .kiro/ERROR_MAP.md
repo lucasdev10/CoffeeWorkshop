@@ -1023,3 +1023,70 @@ The monolith's user feature tests covered a different model (admin CRUD: `findAl
 - Spec files for all store slices and components were already implemented in prior tasks (8.3–8.6) — no re-work needed
 - The repository layer (in-memory mock with `setTimeout`) is testable without any HTTP mocking; use `new Promise` with `subscribe({ next, error })` and a per-test timeout of 10s to handle the 500ms delay
 - Always check whether a repository has a companion spec file when migrating tests — it's easy to miss since repositories don't show up in component-oriented checklists
+
+---
+
+## Task: 8.8 - Create User MFE development and build scripts
+
+**Date**: 2025-01-14
+**Status**: ✅ SUCCESS
+**Duration**: ~5 minutes
+
+### Summary
+
+All required scripts were already in place from prior tasks (8.1–8.7). README.md was significantly enhanced to match the auth-mfe reference quality, adding missing sections. No errors encountered.
+
+### Scripts Verified (package.json)
+
+| Script          | Command                               | Requirement |
+| --------------- | ------------------------------------- | ----------- |
+| `start`         | `ng serve --port 4205`                | 13.6, 13.8  |
+| `build`         | `ng build`                            | 14.x        |
+| `build:prod`    | `ng build --configuration production` | 14.x        |
+| `test`          | `vitest --run`                        | 15.4        |
+| `test:coverage` | `vitest --coverage --run`             | 15.4, 15.5  |
+
+### angular.json Verified
+
+| Setting       | Value                                         | Requirement |
+| ------------- | --------------------------------------------- | ----------- |
+| serve.port    | `4205`                                        | 13.6        |
+| serve builder | `@angular/build:dev-server`                   | 13.8        |
+| build builder | `@angular-architects/module-federation:build` | 14.x        |
+
+### README.md Enhancements
+
+Added / expanded the following sections (previously missing or incomplete):
+
+- **Architecture table** — name, port, remoteEntry URL, exposed module
+- **Available Scripts table** — all 8 scripts mapped to commands and descriptions
+- **Live-reload note** — `ng serve` enables HMR by default in Angular 21 (req 13.12)
+- **Module Federation** — webpack.config.js snippet + Shell App loadRemoteModule usage
+- **Port Assignments Table** — all 6 MFEs with ports and remoteEntry URLs
+- **Shared Library Dependency** — build instructions + how resolution works (tsconfig + vitest alias)
+- **Environment Configuration** — explicit note that env is handled by Shell, with key runtime config context
+- **Communication** — NgRx store reads and custom event `user:profile-updated`
+- **Development Workflow** — standalone and integration (with Shell) sections
+- **Shell App link** — link to `../CoffeeWorkshop/README.md` for full setup
+- **Testing** — consolidated test commands with explanations
+- **Project Structure** — annotated directory tree
+- **Troubleshooting** — port kill command, shared-lib errors, npm install fix
+
+### Errors Encountered
+
+- None
+
+### Commands Used
+
+- No commands run; all changes were file writes
+
+### Known Patterns Applied from ERROR_MAP
+
+- ✅ Pattern 2 — Verified all npm scripts exist before claiming task complete
+- ✅ Entry 3 — `ng serve` stub builder exit 0 is expected (no actual webpack bundle produced)
+
+### Learnings
+
+- When prior tasks complete cleanly, script setup tasks are often pre-satisfied; verify before reimplementing
+- README should mirror the auth-mfe README structure for consistency across all MFEs
+- `ng serve` in Angular 21 provides HMR/live-reload by default — no `--live-reload` flag needed

@@ -469,7 +469,7 @@ END
     - Create README.md with setup instructions
     - _Requirements: 13.5, 13.8, 15.4, 12.9_
 
-- [ ] 8. Create User MFE
+- [x] 8. Create User MFE
   - [x] 8.1 Create coffee-user-mfe repository with Angular structure
     - Initialize new Git repository
     - Create Angular application using Angular CLI
@@ -512,7 +512,7 @@ END
     - Test event emission
     - Ensure all tests pass
     - _Requirements: 6.9, 15.4_
-  - [ ] 8.8 Create User MFE development and build scripts
+  - [x] 8.8 Create User MFE development and build scripts
     - Add "start" script to serve on port 4205
     - Add "build", "test", "test:coverage" scripts
     - Create README.md with setup instructions
