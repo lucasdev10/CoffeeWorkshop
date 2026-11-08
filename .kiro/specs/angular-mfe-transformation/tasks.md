@@ -457,7 +457,7 @@ END
     - Configure route "login" for LoginPage
     - Configure route "register" for RegisterPage
     - _Requirements: 5.5_
-  - [ ]\* 7.7 Migrate Auth MFE unit tests
+  - [x] 7.7 Migrate Auth MFE unit tests
     - Move auth unit tests from monolith
     - Test login, logout, register flows
     - Test event emission

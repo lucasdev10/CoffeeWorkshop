@@ -32,6 +32,7 @@ Central registry of all errors encountered during task execution. Use this docum
 | 7.4          | Implement Auth MFE store and synchronization   | ✅ SUCCESS | 1 (info)    | 2026-10-30   |
 | 7.5          | Implement Auth MFE custom event emission       | ✅ SUCCESS | 0           | 2026-11-08   |
 | 7.6          | Create Auth MFE routing                        | ✅ SUCCESS | 0           | 2026-11-08   |
+| 7.7          | Migrate Auth MFE unit tests                    | ✅ SUCCESS | 3 (minor)   | 2025-01-14   |
 
 ---
 
@@ -500,3 +501,57 @@ providers: [provideMockStore({ initialState: ... })]
 - `inject(Token, { optional: true })` is the correct way to optionally inject in Angular with `inject()` (not `@Optional()` decorator)
 - `done()` callback style is deprecated in Vitest 4.x — use `async/await` with `new Promise()` instead
 - The Cart MFE used `@Optional() private eventBus?: IEventBusService` via constructor injection; for the Auth MFE we used the modern `inject()` API which is simpler and testable
+
+---
+
+## Task: 7.7 - Migrate Auth MFE Unit Tests
+
+**Date**: 2025-01-14
+**Status**: ✅ SUCCESS
+**Duration**: ~20 minutes
+
+### Summary
+
+All 9 test files with 110 tests pass successfully in the Auth MFE.
+
+### Errors Encountered
+
+- **Error Type**: Test Error - Angular Signals Form API Misuse
+  - Root Cause: Tests used `component.loginForm.email.set('value')` — treating field path accessors (`loginForm.email`, `loginForm.password`) as `WritableSignal`s. These are actually `SchemaPath` accessor objects for use with validators, NOT writable signals.
+  - Solution: Use `component.loginForm().value.set({ email: '...', password: '...' })` to set all form values at once via the `WritableSignal<TValue>` on the root form instance.
+  - Task(s) Affected: login-page.spec.ts, register-page.spec.ts
+  - Angular Forms Signals docs confirm: `nameForm().value.set({first: 'John', last: 'Doe'})`
+
+- **Error Type**: Test Error - Angular Component Resolution in Vitest/jsdom
+  - Root Cause: `TestBed.overrideComponent` called inside `beforeEach` after `resolveComponentResources()` already ran in the global `beforeAll` (test.ts). Using `overrideComponent` re-registered the component's metadata with a new template, but Angular's JIT cache still saw it as unresolved from the original `templateUrl`/`styleUrl` declarations.
+  - Solution: Remove `TestBed.overrideComponent` entirely. The global `resolveComponentResources()` in `test.ts` beforeAll is sufficient to resolve both `templateUrl` and `styleUrl` for all components including `RegisterPageComponent`. The component renders correctly without template override.
+  - Task(s) Affected: register-page.spec.ts
+
+- **Error Type**: Test Error - Mock Observable timing for error$ in LoginPageComponent
+  - Root Cause: Using `of(null)` for `error$` mock meant the mock was captured at time of test setup. When the test updated `mockAuthFacade.error$` to `of('Invalid credentials')`, the component's `error$` reference still pointed to the old `of(null)` stream.
+  - Solution: Use `BehaviorSubject` for both `error$` and `isLoading$` mocks, and call `.next()` to update the value. The component's `error$` reference then picks up the new value reactively.
+  - Task(s) Affected: login-page.spec.ts
+
+### Commands Used
+
+- `npx vitest --run` (in `c:\Users\lusca\Desktop\coffee-auth-mfe`)
+
+### Test Coverage
+
+All 9 test files, 110 tests:
+
+- `auth.routes.spec.ts` (5 tests) — AUTH_ROUTES structure
+- `app.spec.ts` (2 tests) — AppComponent bootstrap
+- `event-bus.service.spec.ts` (9 tests) — EventBusService emit/listen
+- `auth.effects.spec.ts` (19 tests) — login, register, logout, hydrate effects + event emission
+- `auth.facade.spec.ts` (10 tests) — AuthFacade dispatch/selector wiring
+- `auth.reducer.spec.ts` (14 tests) — state transitions for all actions
+- `auth.selectors.spec.ts` (8 tests) — all selectors
+- `login-page.spec.ts` (18 tests) — form validation, submit, error display, password toggle
+- `register-page.spec.ts` (25 tests) — form validation, submit, password/confirm toggles, error display
+
+### Learnings
+
+- Angular Forms Signals `form()` API: field path accessors (e.g., `form.email`) are for schema/validators, NOT for setting values in tests. Use `form().value.set({...})` to update field values.
+- `TestBed.overrideComponent` inside `beforeEach` conflicts with the global `resolveComponentResources()` run in `test.ts`'s `beforeAll`. Avoid `overrideComponent` unless the component truly needs a different template.
+- Always use `BehaviorSubject` for mocking observables in Angular tests when you need to update mock values between tests.
