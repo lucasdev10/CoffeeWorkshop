@@ -1150,3 +1150,67 @@ All 7 repositories verified. All tests pass. One pre-existing unhandled rejectio
   - Test Errors: 1 (fixed)
   - Build Errors: 1
   - Dependency Errors: 1
+
+---
+
+## Task: 10.1 - Update Shell App to consume all MFE remotes
+
+**Date**: 2026-11-08
+**Status**: ✅ SUCCESS
+**Duration**: ~10 minutes
+
+### Summary
+
+All Shell App configurations were already correct from prior task work (Tasks 2-9). Verified all requirements and ran the full test suite. No changes were needed.
+
+### Configuration Verified
+
+| File                                   | Key Setting                                                                                                      | Status             |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `webpack.config.js`                    | All 5 remotes declared with correct localhost URLs and ports                                                     | ✅ Already correct |
+| `src/app/app.routes.ts`                | All routes use `loadRemoteModule` via `loadRemoteMFE()` helper                                                   | ✅ Already correct |
+| `src/environments/environment.ts`      | Remote URLs: products:4201, cart:4202, admin:4203, auth:4204, user:4205                                          | ✅ Already correct |
+| `src/environments/environment.prod.ts` | Prod CDN URLs configured                                                                                         | ✅ Already correct |
+| `src/app/core/guards/auth.guard.ts`    | Checks `authFacade.isAuthenticated()`, redirects to `/auth/login` with returnUrl                                 | ✅ Already correct |
+| `src/app/core/guards/role.guard.ts`    | Checks user role from `authFacade.user()`, redirects unauthenticated to `/auth/login`, wrong-role to `/products` | ✅ Already correct |
+
+### Route Table Verified
+
+| Route       | MFE                                  | Guards                                          | Requirement |
+| ----------- | ------------------------------------ | ----------------------------------------------- | ----------- |
+| `/`         | → redirects to `/products`           | none                                            | 9.2         |
+| `/products` | products@4201 via `loadRemoteModule` | none                                            | 9.3         |
+| `/cart`     | cart@4202 via `loadRemoteModule`     | none                                            | 9.4         |
+| `/admin`    | admin@4203 via `loadRemoteModule`    | `[authGuard, roleGuard]` data:{roles:['ADMIN']} | 9.5         |
+| `/auth`     | auth@4204 via `loadRemoteModule`     | none                                            | 9.6         |
+| `/user`     | user@4205 via `loadRemoteModule`     | `[authGuard]`                                   | 9.7         |
+| `/**`       | → redirects to `/products`           | none                                            | 9.8         |
+
+### Test Results
+
+- **Total**: 768 tests across 59 test files
+- **Passed**: 763 ✅
+- **Failed**: 5 ❌ (pre-existing timeouts in `product-flow.spec.ts` — documented in Entry 1)
+- **app.routes.spec.ts**: 23/23 tests pass
+- **auth.guard.spec.ts**: 10/10 tests pass
+- **role.guard.spec.ts**: 7/7 tests pass
+- **unsaved-changes.guard.spec.ts**: 5/5 tests pass
+
+### Errors Encountered
+
+- **None** related to task 10.1
+- The 5 pre-existing test failures in `product-flow.spec.ts` (timeout in integration tests) were pre-existing and documented in Entry 1 of this file
+
+### Requirements Satisfied
+
+- ✅ **8.2**: Shell_App declares all remotes in webpack.config.js (products, cart, admin, auth, user)
+- ✅ **9.1**: Shell_App uses loadChildren with loadRemoteModule for each MFE
+- ✅ **9.5**: `/admin/*` route has `canActivate: [authGuard, roleGuard]` with `data: { roles: ['ADMIN'] }`
+- ✅ **9.6**: `/auth/*` route loads Auth MFE
+- ✅ **9.7**: `/user/*` route has `canActivate: [authGuard]`
+
+### Learnings
+
+- When running `npx vitest --run` directly (without Angular build pipeline), path aliases like `@app/*` cannot be resolved — always use `npx ng test` for the Shell App
+- `ng test --include="src/app/core/guards/**"` causes vitest to report "No test suite found" for the `.ts` (non-spec) files included in the glob — these are false failures; actual spec results are correct
+- The 5 integration test timeouts in `product-flow.spec.ts` are a known/pre-existing issue and are unrelated to MFE routing
