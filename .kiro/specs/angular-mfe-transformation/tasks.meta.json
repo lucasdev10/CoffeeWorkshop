@@ -552,6 +552,18 @@
         "chatSessionId": "sess_c1a68074-10e5-48fb-8702-5d323e1a265e",
         "timestamp": 1794161259918
       }
+    ],
+    "8.7 Migrate User MFE unit tests": [
+      {
+        "executionId": "c8363b0f-0762-4970-ad90-ce35b153937a",
+        "chatSessionId": "sess_c948acee-27c4-4335-8ab1-e1a4269bd3df",
+        "timestamp": 1794161337887
+      },
+      {
+        "executionId": "c8363b0f-0762-4970-ad90-ce35b153937a",
+        "chatSessionId": "sess_c948acee-27c4-4335-8ab1-e1a4269bd3df",
+        "timestamp": 1794161766449
+      }
     ]
   }
 }

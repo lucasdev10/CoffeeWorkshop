@@ -506,7 +506,7 @@ END
     - Configure route "settings" for SettingsPage
     - Inject global Store to verify authentication
     - _Requirements: 6.5, 6.11_
-  - [ ]\* 8.7 Migrate User MFE unit tests
+  - [x] 8.7 Migrate User MFE unit tests
     - Move user page unit tests from monolith
     - Test profile update flows
     - Test event emission
